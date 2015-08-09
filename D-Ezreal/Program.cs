@@ -772,7 +772,7 @@ namespace D_Ezreal
             }
         }
 
-        // By Diabaths
+        
         private static void UseRcombo()
         {
             var target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
