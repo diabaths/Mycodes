@@ -786,7 +786,7 @@ namespace D_Ezreal
             if (target.HasBuff("JudicatorIntervention") || target.HasBuff("Undying Rage")) return;
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
             {
-                if (_player.Distance(target) > minrange && _r.GetPrediction(target).Hitchance >= HitChance.High)
+                if (_player.Distance(target) >= minrange && _r.GetPrediction(target).Hitchance >= HitChance.High)
                 {
                     if (_config.Item("castRezreal" + target.BaseSkinName) != null &&
                         _config.Item("castRezreal" + target.BaseSkinName).GetValue<bool>() == true)

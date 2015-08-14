@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D-Ezreal", "D-Ezreal\D-Ezreal.csproj", "{52AA620D-10DE-4CA0-8830-4A14B800DBED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D-Elise", "D-Elise\D-Elise.csproj", "{95540618-CE2A-4928-BDBD-44B836596297}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_Nidalee", "D_Nidalee\D_Nidalee.csproj", "{F0B83009-0690-4427-A04B-41C52984B7AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{52AA620D-10DE-4CA0-8830-4A14B800DBED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52AA620D-10DE-4CA0-8830-4A14B800DBED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52AA620D-10DE-4CA0-8830-4A14B800DBED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95540618-CE2A-4928-BDBD-44B836596297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95540618-CE2A-4928-BDBD-44B836596297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95540618-CE2A-4928-BDBD-44B836596297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95540618-CE2A-4928-BDBD-44B836596297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0B83009-0690-4427-A04B-41C52984B7AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0B83009-0690-4427-A04B-41C52984B7AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0B83009-0690-4427-A04B-41C52984B7AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0B83009-0690-4427-A04B-41C52984B7AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
