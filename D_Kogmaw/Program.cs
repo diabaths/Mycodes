@@ -795,7 +795,7 @@ namespace D_Kogmaw
                 if (_e.IsReady() && useE && minion.Distance(_player.Position) < _e.Range &&
                     minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.E))
                 {
-                    _q.Cast(minion);
+                    _e.Cast(minion);
                 }
             }
         }
