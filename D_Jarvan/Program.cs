@@ -480,19 +480,18 @@ namespace D_Jarvan
                         ComboDamage(t) > t.Health)
                         _r.CastIfHitchanceEquals(t, HitChance.Medium);
             }
-            if (useE && _e.IsReady() && t.IsValidTarget(_q.Range) && _q.IsReady())
+            if (useE && _e.IsReady() && t.IsValidTarget(_e.Range) && _q.IsReady())
             {
-                //xsalice Code
-                var vec = t.ServerPosition - _player.ServerPosition;
-                var castBehind = _e.GetPrediction(t).CastPosition + Vector3.Normalize(vec) * 100;
-                _e.Cast(castBehind);
+                var predE = _e.GetPrediction(t);
+                if (predE.Hitchance >= _e.MinHitChance &&
+                    _e.Cast(predE.UnitPosition.Extend(
+                            _player.ServerPosition, -_e.Width/(t.IsFacing(_player) ? 2 : 1))))
+                 if (useQ && t.IsValidTarget(_e.Range) && _q.IsReady() && _epos != default(Vector3) &&
+                        t.IsValidTarget(200, true, _epos))
+                    {
+                        _q.Cast(predE.UnitPosition);
+                    }
             }
-            if (useQ && t.IsValidTarget(_q.Range) && _q.IsReady() && _epos != default(Vector3) &&
-                t.IsValidTarget(200, true, _epos))
-            {
-                _q.Cast(_epos);
-            }
-
             if (useW && _w.IsReady())
             {
                 if (t.IsValidTarget(_w.Range))
@@ -1108,19 +1107,19 @@ namespace D_Jarvan
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.68f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkOrange,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.68f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkRed,
                         "Smite Jungle Off");
                 if (_config.Item("smitecombo").GetValue<bool>())
                 {
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.66f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkOrange,
                         "Smite Target On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.66f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkRed,
                         "Smite Target Off");
             }
             if (_config.Item("CircleLag").GetValue<bool>())

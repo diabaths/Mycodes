@@ -1006,25 +1006,23 @@ namespace D_Nidalee
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            var cat = Drawing.WorldToScreen(Player.Position);
-
-            if (Config.Item("Drawsmite").GetValue<bool>())
+            if (_config.Item("Drawsmite").GetValue<bool>())
             {
-                if (Config.Item("Usesmite").GetValue<KeyBind>().Active)
+                if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.68f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkOrange,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.68f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkRed,
                         "Smite Jungle Off");
-                if (Config.Item("smitecombo").GetValue<bool>())
+                if (_config.Item("smitecombo").GetValue<bool>())
                 {
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.66f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkOrange,
                         "Smite Target On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.90f, Drawing.Height * 0.66f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkRed,
                         "Smite Target Off");
             }
             if (Config.Item("CircleLag").GetValue<bool>())
