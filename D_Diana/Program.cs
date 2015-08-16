@@ -1125,7 +1125,7 @@ namespace D_Diana
                 if (unit == ObjectManager.Player.Name && (name == "dianaarcthrow"))
                 {
                     _qpos = spell;
-                    _qcreated = false;
+                    _qcreated = true;
                     return;
                 }
                 // credits 100% to brian0305
