@@ -140,8 +140,7 @@ namespace D_Kogmaw
             _config.SubMenu("items")
                 .SubMenu("Offensive")
                 .AddItem(new MenuItem("Hextechmyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("usedfg", "Use DFG")).SetValue(true);
-            //Deffensive
+           //Deffensive
             _config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
             _config.SubMenu("items").SubMenu("Deffensive").AddSubMenu(new Menu("Cleanse", "Cleanse"));
             _config.SubMenu("items")
@@ -615,11 +614,7 @@ namespace D_Kogmaw
             var ignitecombo = _config.Item("UseIgnitecombo").GetValue<bool>();
             var rLim = _config.Item("RlimC").GetValue<Slider>().Value;
             UseItemes();
-            if (etarget.IsValidTarget(_dfg.Range) && _config.Item("usedfg").GetValue<bool>() &&
-                _dfg.IsReady() && etarget.Health <= ComboDamage(etarget))
-            {
-                _dfg.Cast(etarget);
-            }
+            
             if (_igniteSlot != SpellSlot.Unknown && ignitecombo &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {

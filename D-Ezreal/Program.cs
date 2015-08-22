@@ -168,8 +168,7 @@ namespace D_Ezreal
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hextech", "Hextech Gunblade")).SetValue(true);
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("HextechEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hextechmyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("usedfg", "Use DFG")).SetValue(true);
-
+            
             _config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
             _config.SubMenu("items").SubMenu("Deffensive").AddSubMenu(new Menu("Cleanse", "Cleanse"));
             _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("useqss", "Use QSS/Mercurial Scimitar/Dervish Blade")).SetValue(true);
@@ -484,11 +483,7 @@ namespace D_Ezreal
             var useW = _config.Item("UseWC").GetValue<bool>();
             var useR = _config.Item("UseRcombo").GetValue<bool>();
             UseItemes();
-            if (target.IsValidTarget(_dfg.Range) && _config.Item("usedfg").GetValue<bool>() &&
-                _dfg.IsReady() && target.Health <= ComboDamage(target))
-            {
-                _dfg.Cast(target);
-            }
+            
             if (target.IsValidTarget(600) && _igniteSlot != SpellSlot.Unknown && ignitecombo &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
@@ -580,11 +575,6 @@ namespace D_Ezreal
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
             if (Items.HasItem(3146) && Items.CanUseItem(3146))
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hexgun);
-            if (Items.HasItem(3128) && Items.CanUseItem(3128))
-            {
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Dfg);
-                dmg = dmg * 1.2;
-            }
             if (ObjectManager.Player.GetSpellSlot("SummonerIgnite") != SpellSlot.Unknown)
             {
                 dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);

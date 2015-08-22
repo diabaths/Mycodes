@@ -163,8 +163,7 @@ namespace D_Nidalee
             Config.SubMenu("items")
                 .SubMenu("Offensive")
                 .AddItem(new MenuItem("Blademyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
-            Config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("UseItemsdfg", "Use DFG")).SetValue(true);
-            Config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
+          UseItemsdfg Config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
             Config.SubMenu("items")
                 .SubMenu("Deffensive")
                 .AddItem(new MenuItem("Omen", "Use Randuin Omen"))
@@ -589,16 +588,10 @@ namespace D_Nidalee
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            var itemsDfg = Config.Item("UseItemsdfg").GetValue<bool>();
             var itemsIgnite = Config.Item("UseItemsignite").GetValue<bool>();
             if (target == null) return;
             Smiteontarget();
-            if (_dfg.IsReady() && target.HasBuff("nidaleepassivehunted", true) &&
-                Player.Distance(target) <= _dfg.Range && itemsDfg &&
-                target.Health <= ComboDamage(target))
-            {
-                _dfg.Cast(target);
-            }
+            
             if (itemsIgnite && IgniteSlot != SpellSlot.Unknown &&
                 Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
             {

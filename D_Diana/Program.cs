@@ -90,7 +90,6 @@ namespace D_Diana
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseIgnitecombo", "Use Ignite(rush for it)")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseItems", "Use DFG")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("smitecombo", "Use Smite in target")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W")).SetValue(true);
@@ -609,11 +608,7 @@ namespace D_Diana
             var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
 
             Smiteontarget();
-            if (target.IsValidTarget(_dfg.Range) && _config.Item("UseItems").GetValue<bool>() &&
-                _dfg.IsReady() && target.Health <= ComboDamage(target))
-            {
-                _dfg.Cast(target);
-            }
+            
             if (target.IsValidTarget(600) && _igniteSlot != SpellSlot.Unknown && ignitecombo &&
                   _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
@@ -654,11 +649,7 @@ namespace D_Diana
             var target = t;
             var ignitecombo = _config.Item("UseIgnitecombo").GetValue<bool>();
             Smiteontarget();
-            if (t.IsValidTarget(_dfg.Range) && _config.Item("UseItems").GetValue<bool>() &&
-               _dfg.IsReady() && t.Health <= ComboDamage(target))
-            {
-                _dfg.Cast(target);
-            }
+            
             if (_igniteSlot != SpellSlot.Unknown && ignitecombo && target.IsValidTarget(600) &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {

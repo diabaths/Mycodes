@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{539F08C1-D35F-4861-B011-2AE60063D5DB}</ProjectGuid>
+    <ProjectGuid>{534215D4-415A-4BE9-8FB7-3044C6A819C2}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>D_Kogmaw</RootNamespace>
-    <AssemblyName>D_Kogmaw</AssemblyName>
+    <RootNamespace>D_Kayle</RootNamespace>
+    <AssemblyName>D_Kayle</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PreBuildEvent />
