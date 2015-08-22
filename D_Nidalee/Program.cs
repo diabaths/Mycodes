@@ -689,11 +689,7 @@ namespace D_Nidalee
             {
                 dmg += Player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
             }
-            if (Items.HasItem(3128) && Items.CanUseItem(3128))
-            {
-                dmg += Player.GetItemDamage(hero, Damage.DamageItems.Dfg);
-                dmg = dmg * 1.2;
-            }
+            
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
                 dmg += Player.GetItemDamage(hero, Damage.DamageItems.Botrk);
             if (Items.HasItem(3144) && Items.CanUseItem(3144))

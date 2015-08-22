@@ -811,11 +811,7 @@ namespace D_Diana
                 dmg += _player.GetSpellDamage(hero, SpellSlot.W);
             if (_r.IsReady())
                 dmg += _player.GetSpellDamage(hero, SpellSlot.R);
-            if (Items.HasItem(3128))
-            {
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Dfg);
-                dmg = dmg * 1.2;
-            }
+           
             if (ObjectManager.Player.GetSpellSlot("SummonerIgnite") != SpellSlot.Unknown)
             {
                 dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);

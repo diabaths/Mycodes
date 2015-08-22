@@ -633,11 +633,7 @@ namespace D_Kayle
                 damage += _player.GetSpellDamage(enemy, SpellSlot.E);
                 damage = damage + _player.GetAutoAttackDamage(enemy, true) * 4;
             }
-            if (Items.HasItem(3128) && Items.CanUseItem(3128))
-            {
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Dfg);
-                damage = damage * 1.2;
-            }
+            
             if (itemscheck &&
                 ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
             {
