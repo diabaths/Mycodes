@@ -163,7 +163,7 @@ namespace D_Nidalee
             Config.SubMenu("items")
                 .SubMenu("Offensive")
                 .AddItem(new MenuItem("Blademyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
-          UseItemsdfg Config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
+           Config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
             Config.SubMenu("items")
                 .SubMenu("Deffensive")
                 .AddItem(new MenuItem("Omen", "Use Randuin Omen"))
