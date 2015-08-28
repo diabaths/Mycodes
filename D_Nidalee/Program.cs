@@ -138,13 +138,13 @@ namespace D_Nidalee
 
             //Extra
             Config.AddSubMenu(new Menu("Heal", "Heal"));
-            Config.SubMenu("Heal").AddItem(new MenuItem("UseAutoE", "Use auto E")).SetValue(true);
+            Config.SubMenu("Heal").AddItem(new MenuItem("MPPercent", "Mana percent")).SetValue(new Slider(40, 1, 100));
+            Config.SubMenu("Heal").AddItem(new MenuItem("AutoSwitchform", "Auto Switch Forms")).SetValue(true);
+            Config.SubMenu("Heal").AddItem(new MenuItem("UseAutoE", "Use Heal(E)")).SetValue(true);
             Config.SubMenu("Heal").AddItem(new MenuItem("HPercent", "Health percent")).SetValue(new Slider(40, 1, 100));
-            Config.SubMenu("Heal").AddItem(new MenuItem("AllyUseAutoE", "Ally Use auto E")).SetValue(true);
-            Config.SubMenu("Heal")
-                .AddItem(new MenuItem("AllyHPercent", "Health percent"))
-                .SetValue(new Slider(40, 1, 100));
-
+            Config.SubMenu("Heal").AddItem(new MenuItem("AllyUseAutoE", "Ally Use Heal(E)")).SetValue(true);
+            Config.SubMenu("Heal").AddItem(new MenuItem("AllyHPercent", " Ally Health percent")).SetValue(new Slider(40, 1, 100));
+           
             Config.AddSubMenu(new Menu("items", "items"));
             Config.SubMenu("items").AddSubMenu(new Menu("Offensive", "Offensive"));
             Config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Tiamat", "Use Tiamat")).SetValue(true);
@@ -325,7 +325,10 @@ namespace D_Nidalee
             {
                 Escapeterino();
             }
-            AllyAutoE();
+            if (Config.Item("AllyUseAutoE").GetValue<bool>())
+            {
+                AllyAutoE();
+            }
             Cooldowns();
             Player = ObjectManager.Player;
             QC = new Spell(SpellSlot.Q, Player.AttackRange + 50);
@@ -904,19 +907,27 @@ namespace D_Nidalee
         {
             if (Player.Spellbook.CanUseSpell(SpellSlot.E) == SpellState.Ready && Player.IsMe)
             {
-
+                var forms = Config.Item("AutoSwitchform").GetValue<bool>();
+                var health = Player.Health <= (Player.MaxHealth*(Config.Item("HPercent").GetValue<Slider>().Value)/100);
+                var mana = Player.Mana >= (Player.MaxMana*(Config.Item("MPPercent").GetValue<Slider>().Value)/100);
                 if (Player.HasBuff("Recall") || Player.InFountain()) return;
-
-                if (E.IsReady() &&
-                    Player.Health <= (Player.MaxHealth * (Config.Item("HPercent").GetValue<Slider>().Value) / 100))
+                if (E.IsReady() && health)
                 {
-                    Player.Spellbook.CastSpell(SpellSlot.E, Player);
+                    if (IsHuman && mana)
+                    {
+                        Player.Spellbook.CastSpell(SpellSlot.E, Player);
+                    }
+
+                    else if (IsCougar && R.IsReady() && mana && forms)
+                    {
+                        R.Cast();
+                        Player.Spellbook.CastSpell(SpellSlot.E, Player);
+                    }
                 }
-
             }
-
-
         }
+
+
 
         private static void LastHit()
         {
@@ -936,13 +947,24 @@ namespace D_Nidalee
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly && !hero.IsMe))
             {
+                var forms = Config.Item("AutoSwitchform").GetValue<bool>();
+                var mana = Player.Mana >= (Player.MaxMana*(Config.Item("MPPercent").GetValue<Slider>().Value)/100);
                 if (Player.HasBuff("Recall") || hero.HasBuff("Recall") || hero.InFountain()) return;
-                if (E.IsReady() && Config.Item("AllyUseAutoE").GetValue<bool>() &&
-                    (hero.Health / hero.MaxHealth) * 100 <= Config.Item("AllyHPercent").GetValue<Slider>().Value &&
+                if (E.IsReady() &&
+                    (hero.Health/hero.MaxHealth)*100 <= Config.Item("AllyHPercent").GetValue<Slider>().Value &&
                     Utility.CountEnemiesInRange(1200) > 0 &&
                     hero.Distance(Player.ServerPosition) <= E.Range)
                 {
-                    E.Cast(hero);
+                    if (IsHuman && mana)
+                    {
+                        Player.Spellbook.CastSpell(SpellSlot.E, hero);
+                    }
+
+                    else if (IsCougar && R.IsReady() && mana && forms)
+                    {
+                        R.Cast();
+                        Player.Spellbook.CastSpell(SpellSlot.E, hero);
+                    }
                 }
             }
         }
