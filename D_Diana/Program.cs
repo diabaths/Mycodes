@@ -286,7 +286,7 @@ namespace D_Diana
 
             _config.AddToMainMenu();
 
-            new AssassinManager();
+            //new AssassinManager();
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             GameObject.OnCreate += OnCreate;
@@ -295,7 +295,7 @@ namespace D_Diana
             Game.PrintChat(
                 "<font color='#FF0000'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#FF9900'>ssssssssssmith@hotmail.com</font> (10) S");
 
-            // Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+            //Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
@@ -392,6 +392,7 @@ namespace D_Diana
                 AutoW();
             }*/
         }
+       
         private static int[] Style()
         {
             switch (_config.Item("dianaStyle").GetValue<StringList>().SelectedIndex)
@@ -422,10 +423,16 @@ namespace D_Diana
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe)
+            var spell = args.SData;
+            if (!sender.IsMe)
             {
-                // Game.PrintChat("Spell name: " + args.SData.Name.ToString());
+                return;
             }
+           
+           /*if (sender.IsMe)
+            {
+                 Game.PrintChat("Spell name: " + args.SData.Name.ToString());
+            }*/
         }
         private static void Usecleanse()
         {
@@ -1119,66 +1126,66 @@ namespace D_Diana
                 }
                 // credits 100% to brian0305
                 if (missile.IsValid)
-                {
-                    if (caster.IsEnemy)
-                    {
-                        if (_config.Item("AutoShield").GetValue<bool>() && _w.IsReady())
-                        {
-                            var shieldBuff = new Int32[] {40, 55, 70, 85, 100}[_w.Level - 1] +
-                                             1.3*_player.FlatMagicDamageMod;
-                            if (spell.SData.Name.Contains("BasicAttack"))
-                            {
-                                if (spell.Target.IsMe && _player.Health <= caster.GetAutoAttackDamage(_player, true) &&
-                                    _player.Health + shieldBuff > caster.GetAutoAttackDamage(_player, true) &&
-                                    caster.IsValidTarget(_w.Range) && _w.IsReady()) _w.Cast();
-                            }
-                            else if (spell.Target.IsMe || spell.EndPosition.Distance(_player.Position) <= 130)
-                            {
-                                if (spell.SData.Name == "summonerdot")
-                                {
-                                    if (_player.Health <=
-                                        (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
-                                            Damage.SummonerSpell.Ignite) &&
-                                        _player.Health + shieldBuff >
-                                        (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
-                                            Damage.SummonerSpell.Ignite) && _w.IsReady())
-                                        _w.Cast();
-                                }
-                                else if (_player.Health <=
-                                         (caster as Obj_AI_Hero).GetSpellDamage(_player,
-                                             (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) &&
+                 {
+                     if (caster.IsEnemy)
+                     {
+                         if (_config.Item("AutoShield").GetValue<bool>() && _w.IsReady())
+                         {
+                             var shieldBuff = new Int32[] {40, 55, 70, 85, 100}[_w.Level - 1] +
+                                              1.3*_player.FlatMagicDamageMod;
+                             if (spell.SData.Name.Contains("BasicAttack"))
+                             {
+                                 if (spell.Target.IsMe && _player.Health <= caster.GetAutoAttackDamage(_player, true) &&
+                                     _player.Health + shieldBuff > caster.GetAutoAttackDamage(_player, true) &&
+                                     caster.IsValidTarget(_w.Range) && _w.IsReady()) _w.Cast();
+                             }
+                             else if (spell.Target.IsMe || spell.EndPosition.Distance(_player.Position) <= 130)
+                             {
+                                 if (spell.SData.Name == "summonerdot")
+                                 {
+                                     if (_player.Health <=
+                                         (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
+                                             Damage.SummonerSpell.Ignite) &&
                                          _player.Health + shieldBuff >
-                                         (caster as Obj_AI_Hero).GetSpellDamage(_player,
-                                             (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) && _w.IsReady())
-                                    _w.Cast();
-                            }
-                        }
+                                         (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
+                                             Damage.SummonerSpell.Ignite) && _w.IsReady())
+                                         _w.Cast();
+                                 }
+                                 else if (_player.Health <=
+                                          (caster as Obj_AI_Hero).GetSpellDamage(_player,
+                                              (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) &&
+                                          _player.Health + shieldBuff >
+                                          (caster as Obj_AI_Hero).GetSpellDamage(_player,
+                                              (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) && _w.IsReady())
+                                     _w.Cast();
+                             }
+                         }
 
-                        /*  if (_config.Item("zhonyas").GetValue<bool>() && _zhonya.IsReady())
-                          {
-                              if (spell.SData.Name.Contains("BasicAttack"))
-                              {
-                                  if (spell.Target.IsMe && _player.Health+150 <= caster.GetAutoAttackDamage(_player, true))
-                                  _zhonya.Cast();
+                         /*  if (_config.Item("zhonyas").GetValue<bool>() && _zhonya.IsReady())
+                           {
+                               if (spell.SData.Name.Contains("BasicAttack"))
+                               {
+                                   if (spell.Target.IsMe && _player.Health+150 <= caster.GetAutoAttackDamage(_player, true))
+                                   _zhonya.Cast();
 
-                              }
-                              else if (spell.Target.IsMe || spell.EndPosition.Distance(_player.Position) <= 130)
-                              {
-                                  if (spell.SData.Name == "summonerdot")
-                                  {
-                                      if (_player.Health +150<=
-                                          (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
-                                              Damage.SummonerSpell.Ignite))
-                                          _zhonya.Cast();
-                                  }
-                                  else if (_player.Health +150<=
-                                           (caster as Obj_AI_Hero).GetSpellDamage(_player,
-                                               (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) )
-                                      _zhonya.Cast();
-                              }
-                          }*/
-                    }
-                }
+                               }
+                               else if (spell.Target.IsMe || spell.EndPosition.Distance(_player.Position) <= 130)
+                               {
+                                   if (spell.SData.Name == "summonerdot")
+                                   {
+                                       if (_player.Health +150<=
+                                           (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
+                                               Damage.SummonerSpell.Ignite))
+                                           _zhonya.Cast();
+                                   }
+                                   else if (_player.Health +150<=
+                                            (caster as Obj_AI_Hero).GetSpellDamage(_player,
+                                                (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) )
+                                       _zhonya.Cast();
+                               }
+                           }*/
+                     }
+                 }
             }
         }
 
