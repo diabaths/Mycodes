@@ -54,10 +54,10 @@ namespace D_Diana
 
             _q = new Spell(SpellSlot.Q, 830f);
             _w = new Spell(SpellSlot.W, 200f);
-            _e = new Spell(SpellSlot.E, 420f);
+            _e = new Spell(SpellSlot.E, 450f);
             _r = new Spell(SpellSlot.R, 825f);
 
-            _q.SetSkillshot(0.35f, 200f, 1800, false, SkillshotType.SkillshotCircle);
+            _q.SetSkillshot(0.35f, 190f, 1800, false, SkillshotType.SkillshotCircle);
 
             SpellList.Add(_q);
             SpellList.Add(_w);
@@ -96,7 +96,7 @@ namespace D_Diana
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseRSecond", "Use Second R")).SetValue(false);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRSecond", "Use Second R")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("Normalcombo", "Q-R Combo")).SetValue(true);
             _config.Item("Normalcombo").ValueChanged += SwitchCombo;
             _config.SubMenu("Combo").AddItem(new MenuItem("Misayacombo", "R-Q Combo").SetValue(false));
@@ -213,6 +213,7 @@ namespace D_Diana
             _config.SubMenu("Farm").AddSubMenu(new Menu("Jungle", "Jungle"));
             _config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseQJungle", "Use Q")).SetValue(true);
             _config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseWJungle", "Use W")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseRJungle", "Use R")).SetValue(true);
             _config.SubMenu("Farm")
                 .SubMenu("Jungle")
                 .AddItem(
@@ -239,7 +240,7 @@ namespace D_Diana
             _config.AddSubMenu(new Menu("Misc", "Misc"));
             //_config.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Usepackes")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("AutoShield", "Auto W")).SetValue(true);
-            // _config.SubMenu("Misc").AddItem(new MenuItem("Shieldper", "Self Health %")).SetValue(new Slider(40, 1, 100));
+            _config.SubMenu("Misc").AddItem(new MenuItem("Shieldper", "Self Health %")).SetValue(new Slider(25, 1, 100));
             _config.SubMenu("Misc")
                 .AddItem(
                     new MenuItem("Escape", "Escape Key!").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
@@ -295,10 +296,10 @@ namespace D_Diana
             Game.PrintChat(
                 "<font color='#FF0000'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#FF9900'>ssssssssssmith@hotmail.com</font> (10) S");
 
-            //Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Orbwalking.AfterAttack += Orbwalking_AfterAttack;
+            //Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             _config.Item("dianaAutoLevel").ValueChanged += LevelUpMode;
             if (_config.Item("dinaAutoLevel").GetValue<bool>())
             {
@@ -387,10 +388,10 @@ namespace D_Diana
                 KillSteal();
             }
             Usecleanse();
-            /* if (_config.Item("AutoShield").GetValue<bool>() && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
+            if (_config.Item("AutoShield").GetValue<bool>() && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 AutoW();
-            }*/
+            }
         }
        
         private static int[] Style()
@@ -428,7 +429,10 @@ namespace D_Diana
             {
                 return;
             }
-           
+            if (spell.Name.ToLower().Contains("dianaarc") || spell.Name.ToLower().Contains("dianaorbs") || spell.Name.ToLower().Contains("dianavortex"))
+            {
+                Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
+            }
            /*if (sender.IsMe)
             {
                  Game.PrintChat("Spell name: " + args.SData.Name.ToString());
@@ -614,6 +618,7 @@ namespace D_Diana
             var useR = _config.Item("UseRCombo").GetValue<bool>();
             var ignitecombo = _config.Item("UseIgnitecombo").GetValue<bool>();
             var qmana = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost;
+            var wmana = _player.Spellbook.GetSpell(SpellSlot.W).ManaCost;
             var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
 
             Smiteontarget();
@@ -645,10 +650,21 @@ namespace D_Diana
             {
                 _e.Cast();
             }
-            if (target.IsValidTarget(_r.Range) && _config.Item("UseRSecond").GetValue<bool>() && _r.IsReady() &&
-                !_w.IsReady() && !_q.IsReady())
+            if (_config.Item("UseRSecond").GetValue<bool>() && target.IsValidTarget(_r.Range))
             {
-                _r.Cast(target);
+                if (target.Health <=
+                    _player.GetSpellDamage(target, SpellSlot.R) + _player.GetSpellDamage(target, SpellSlot.W) +
+                    _player.GetAutoAttackDamage(target, true) && _r.IsReady() && _w.IsReady() && _player.Mana > wmana + rmana)
+                {
+                    _r.Cast(target);
+                    _w.Cast();
+                }
+                if (target.Health <=
+                    _player.GetSpellDamage(target, SpellSlot.R) + _player.GetAutoAttackDamage(target, true) &&
+                    _r.IsReady())
+                {
+                    _r.Cast(target);
+                }
             }
             UseItemes();
         }
@@ -657,8 +673,10 @@ namespace D_Diana
         {
             var target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
             var ignitecombo = _config.Item("UseIgnitecombo").GetValue<bool>();
+            var wmana = _player.Spellbook.GetSpell(SpellSlot.W).ManaCost;
+            var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
             Smiteontarget();
-            
+
             if (_igniteSlot != SpellSlot.Unknown && ignitecombo && target.IsValidTarget(600) &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
@@ -688,14 +706,25 @@ namespace D_Diana
             {
                 _e.Cast();
             }
-            if (target.IsValidTarget(_r.Range) && _config.Item("UseRSecond").GetValue<bool>() && _r.IsReady() &&
-                !_w.IsReady() && !_q.IsReady())
+            if (_config.Item("UseRSecond").GetValue<bool>() && target.IsValidTarget(_r.Range))
             {
-                _r.Cast(target);
+                if (target.Health <=
+                    _player.GetSpellDamage(target, SpellSlot.R) + _player.GetSpellDamage(target, SpellSlot.W) +
+                    _player.GetAutoAttackDamage(target, true) && _r.IsReady() && _w.IsReady() &&
+                    _player.Mana > wmana + rmana)
+                {
+                    _r.Cast(target);
+                    _w.Cast();
+                }
+                if (target.Health <=
+                    _player.GetSpellDamage(target, SpellSlot.R) + _player.GetAutoAttackDamage(target, true) &&
+                    _r.IsReady())
+                {
+                    _r.Cast(target);
+                }
             }
             UseItemes();
         }
-
 
         private static void UseItemes()
         {
@@ -1041,6 +1070,7 @@ namespace D_Diana
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var useQ = _config.Item("UseQJungle").GetValue<bool>();
             var useW = _config.Item("UseWJungle").GetValue<bool>();
+            var useR = _config.Item("UseRJungle").GetValue<bool>();
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
@@ -1051,6 +1081,10 @@ namespace D_Diana
                 if (_w.IsReady() && useW && _player.Distance(mob) < _w.Range)
                 {
                     _w.Cast();
+                }
+                if (_r.IsReady() && useR && _player.Distance(mob) < _r.Range && mob.HasBuff("dianamoonlight", true))
+                {
+                    _r.Cast(mob);
                 }
             }
         }
@@ -1091,16 +1125,16 @@ namespace D_Diana
             }
         }
 
-        /* private static void AutoW()
+        private static void AutoW()
         {
-            if (_player.HasBuff("Recall") || Utility.InFountain()) return;
+            if (_player.HasBuff("Recall") || _player.InFountain()) return;
             if (_w.IsReady() &&
                 _player.Health <= (_player.MaxHealth * (_config.Item("Shieldper").GetValue<Slider>().Value) / 100))
             {
                 _w.Cast();
             }
 
-        }*/
+        }
 
         /* private static bool Packets()
          {
@@ -1125,7 +1159,7 @@ namespace D_Diana
                     return;
                 }
                 // credits 100% to brian0305
-                if (missile.IsValid)
+                /*if (missile.IsValid)
                  {
                      if (caster.IsEnemy)
                      {
@@ -1183,15 +1217,12 @@ namespace D_Diana
                                                 (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) )
                                        _zhonya.Cast();
                                }
-                           }*/
+                           }
                      }
-                 }
+                 }*/
             }
         }
-
-
-
-
+        
         private static void OnDelete(GameObject sender, EventArgs args)
         {//if (sender is Obj_SpellMissile)
             var missile = sender as Obj_SpellMissile;
