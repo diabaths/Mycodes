@@ -71,10 +71,9 @@ namespace D_Ezreal
             _e = new Spell(SpellSlot.E, 475);
             _r = new Spell(SpellSlot.R, 3000);
 
-            _q.SetSkillshot(0.5f, 80f, 1200f, true, SkillshotType.SkillshotLine);
-            _w.SetSkillshot(0.5f, 80f, 1200f, false, SkillshotType.SkillshotLine);
-            _e.SetSkillshot(0.25f, 80f, 1600f, false, SkillshotType.SkillshotCircle);
-            _r.SetSkillshot(1f, 160f, 2000f, false, SkillshotType.SkillshotLine);
+            _q.SetSkillshot(0.25f, 50f, 2000f, true, SkillshotType.SkillshotLine);
+            _w.SetSkillshot(0.25f, 80f, 1600f, false, SkillshotType.SkillshotLine);
+            _r.SetSkillshot(1.1f, 160f, 2000f, false, SkillshotType.SkillshotLine);
 
             _archangel = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ||
               Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
