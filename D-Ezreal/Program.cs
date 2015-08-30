@@ -37,7 +37,7 @@ namespace D_Ezreal
         private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
         private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
         private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
-        private static Items.Item _youmuu, _blade, _bilge, _dfg, _hextech, _archangel;
+        private static Items.Item _youmuu, _blade, _bilge, _hextech, _archangel;
 
         private static void Main(string[] args)
         {
@@ -80,10 +80,6 @@ namespace D_Ezreal
            ? new Items.Item(3048, float.MaxValue)
            : new Items.Item(3040, float.MaxValue);
 
-            _dfg = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ||
-                   Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
-                ? new Items.Item(3188, 750)
-                : new Items.Item(3128, 750);
             _hextech = new Items.Item(3146, 700);
             _youmuu = new Items.Item(3142, 10);
             _bilge = new Items.Item(3144, 450f);
