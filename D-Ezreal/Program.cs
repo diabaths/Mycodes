@@ -142,7 +142,7 @@ namespace D_Ezreal
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != _player.Team))
                 _config.SubMenu("R Factions")
                     .SubMenu("Use R killsteal")
-                    .AddItem(new MenuItem("castRkill" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(false));
+                    .AddItem(new MenuItem("castRkill" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(true));
             _config.SubMenu("R Factions")
                 .AddItem(new MenuItem("Minrange", "Min R range to Use").SetValue(new Slider(800, 0, 1500)));
             _config.SubMenu("R Factions")

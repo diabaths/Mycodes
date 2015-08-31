@@ -387,6 +387,19 @@ namespace D_Nidalee
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
+            var spell = args.SData;
+            if (!sender.IsMe)
+            {
+                return;
+            }
+            if (spell.Name.ToLower().Contains("takedown"))
+            {Game.PrintChat("reset");
+                Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
+            }
+            if (sender.IsMe)
+             {
+                  Game.PrintChat("Spell name: " + args.SData.Name.ToString());
+             }
             if (sender.IsMe && Config.Item("DrawCooldown").GetValue<bool>())
                 //Game.PrintChat("Spell name: " + args.SData.Name.ToString());
                 GetCDs(args);
