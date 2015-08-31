@@ -393,13 +393,13 @@ namespace D_Nidalee
                 return;
             }
             if (spell.Name.ToLower().Contains("takedown"))
-            {Game.PrintChat("reset");
+            {   //Game.PrintChat("reset");
                 Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
             }
-            if (sender.IsMe)
+           /* if (sender.IsMe)
              {
                   Game.PrintChat("Spell name: " + args.SData.Name.ToString());
-             }
+             }*/
             if (sender.IsMe && Config.Item("DrawCooldown").GetValue<bool>())
                 //Game.PrintChat("Spell name: " + args.SData.Name.ToString());
                 GetCDs(args);
