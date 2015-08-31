@@ -46,7 +46,7 @@ namespace D_Graves
             _e = new Spell(SpellSlot.E, 425f);
             _r = new Spell(SpellSlot.R, 1200f);
 
-            _q.SetSkillshot(0.26f, 10f * 2 * (float)Math.PI / 180, 1950, false, SkillshotType.SkillshotCone);
+            _q.SetSkillshot(0.25f, 15f * 2 * (float)Math.PI / 180, 2000, false, SkillshotType.SkillshotCone);
             _w.SetSkillshot(0.30f, 250f, 1650f, false, SkillshotType.SkillshotCircle);
             _r.SetSkillshot(0.22f, 150f, 2100, true, SkillshotType.SkillshotLine);
 
@@ -73,7 +73,7 @@ namespace D_Graves
             _config.SubMenu("Combo").AddSubMenu(new Menu("Use E", "Use E"));
             _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("UseEC", "Use E")).SetValue(true);
             _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("diveintower", "Dive In tower with E")).SetValue(false);
-            _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("UseWHE", "Your HP% Use W >").SetValue(new Slider(65, 1, 100)));
+            _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("UseWHE", "Your HP% to Use E >").SetValue(new Slider(65, 1, 100)));
             _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("EnemyC", "Enemy in R.Range <").SetValue(new Slider(2, 1, 5)));
             _config.SubMenu("Combo").AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -114,7 +114,10 @@ namespace D_Graves
             //Lane Clear
             _config.SubMenu("Farm").AddSubMenu(new Menu("LaneClear", "LaneClear"));
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQL", "Q LaneClear")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("minminions", "Minimum minions to use Q").SetValue(new Slider(3, 1, 6)));
+            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("Qinautoattack range", "Use Q to last hit in autoattack range")).SetValue(true);
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseWL", "W LaneClear")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("minminionsw", "Minimum minions to use W").SetValue(new Slider(3, 1, 5)));
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("Lanemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("ActiveLane", "LaneClear!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
             //Jungle clear
@@ -567,45 +570,58 @@ namespace D_Graves
         {
             if (!Orbwalking.CanMove(40)) return;
 
-            var rangedMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range + _q.Width + 30,
-                MinionTypes.Ranged);
-            var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range + _q.Width + 30,
+            var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All);
+            var allMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range + _w.Width/2,
                 MinionTypes.All);
-            var allMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range, MinionTypes.All);
             var rangedMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range + _w.Width + 50,
                 MinionTypes.Ranged);
+            var minionhitq = _config.Item("minminions").GetValue<Slider>().Value;
+            var minionhitw = _config.Item("minminionsw").GetValue<Slider>().Value;
             var useQl = _config.Item("UseQL").GetValue<bool>();
             var useWl = _config.Item("UseWL").GetValue<bool>();
+            var qinAuto = _config.Item("Qinautoattack").GetValue<bool>();
+
+
             if (_q.IsReady() && useQl)
             {
-                var fl2 = _q.GetLineFarmLocation(allMinionsQ, _q.Width);
+                var fl2 = _q.GetCircularFarmLocation(allMinionsQ, 200);
 
-                if (fl2.MinionsHit >= 3)
+                if (fl2.MinionsHit >= minionhitq)
                 {
                     _q.Cast(fl2.Position);
                 }
                 else
+                {
                     foreach (var minion in allMinionsQ)
-                        if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (Orbwalking.InAutoAttackRange(minion) && qinAuto &&
+                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
+                        {
                             _q.Cast(minion);
+                        }
+                        else if (!Orbwalking.InAutoAttackRange(minion) &&
+                                 minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
+                        {
+                            _q.Cast(minion);
+                        }
+                }
             }
 
             if (_w.IsReady() && useWl)
             {
                 var fl1 = _w.GetCircularFarmLocation(rangedMinionsW, _w.Width);
 
-                if (fl1.MinionsHit >= 3)
+                if (fl1.MinionsHit >= minionhitw)
                 {
                     _w.Cast(fl1.Position);
                 }
                 else
                     foreach (var minion in allMinionsW)
                         if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.W))
+                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W))
                             _w.Cast(minion);
             }
         }
+
 
         private static void LastHit()
         {
