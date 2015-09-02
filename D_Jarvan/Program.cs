@@ -849,7 +849,7 @@ namespace D_Jarvan
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var useblue = _config.Item("Useblue").GetValue<bool>();
             var usered = _config.Item("Usered").GetValue<bool>();
-            var health = (100 * (_player.Mana / _player.MaxMana)) < _config.Item("healthJ").GetValue<Slider>().Value;
+            var health = (100 * (_player.Health / _player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
             var mana = (100 * (_player.Mana / _player.MaxMana)) < _config.Item("manaJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)

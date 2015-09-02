@@ -846,7 +846,7 @@ namespace D_Shyvana
             var jungle = _config.Item("ActiveJungle").GetValue<KeyBind>().Active;
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var usered = _config.Item("Usered").GetValue<bool>();
-            var health = (100 * (_player.Mana / _player.MaxMana)) < _config.Item("healthJ").GetValue<Slider>().Value;
+            var health = (100 * (_player.Health / _player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {

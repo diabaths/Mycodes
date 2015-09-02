@@ -553,7 +553,7 @@ namespace D_Nidalee
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var useblue = Config.Item("Useblue").GetValue<bool>();
             var usered = Config.Item("Usered").GetValue<bool>();
-            var health = (100 * (Player.Mana / Player.MaxMana)) < Config.Item("healthJ").GetValue<Slider>().Value;
+            var health = (100 * (Player.Health / Player.MaxHealth)) < Config.Item("healthJ").GetValue<Slider>().Value;
             var mana = (100 * (Player.Mana / Player.MaxMana)) < Config.Item("manaJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
