@@ -279,7 +279,7 @@ namespace D_RekSai
                 .AddItem(new MenuItem("AutoWMP", "Use W if Fury is >= "))
                 .SetValue(new Slider(100, 1, 100));
             _config.SubMenu("Misc").AddItem(new MenuItem("Inter_W", "Use W to Interrupter")).SetValue(true);
-            _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "GapClosers W")).SetValue(true);
+           // _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "GapClosers W")).SetValue(true);
             _config.SubMenu("Misc")
                 .AddItem(new MenuItem("escapeterino", "Escape!!!"))
                 .SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Press));
@@ -350,7 +350,7 @@ namespace D_RekSai
 
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
-            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             //Orbwalking.AfterAttack += Orbwalking_AfterAttack;
 
         }
