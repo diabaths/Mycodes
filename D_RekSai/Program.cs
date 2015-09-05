@@ -16,8 +16,6 @@ namespace D_RekSai
 
         private static Spell _q, _bq, _w, _e, _be, _r;
 
-        private static bool _qcreated = false;
-
         private static Menu _config;
 
         private static Menu TargetSelectorMenu;
@@ -813,18 +811,25 @@ namespace D_RekSai
                 }
                 if (_config.Item("UseECombo").GetValue<bool>() && _be.IsReady() && t.IsValidTarget(_be.Range))
                 {
-                    if (Prediction.GetPrediction(t, 10).UnitPosition
+                   /* if (Prediction.GetPrediction(t, 10).UnitPosition
                         .Distance(_player.Position) > t.Distance(_player.Position))
                     {
                         var x = Prediction.GetPrediction(t, 500).UnitPosition;
                         var y = _player.Position.Extend(x, _be.Range);
                         _be.Cast(x);
+                    }*/
+                     var predE = _be.GetPrediction(t);
+                    if (predE.Hitchance >= Echange() &&
+                        _be.Cast(predE.UnitPosition.Extend(
+                            _player.ServerPosition, -_be.Width/(t.IsFacing(_player) ? 2 : 1))))
+                    {
+                        _be.Cast(t);
                     }
                 }
                 if (_config.Item("UseWCombo").GetValue<bool>() && _w.IsReady() && t.IsValidTarget(_w.Range) &&
                         !_bq.IsReady())
                 {
-                    _w.Cast();
+                    _w.Cast(t);
                 }
 
             }
@@ -855,14 +860,15 @@ namespace D_RekSai
                 }
                 if (_config.Item("UseWCombo").GetValue<bool>() && _w.IsReady())
                 {
-                    if (!_q.IsReady() && _be.IsReady()
-                       && !(t as Obj_AI_Base).HasBuff("reksaiknockupimmune") && t.IsValidTarget(_be.Range))
+                    if (!_q.IsReady()
+                       && !(t as Obj_AI_Base).HasBuff("reksaiknockupimmune") && t.IsValidTarget(_bq.Range))
                     _w.Cast();
                     /*if (_player.Distance(t) >= 500)
                     {
                         _w.Cast();
                     }*/
                 }
+
             }
             UseItemes();
         }
