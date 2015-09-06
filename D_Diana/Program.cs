@@ -429,7 +429,7 @@ namespace D_Diana
             {
                 return;
             }
-            if (spell.Name.ToLower().Contains("dianaarc") || spell.Name.ToLower().Contains("dianaorbs") || spell.Name.ToLower().Contains("dianavortex"))
+            if (spell.Name.ToLower().Contains("dianaarc") || spell.Name.ToLower().Contains("dianateleport"))
             {
                 Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
             }
