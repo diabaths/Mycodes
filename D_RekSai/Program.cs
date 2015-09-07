@@ -358,9 +358,9 @@ namespace D_RekSai
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            if (_w.Instance.Name.ToLower().Contains("burrowed"))
+            /*if (_w.Instance.Name.ToLower().Contains("burrowed"))
                 burrowed = true;
-            else burrowed = false;
+            else burrowed = false;*/
             _player = ObjectManager.Player;
 
             _orbwalker.SetAttack(true);
@@ -417,6 +417,10 @@ namespace D_RekSai
             {
                 autoburrowed();
             }
+        }
+        private static bool burrowed(this Obj_AI_Hero player)
+        {
+            return player.Spellbook.GetSpell(SpellSlot.Q).Name == "reksaiqburrowed";
         }
 
         public static Vector2? GetFirstWallPoint(Vector3 from, Vector3 to, float step = 25)
