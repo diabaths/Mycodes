@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivir_is_Back", "Sivir_is_B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_RekSai", "D_RekSai\D_RekSai.csproj", "{4EE37ECB-D1B8-45E8-AD92-4368EBBD905A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oriana_by_trelli", "Oriana_by_trelli\Oriana_by_trelli.csproj", "{D8B1D84E-D8D9-439F-933D-393E2F2B136D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orianna_by_trelli", "Oriana_by_trelli\Orianna_by_trelli.csproj", "{D8B1D84E-D8D9-439F-933D-393E2F2B136D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

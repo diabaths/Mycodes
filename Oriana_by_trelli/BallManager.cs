@@ -10,7 +10,7 @@ using ObjectManager = LeagueSharp.ObjectManager;
 
 #endregion
 
-namespace Oriana_by_trelli
+namespace Orianna_by_trelli
 {
     internal class BallManager
     {

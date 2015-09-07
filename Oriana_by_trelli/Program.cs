@@ -9,7 +9,7 @@ using LeagueSharp.Common;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace Oriana_by_trelli
+namespace Orianna_by_trelli
 {
     class Program
     {
