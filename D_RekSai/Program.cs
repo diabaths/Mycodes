@@ -32,13 +32,13 @@ namespace D_RekSai
 
         private static Spell _smite;
 
-        private static bool burrowed = false;
+        //private static bool burrowed = false;
 
         //Credits to Kurisu
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3726, 3723 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
+        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3726, 3723};
+        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719};
+        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714};
+        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707};
 
         private static void Main(string[] args)
         {
@@ -50,7 +50,7 @@ namespace D_RekSai
             _player = ObjectManager.Player;
             if (ObjectManager.Player.BaseSkinName != ChampionName) return;
 
-            _q = new Spell(SpellSlot.Q);
+            _q = new Spell(SpellSlot.Q, 300);
             _bq = new Spell(SpellSlot.Q, 1450);
             _w = new Spell(SpellSlot.W, 200f);
             _bw = new Spell(SpellSlot.W, 200f);
@@ -188,7 +188,7 @@ namespace D_RekSai
                 .SubMenu("Deffensive")
                 .SubMenu("Cleanse")
                 .AddItem(new MenuItem("Cleansemode", "Use Cleanse"))
-                .SetValue(new StringList(new string[2] { "Always", "In Combo" }));
+                .SetValue(new StringList(new string[2] {"Always", "In Combo"}));
             //_config.SubMenu("items").SubMenu("Deffensive").AddItem(new MenuItem("zhonyas", "Use Zhonyas")).SetValue(true); 
             _config.SubMenu("items")
                 .SubMenu("Deffensive")
@@ -308,24 +308,24 @@ namespace D_RekSai
                 .SubMenu("Combo")
                 .AddItem(
                     new MenuItem("BQchange", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance")
                 .SubMenu("Combo")
                 .AddItem(
                     new MenuItem("Echange", "burrowed E HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").AddSubMenu(new Menu("Harass", "Harass"));
             _config.SubMenu("HitChance")
                 .SubMenu("Harass")
                 .AddItem(
                     new MenuItem("BQchangeharass", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").AddSubMenu(new Menu("KillSteal", "KillSteal"));
             _config.SubMenu("HitChance")
                 .SubMenu("KillSteal")
                 .AddItem(
                     new MenuItem("Qchangekill", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -358,9 +358,9 @@ namespace D_RekSai
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            if (_w.Instance.Name.ToLower().Contains("burrowed"))
+            /*if (_w.Instance.Name.ToLower().Contains("burrowed"))
                 burrowed = true;
-            else burrowed = false;
+            else burrowed = false;*/
             _player = ObjectManager.Player;
 
             _orbwalker.SetAttack(true);
@@ -413,15 +413,16 @@ namespace D_RekSai
                  !_config.Item("ActiveLane").GetValue<KeyBind>().Active ||
                  !_config.Item("ActiveJungle").GetValue<KeyBind>().Active ||
                  !_config.Item("escapeterino").GetValue<KeyBind>().Active) &&
-                _config.Item("turnburrowed").GetValue<bool>() && !burrowed)
+                _config.Item("turnburrowed").GetValue<bool>() && !_player.burrowed())
             {
                 autoburrowed();
             }
         }
-       /* private static bool burrowed(this Obj_AI_Hero player)
+
+        private static bool burrowed(this Obj_AI_Hero player)
         {
             return player.Spellbook.GetSpell(SpellSlot.Q).Name == "reksaiqburrowed";
-        }*/
+        }
 
         public static Vector2? GetFirstWallPoint(Vector3 from, Vector3 to, float step = 25)
         {
@@ -434,11 +435,11 @@ namespace D_RekSai
 
             for (float d = 0; d < from.Distance(to); d = d + step)
             {
-                var testPoint = from + d * direction;
+                var testPoint = from + d*direction;
                 var flags = NavMesh.GetCollisionFlags(testPoint.X, testPoint.Y);
                 if (flags.HasFlag(CollisionFlags.Wall) || flags.HasFlag(CollisionFlags.Building))
                 {
-                    return from + (d - step) * direction;
+                    return from + (d - step)*direction;
                 }
             }
 
@@ -448,8 +449,8 @@ namespace D_RekSai
 
         private static void autoburrowed()
         {
-            if (burrowed || _player.HasBuff("recall") || _player.InFountain()) return;
-            if (!burrowed && _w.IsReady())
+            if (_player.burrowed() || _player.HasBuff("recall") || _player.InFountain()) return;
+            if (!_player.burrowed() && _w.IsReady())
             {
                 _w.Cast();
             }
@@ -459,7 +460,7 @@ namespace D_RekSai
         {
             // Walljumper credits to Hellsing
 
-            if (!burrowed && _w.IsReady() && _be.IsReady())
+            if (!_player.burrowed() && _w.IsReady() && _be.IsReady())
                 _w.Cast();
 
             // We need to define a new move position since jumping over walls
@@ -470,14 +471,14 @@ namespace D_RekSai
 
             // Be more precise
             if (wallCheck != null)
-                wallCheck = GetFirstWallPoint((Vector3)wallCheck, Game.CursorPos, 5);
+                wallCheck = GetFirstWallPoint((Vector3) wallCheck, Game.CursorPos, 5);
 
             // Define more position point
-            var movePosition = wallCheck != null ? (Vector3)wallCheck : Game.CursorPos;
+            var movePosition = wallCheck != null ? (Vector3) wallCheck : Game.CursorPos;
 
             // Update fleeTargetPosition
             var tempGrid = NavMesh.WorldToGrid(movePosition.X, movePosition.Y);
-            var fleeTargetPosition = NavMesh.GridToWorld((short)tempGrid.X, (short)tempGrid.Y);
+            var fleeTargetPosition = NavMesh.GridToWorld((short) tempGrid.X, (short) tempGrid.Y);
 
             // Also check if we want to AA aswell
             Obj_AI_Base target = null;
@@ -486,7 +487,7 @@ namespace D_RekSai
             var wallJumpPossible = false;
 
             // Only calculate stuff when our Q is up and there is a wall inbetween
-            if (burrowed && _be.IsReady() && wallCheck != null)
+            if (_player.burrowed() && _be.IsReady() && wallCheck != null)
             {
                 // Get our wall position to calculate from
                 var wallPosition = movePosition;
@@ -494,7 +495,7 @@ namespace D_RekSai
                 // Check 300 units to the cursor position in a 160 degree cone for a valid non-wall spot
                 Vector2 direction = (Game.CursorPos.To2D() - wallPosition.To2D()).Normalized();
                 float maxAngle = 80;
-                float step = maxAngle / 20;
+                float step = maxAngle/20;
                 float currentAngle = 0;
                 float currentStep = 0;
                 bool jumpTriggered = false;
@@ -507,7 +508,7 @@ namespace D_RekSai
                     // Check next angle
                     if ((currentAngle == 0 || currentAngle < 0) && currentStep != 0)
                     {
-                        currentAngle = (currentStep) * (float)Math.PI / 180;
+                        currentAngle = (currentStep)*(float) Math.PI/180;
                         currentStep += step;
                     }
 
@@ -520,11 +521,11 @@ namespace D_RekSai
                     if (currentStep == 0)
                     {
                         currentStep = step;
-                        checkPoint = wallPosition + (_be.Range + 200) * direction.To3D();
+                        checkPoint = wallPosition + (_be.Range + 200)*direction.To3D();
                     }
                     // Rotated check
                     else
-                        checkPoint = wallPosition + _be.Range * direction.Rotated(currentAngle).To3D();
+                        checkPoint = wallPosition + (_be.Range + 200)*direction.Rotated(currentAngle).To3D();
 
                     // Check if the point is not a wall
                     if (!checkPoint.IsWall())
@@ -535,7 +536,7 @@ namespace D_RekSai
                         {
                             // There is a wall inbetween, get the closes point to the wall, as precise as possible
                             Vector3 wallPositionOpposite =
-                                (Vector3)GetFirstWallPoint((Vector3)wallCheck, wallPosition, 5);
+                                (Vector3) GetFirstWallPoint((Vector3) wallCheck, wallPosition, 5);
 
                             // Check if it's worth to jump considering the path length
                             if (_player.GetPath(wallPositionOpposite).ToList().To2D().PathLength() -
@@ -543,7 +544,7 @@ namespace D_RekSai
                             {
                                 // Check the distance to the opposite side of the wall
                                 if (_player.Distance(wallPositionOpposite, true) <
-                                    Math.Pow(_be.Range - _player.BoundingRadius / 2, 2))
+                                    Math.Pow((_be.Range + 200) - _player.BoundingRadius/2, 2))
                                 {
                                     // Make the jump happen
                                     _be.Cast(wallPositionOpposite);
@@ -580,7 +581,7 @@ namespace D_RekSai
             else
             {
                 Orbwalking.Orbwalk(target, Game.CursorPos, 90f, 0f, false, false);
-                if (burrowed && _be.IsReady())
+                if (_player.burrowed() && _be.IsReady())
                     _be.Cast(Game.CursorPos);
             }
         }
@@ -595,7 +596,8 @@ namespace D_RekSai
 
         private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
         {
-            if (burrowed && _bw.IsReady() && unit.IsValidTarget(_q.Range) && _config.Item("Inter_W").GetValue<bool>())
+            if (_player.burrowed() && _bw.IsReady() && unit.IsValidTarget(_q.Range) &&
+                _config.Item("Inter_W").GetValue<bool>())
                 _bw.Cast(unit);
         }
 
@@ -840,22 +842,21 @@ namespace D_RekSai
                     _player.Spellbook.CastSpell(_igniteSlot, t);
                 }
             }
-            if (burrowed)
+            if (_player.burrowed())
             {
+                if (_config.Item("UseECombo").GetValue<bool>())
+                {
+                    var te = TargetSelector.GetTarget(_e.Range + _bw.Range, TargetSelector.DamageType.Physical);
+                    if (_be.IsReady() && te.IsValidTarget(_e.Range + _bw.Range) && _player.Distance(te) > _q.Range)
+                    {
+                        _be.Cast(te.Position - 100);
+                    }
+                }
                 if (_config.Item("UseQCombo").GetValue<bool>())
                 {
                     var tbq = TargetSelector.GetTarget(_bq.Range, TargetSelector.DamageType.Magical);
                     if (_bq.IsReady() && t.IsValidTarget(_bq.Range))
                         _bq.CastIfHitchanceEquals(tbq, BQchange());
-                }
-                if (_config.Item("UseECombo").GetValue<bool>())
-                {
-                    var te = TargetSelector.GetTarget(_e.Range + _bw.Range, TargetSelector.DamageType.Physical);
-                    if (_be.IsReady() && te.IsValidTarget())
-                    {
-                        //_be.CastIfHitchanceEquals(te, Echange());
-                        _be.Cast(te.Position);
-                    }
                 }
                 if (_config.Item("UseWCombo").GetValue<bool>())
                 {
@@ -868,7 +869,7 @@ namespace D_RekSai
                 }
             }
 
-            if (!burrowed)
+            if (!_player.burrowed())
             {
                 if (_config.Item("UseQCombo").GetValue<bool>())
                 {
@@ -916,14 +917,14 @@ namespace D_RekSai
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
                 var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth * (_config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
+                                    (hero.MaxHealth*(_config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
                 var iBilgemyhp = _player.Health <=
-                                 (_player.MaxHealth * (_config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
+                                 (_player.MaxHealth*(_config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
                 var iBlade = _config.Item("Blade").GetValue<bool>();
                 var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth * (_config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
+                                    (hero.MaxHealth*(_config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
                 var iBlademyhp = _player.Health <=
-                                 (_player.MaxHealth * (_config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
+                                 (_player.MaxHealth*(_config.Item("Blademyhp").GetValue<Slider>().Value)/100);
                 var iOmen = _config.Item("Omen").GetValue<bool>();
                 var iOmenenemys = hero.CountEnemiesInRange(450) >= _config.Item("Omenenemys").GetValue<Slider>().Value;
                 var iTiamat = _config.Item("Tiamat").GetValue<bool>();
@@ -957,7 +958,7 @@ namespace D_RekSai
             {
                 foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly || hero.IsMe))
                 {
-                    if (hero.Health <= (hero.MaxHealth * (_config.Item("lotisminhp").GetValue<Slider>().Value) / 100) &&
+                    if (hero.Health <= (hero.MaxHealth*(_config.Item("lotisminhp").GetValue<Slider>().Value)/100) &&
                         hero.Distance(_player.ServerPosition) <= _lotis.Range && _lotis.IsReady())
                         _lotis.Cast();
                 }
@@ -971,7 +972,7 @@ namespace D_RekSai
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
 
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
@@ -1014,13 +1015,13 @@ namespace D_RekSai
         {
             var dmg = 0d;
 
-            if (_q.IsReady() && !burrowed)
+            if (_q.IsReady() && !_player.burrowed())
 
                 dmg += QDamage(hero);
 
-            if (burrowed)
+            if (_player.burrowed())
                 dmg += BqDamage(hero);
-            if (_w.IsReady() && burrowed)
+            if (_w.IsReady() && _player.burrowed())
                 dmg += WDamage(hero);
             if (_e.IsReady())
                 if (_player.Mana < 100)
@@ -1043,8 +1044,8 @@ namespace D_RekSai
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
             if (Items.HasItem(3144) && Items.CanUseItem(3144))
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Bilgewater);
-            dmg += _player.GetAutoAttackDamage(hero, true) * 2;
-            return (float)dmg;
+            dmg += _player.GetAutoAttackDamage(hero, true)*2;
+            return (float) dmg;
         }
 
         private static void Harass()
@@ -1056,17 +1057,17 @@ namespace D_RekSai
             var useItemsH = _config.Item("UseItemsharass").GetValue<bool>();
             if (_config.Item("UseQHarass").GetValue<bool>())
             {
-                if (target.IsValidTarget(_bq.Range) && _bq.IsReady() && burrowed)
+                if (target.IsValidTarget(_bq.Range) && _bq.IsReady() && _player.burrowed())
                 {
                     _bq.CastIfHitchanceEquals(target, BQchangeharass());
                 }
-                if (targetq.IsValidTarget(_q.Range) && _q.IsReady() && !burrowed)
+                if (targetq.IsValidTarget(_q.Range) && _q.IsReady() && !_player.burrowed())
                 {
                     _q.Cast();
                 }
             }
             if (targete.IsValidTarget(_e.Range) && _config.Item("UseEHarass").GetValue<bool>() && _e.IsReady() &&
-                !burrowed && reksaifury)
+                !_player.burrowed() && reksaifury)
             {
                 _e.Cast(targete);
             }
@@ -1085,8 +1086,8 @@ namespace D_RekSai
 
             return _e.IsReady()
                 ? _player.CalcDamage(unit, Damage.DamageType.Physical,
-                    new double[] { 0.8, 0.9, 1, 1.1, 1.2 }[_e.Level - 1] * _player.TotalAttackDamage
-                    * (1 + (_player.Mana / _player.MaxMana)))
+                    new double[] {0.8, 0.9, 1, 1.1, 1.2}[_e.Level - 1]*_player.TotalAttackDamage
+                    *(1 + (_player.Mana/_player.MaxMana)))
                 : 0d;
         }
 
@@ -1095,7 +1096,7 @@ namespace D_RekSai
 
             return _e.IsReady()
                 ? _player.CalcDamage(unit, Damage.DamageType.True,
-                    new double[] { 1.6, 1.8, 2, 2.2, 2.4 }[_e.Level - 1] * _player.TotalAttackDamage)
+                    new double[] {1.6, 1.8, 2, 2.2, 2.4}[_e.Level - 1]*_player.TotalAttackDamage)
                 : 0d;
         }
 
@@ -1103,8 +1104,8 @@ namespace D_RekSai
         {
             return _q.IsReady()
                 ? _player.CalcDamage(unit, Damage.DamageType.Physical,
-                    new double[] { 45, 75, 105, 135, 165 }[_q.Level - 1] +
-                    _player.TotalAttackDamage * 0.6)
+                    new double[] {45, 75, 105, 135, 165}[_q.Level - 1] +
+                    _player.TotalAttackDamage*0.6)
                 : 0d;
         }
 
@@ -1112,7 +1113,7 @@ namespace D_RekSai
         {
             return _bq.IsReady()
                 ? _player.CalcDamage(unit, Damage.DamageType.Magical,
-                    new double[] { 60, 90, 120, 150, 180 }[_bq.Level - 1] + 0.7 * _player.FlatMagicDamageMod)
+                    new double[] {60, 90, 120, 150, 180}[_bq.Level - 1] + 0.7*_player.FlatMagicDamageMod)
                 : 0d;
         }
 
@@ -1120,7 +1121,7 @@ namespace D_RekSai
         {
             return _bq.IsReady()
                 ? _player.CalcDamage(unit, Damage.DamageType.Physical,
-                    new double[] { 40, 80, 120, 160, 200 }[_bq.Level - 1] + 0.4 * _player.TotalAttackDamage)
+                    new double[] {40, 80, 120, 160, 200}[_bq.Level - 1] + 0.4*_player.TotalAttackDamage)
                 : 0d;
 
         }
@@ -1134,7 +1135,7 @@ namespace D_RekSai
             var useW = _config.Item("UseWLane").GetValue<bool>();
             var useE = _config.Item("UseELane").GetValue<bool>();
             var useItemsl = _config.Item("UseItemslane").GetValue<bool>();
-            if (_q.IsReady() && useQ && !burrowed)
+            if (_q.IsReady() && useQ && !_player.burrowed())
             {
                 if (allMinions.Count >= 3)
                 {
@@ -1142,10 +1143,10 @@ namespace D_RekSai
                 }
                 else
                     foreach (var minion in allMinions)
-                        if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
                             _q.Cast();
             }
-            if (_bq.IsReady() && useQ && burrowed)
+            if (_bq.IsReady() && useQ && _player.burrowed())
             {
                 var fl2 = _q.GetCircularFarmLocation(allMinions, 400);
 
@@ -1155,10 +1156,10 @@ namespace D_RekSai
                 }
                 else
                     foreach (var minion in allMinions)
-                        if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
                             _bq.Cast(minion);
             }
-            if (_e.IsReady() && useE && !burrowed)
+            if (_e.IsReady() && useE && !_player.burrowed())
             {
                 foreach (var minione in allMinions)
 
@@ -1166,7 +1167,7 @@ namespace D_RekSai
                         _e.Cast(minione);
             }
 
-            if (useW && !burrowed && !_q.IsReady() && !_e.IsReady())
+            if (useW && !_player.burrowed() && !_q.IsReady() && !_e.IsReady())
             {
                 _w.Cast();
             }
@@ -1223,9 +1224,9 @@ namespace D_RekSai
         private static int GetSmiteDmg()
         {
             int level = _player.Level;
-            int index = _player.Level / 5;
-            float[] dmgs = { 370 + 20 * level, 330 + 30 * level, 240 + 40 * level, 100 + 50 * level };
-            return (int)dmgs[index];
+            int index = _player.Level/5;
+            float[] dmgs = {370 + 20*level, 330 + 30*level, 240 + 40*level, 100 + 50*level};
+            return (int) dmgs[index];
         }
 
         //New map Monsters Name By SKO
@@ -1234,11 +1235,11 @@ namespace D_RekSai
             var jungle = _config.Item("ActiveJungle").GetValue<KeyBind>().Active;
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var usered = _config.Item("Usered").GetValue<bool>();
-            var health = (100 * (_player.Health / _player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
+            var health = (100*(_player.Health/_player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {
-                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
+                jungleMinions = new string[] {"TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf"};
             }
             else
             {
@@ -1281,7 +1282,7 @@ namespace D_RekSai
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {
-                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
+                jungleMinions = new string[] {"TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf"};
             }
             else
             {
@@ -1303,7 +1304,7 @@ namespace D_RekSai
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (!burrowed)
+                if (!_player.burrowed())
                 {
                     if (useQ && _q.IsReady() && Orbwalking.InAutoAttackRange(mob))
                     {
@@ -1321,14 +1322,14 @@ namespace D_RekSai
                             _e.Cast(mob);
                         }
                     }
-                    if (useW && !mob.HasBuff("reksaiknockupimmune", true) && _w.IsReady() && !_q.IsReady() &&
+                    if (useW && !mob.HasBuff("reksaiknockupimmune") && _w.IsReady() && !_q.IsReady() &&
                         !_e.IsReady() &&
                         mob.IsValidTarget(_w.Range))
                     {
                         _w.Cast();
                     }
                 }
-                if (burrowed && _bq.IsReady() && useQ && _player.Distance(mob) < _bq.Range)
+                if (_player.burrowed() && _bq.IsReady() && useQ && _player.Distance(mob) < _bq.Range)
                 {
                     _bq.Cast(mob);
                 }
@@ -1361,7 +1362,7 @@ namespace D_RekSai
                 }
                 if (_config.Item("UseQKs").GetValue<bool>())
                 {
-                    if (_bq.IsReady() && hero.IsValidTarget(_bq.Range) && burrowed)
+                    if (_bq.IsReady() && hero.IsValidTarget(_bq.Range) && _player.burrowed())
                     {
                         if (hero.Health <= BqDamage(hero))
                             _bq.CastIfHitchanceEquals(hero, Qchangekill());
@@ -1372,14 +1373,14 @@ namespace D_RekSai
                         _w.Cast();
                         _bq.CastIfHitchanceEquals(hero, Qchangekill());
                     }
-                    if (_q.IsReady() && hero.IsValidTarget(_q.Range) && !burrowed)
+                    if (_q.IsReady() && hero.IsValidTarget(_q.Range) && !_player.burrowed())
                     {
                         if (hero.Health <= QDamage(hero))
                             _q.Cast();
                     }
                 }
                 if (_e.IsReady() && hero.IsValidTarget(_e.Range) && _config.Item("UseEKs").GetValue<bool>() &&
-                    !burrowed)
+                    !_player.burrowed())
                 {
                     if (_player.Mana <= 100 && hero.Health <= EDamage(hero))
                     {
@@ -1395,10 +1396,10 @@ namespace D_RekSai
 
         private static void AutoW()
         {
-            var reksaiHp = (_player.MaxHealth * (_config.Item("AutoWHP").GetValue<Slider>().Value) / 100);
-            var reksaiMp = (_player.MaxMana * (_config.Item("AutoWMP").GetValue<Slider>().Value) / 100);
+            var reksaiHp = (_player.MaxHealth*(_config.Item("AutoWHP").GetValue<Slider>().Value)/100);
+            var reksaiMp = (_player.MaxMana*(_config.Item("AutoWMP").GetValue<Slider>().Value)/100);
             if (_player.HasBuff("Recall") || _player.InFountain()) return;
-            if (_w.IsReady() && _player.Health <= reksaiHp && !burrowed && _player.Mana >= reksaiMp)
+            if (_w.IsReady() && _player.Health <= reksaiHp && !_player.burrowed() && _player.Mana >= reksaiMp)
             {
                 _w.Cast();
             }
@@ -1413,19 +1414,19 @@ namespace D_RekSai
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.DarkOrange,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.DarkRed,
                         "Smite Jungle Off");
                 if (_config.Item("smitecombo").GetValue<bool>())
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.DarkOrange,
                         "Smite Target On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.DarkRed,
                         "Smite Target Off");
             }
 
@@ -1433,7 +1434,7 @@ namespace D_RekSai
             {
                 if (_config.Item("DrawQ").GetValue<bool>())
                 {
-                    if (burrowed)
+                    if (_player.burrowed())
                         Utility.DrawCircle(ObjectManager.Player.Position, _bq.Range, System.Drawing.Color.DarkOrange,
                             _config.Item("CircleThickness").GetValue<Slider>().Value,
                             _config.Item("CircleQuality").GetValue<Slider>().Value);
@@ -1441,7 +1442,7 @@ namespace D_RekSai
 
                 if (_config.Item("DrawE").GetValue<bool>())
                 {
-                    Utility.DrawCircle(ObjectManager.Player.Position, burrowed ? _be.Range : _e.Range,
+                    Utility.DrawCircle(ObjectManager.Player.Position, _player.burrowed() ? _be.Range : _e.Range,
                         System.Drawing.Color.DarkOrange,
                         _config.Item("CircleThickness").GetValue<Slider>().Value,
                         _config.Item("CircleQuality").GetValue<Slider>().Value);
@@ -1450,13 +1451,13 @@ namespace D_RekSai
             }
             else
             {
-                if (_config.Item("DrawQ").GetValue<bool>() && burrowed)
+                if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed())
                 {
                     Drawing.DrawCircle(ObjectManager.Player.Position, _bq.Range, System.Drawing.Color.White);
                 }
                 if (_config.Item("DrawE").GetValue<bool>())
                 {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, burrowed ? _be.Range : _e.Range,
+                    Drawing.DrawCircle(ObjectManager.Player.Position, _player.burrowed() ? _be.Range : _e.Range,
                         System.Drawing.Color.White);
                 }
             }
