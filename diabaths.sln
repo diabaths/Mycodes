@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_Zyra", "D_Zyra\D_Zyra.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sivir_is_Back", "Sivir_is_Back\Sivir_is_Back.csproj", "{8BCEB9B2-8D7D-4EBE-ABD3-52B1E4CCB760}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_RekSai", "D_RekSai\D_RekSai.csproj", "{4EE37ECB-D1B8-45E8-AD92-4368EBBD905A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{8BCEB9B2-8D7D-4EBE-ABD3-52B1E4CCB760}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BCEB9B2-8D7D-4EBE-ABD3-52B1E4CCB760}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BCEB9B2-8D7D-4EBE-ABD3-52B1E4CCB760}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EE37ECB-D1B8-45E8-AD92-4368EBBD905A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EE37ECB-D1B8-45E8-AD92-4368EBBD905A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EE37ECB-D1B8-45E8-AD92-4368EBBD905A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EE37ECB-D1B8-45E8-AD92-4368EBBD905A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
