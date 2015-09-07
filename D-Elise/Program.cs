@@ -629,7 +629,7 @@ namespace D_Elise
                             _orbwalker.SetAttack(true);
                             _spiderW.Cast();
                         }
-                        if (_r.IsReady() && _humanQ.IsReady() && !_spiderQ.IsReady() && !_spiderW.IsReady() && _spider)
+                        if (_r.IsReady() && _humanQ.IsReady() && _spider && !switchR)
                         {
                             _r.Cast();
                         }
