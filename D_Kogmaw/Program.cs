@@ -39,18 +39,7 @@ namespace D_Kogmaw
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        private static void CreateSkins()
-        {
-            Skins.Add("Kog'Maw");
-            Skins.Add("Caterpillar Kog'Maw");
-            Skins.Add("Sonoran Kog'Maw");
-            Skins.Add("Monarch Kog'Maw");
-            Skins.Add("Reindeer Kog'Maw");
-            Skins.Add("Lion Dance Kog'Maw");
-            Skins.Add("Deep Sea Kog'Maw");
-            Skins.Add("Jurassic Kog'Maw");
-        }
-
+       
         private static void Game_OnGameLoad(EventArgs args)
         {
             _player = ObjectManager.Player;
@@ -76,7 +65,7 @@ namespace D_Kogmaw
             _blade = new Items.Item(3153, 450f);
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
 
-            CreateSkins();
+            
 
             //D Kogmaw
             _config = new Menu("D-Kogmaw", "D-Kogmaw", true);
@@ -89,17 +78,7 @@ namespace D_Kogmaw
             //Orbwalker
             _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
             _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
-
-            if (Skins.Count > 0)
-            {
-                _config.AddSubMenu(new Menu("Skin Changer", "Skin Changer"));
-                _config.SubMenu("Skin Changer")
-                    .AddItem(new MenuItem("Skin_enabled", "Enable skin changer").SetValue(false));
-                _config.SubMenu("Skin Changer")
-                    .AddItem(new MenuItem("Skin_select", "Skins").SetValue(new StringList(Skins.ToArray())));
-                _champSkin = _config.Item("Skin_select").GetValue<StringList>().SelectedIndex;
-            }
-
+            
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
@@ -418,26 +397,11 @@ namespace D_Kogmaw
             _orbwalker.SetAttack(true);
 
             KillSteal();
-
-            UpdateSkin();
             Usecleanse();
             Usepotion();
         }
 
-        private static void UpdateSkin()
-        {
-            if (_config.Item("Skin_enabled").GetValue<bool>())
-            {
-                int skin = _config.Item("Skin_select").GetValue<StringList>().SelectedIndex;
-                if (_initialSkin || skin != _champSkin)
-                {
-                    GenerateSkinPacket(ChampionName, skin);
-                    _champSkin = skin;
-                    _initialSkin = false;
-                }
-            }
-        }
-
+       
         private static void Usecleanse()
         {
             if (_player.IsDead ||
