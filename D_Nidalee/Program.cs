@@ -1053,12 +1053,6 @@ namespace D_Nidalee
             var mobs = MinionManager.GetMinions(Player.ServerPosition, 700,
                    MinionTypes.All,
                    MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-            _humaQcd = ((_humQcd - Game.Time) > 0) ? (_humQcd - Game.Time) : 0;
-            _humaWcd = ((_humWcd - Game.Time) > 0) ? (_humWcd - Game.Time) : 0;
-            _humaEcd = ((_humEcd - Game.Time) > 0) ? (_humEcd - Game.Time) : 0;
-            _spideQcd = ((_spidQcd - Game.Time) > 0) ? (_spidQcd - Game.Time) : 0;
-            _spideWcd = ((_spidWcd - Game.Time) > 0) ? (_spidWcd - Game.Time) : 0;
-            _spideEcd = ((_spidEcd - Game.Time) > 0) ? (_spidEcd - Game.Time) : 0;
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
