@@ -713,21 +713,19 @@ namespace D_Nidalee
                     }
                     if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name)) &&
                         !jungleMinions.Any(name => minion.Name.Contains("Mini")))
-                    {Game.PrintChat("stage1");
+                    {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
                     else if (jungle && useblue && mana && minion.Health >= smiteDmg &&
                              jungleMinions.Any(name => minion.Name.StartsWith("SRU_Blue")) &&
                              !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
-                        Game.PrintChat("stage 2");
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
                     else if (jungle && usered && health && minion.Health >= smiteDmg &&
                              jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red")) &&
                              !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
-                        Game.PrintChat("stage 3");
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
                 }
