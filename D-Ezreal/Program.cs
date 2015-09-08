@@ -33,10 +33,10 @@ namespace D_Ezreal
         private static readonly int[] EzrealQwe = { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
         private static readonly int[] EzrealWqe = { 1, 3, 2, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
 
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3726, 3723 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
+        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
+        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
+        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
+        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
         private static Items.Item _youmuu, _blade, _bilge, _hextech, _archangel;
 
         private static void Main(string[] args)

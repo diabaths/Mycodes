@@ -18,10 +18,11 @@ namespace D_Nidalee
 
         public static List<Spell> SpellList = new List<Spell>();
 
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3726, 3723 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
+        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
+        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
+        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
+        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
+
 
         private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis, _zhonya, _dfg, _archangel;
 
@@ -230,32 +231,28 @@ namespace D_Nidalee
             Config.AddSubMenu(new Menu("Farm", "Farm"));
             Config.SubMenu("Farm").AddSubMenu(new Menu("LastHit", "LastHit"));
             Config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("UseQLH", "Use Q (Human)")).SetValue(true);
-            Config.SubMenu("Farm")
-                .SubMenu("LastHit")
-                .AddItem(new MenuItem("lastmana", "Minimum Mana% >").SetValue(new Slider(35, 1, 100)));
-            Config.SubMenu("Farm")
-                .SubMenu("LastHit")
-                .AddItem(
-                    new MenuItem("ActiveLast", "LastHit!").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("lastmana", "Minimum Mana% >").SetValue(new Slider(35, 1, 100)));
+            Config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("ActiveLast", "LastHit!").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
 
-            Config.SubMenu("Farm").AddSubMenu(new Menu("Lane/Jungle", "Lane"));
-            Config.SubMenu("Farm").SubMenu("Lane").AddItem(new MenuItem("farm_E1", "Use E (Human)")).SetValue(true);
-            Config.SubMenu("Farm").SubMenu("Lane").AddItem(new MenuItem("UseQLane", "Use Q (Cougar)")).SetValue(true);
-            Config.SubMenu("Farm").SubMenu("Lane").AddItem(new MenuItem("UseWLane", "Use W (Cougar)")).SetValue(true);
-            Config.SubMenu("Farm").SubMenu("Lane").AddItem(new MenuItem("UseELane", "Use E (Cougar)")).SetValue(true);
-            Config.SubMenu("Farm")
-                .SubMenu("Lane")
-                .AddItem(
-                    new MenuItem("LaneClear", "Clear key").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
-            Config.SubMenu("Farm")
-                .SubMenu("Lane")
-                .AddItem(
-                    new MenuItem("farm_R", "Auto Switch Forms(toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
-            Config.SubMenu("Farm")
-                .SubMenu("Lane")
-                .AddItem(new MenuItem("Lane", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+            Config.SubMenu("Farm").AddSubMenu(new Menu("LaneClear", "LaneClear"));
+            Config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("farm_E1", "Use E (Human)")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQLane", "Use Q (Cougar)")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseWLane", "Use W (Cougar)")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseELane", "Use E (Cougar)")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("LaneClear", "Clear key").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("farm_R", "Auto Switch Forms(toggle)").SetValue(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
+            Config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("Lane", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
 
+            //jungle
+            Config.SubMenu("Farm").AddSubMenu(new Menu("Jungle", "Jungle"));
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseQJungle", "Use Human Q")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseWJungle", "Use Human W")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseQCJungle", "Use Cougar Q")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseWCJungle", "Use Cougar W")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("UseECJungle", "Use Cougar E")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("Switchungle", "Switch Forms")).SetValue(true);
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("junglemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+            Config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("ActiveJungle", "Jungle key").SetValue(new KeyBind("V".ToCharArray()[0],KeyBindType.Press)));
             //Smite 
             Config.AddSubMenu(new Menu("Smite", "Smite"));
             Config.SubMenu("Smite")
@@ -353,6 +350,10 @@ namespace D_Nidalee
             if (Config.Item("LaneClear").GetValue<KeyBind>().Active)
             {
                 Farm();
+            }
+            if (Config.Item("ActiveJungle").GetValue<KeyBind>().Active)
+            {
+                Jungleclear();
             }
             if (Config.Item("ActiveKs").GetValue<bool>())
             {
@@ -678,7 +679,7 @@ namespace D_Nidalee
         //New map Monsters Name By SKO
         private static void Smiteuse()
         {
-            var jungle = Config.Item("LaneClear").GetValue<KeyBind>().Active;
+            var jungle = Config.Item("ActiveJungle").GetValue<KeyBind>().Active;
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var useblue = Config.Item("Useblue").GetValue<bool>();
             var usered = Config.Item("Usered").GetValue<bool>();
@@ -701,7 +702,7 @@ namespace D_Nidalee
             if (minions.Count() > 0)
             {
                 int smiteDmg = GetSmiteDmg();
-
+             
                 foreach (Obj_AI_Base minion in minions)
                 {
                     if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline &&
@@ -712,19 +713,21 @@ namespace D_Nidalee
                     }
                     if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name)) &&
                         !jungleMinions.Any(name => minion.Name.Contains("Mini")))
-                    {
+                    {Game.PrintChat("stage1");
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
                     else if (jungle && useblue && mana && minion.Health >= smiteDmg &&
                              jungleMinions.Any(name => minion.Name.StartsWith("SRU_Blue")) &&
                              !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
+                        Game.PrintChat("stage 2");
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
                     else if (jungle && usered && health && minion.Health >= smiteDmg &&
                              jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red")) &&
                              !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
+                        Game.PrintChat("stage 3");
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
                 }
@@ -1015,15 +1018,10 @@ namespace D_Nidalee
 
         private static void Farm()
         {
-            foreach (
-                Obj_AI_Minion Minion in
-                    ObjectManager.Get<Obj_AI_Minion>()
-                        .Where(
-                            minion =>
-                                minion.Team != Player.Team && !minion.IsDead &&
-                                Vector2.Distance(minion.ServerPosition.To2D(), Player.ServerPosition.To2D()) < 600f)
-                        .OrderBy(minion => Vector2.Distance(minion.Position.To2D(), Player.Position.To2D())))
+            var allMinions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition,700, MinionTypes.All);
+            if (allMinions.Count > 0)
             {
+                var Minion = allMinions[0];
                 if (IsCougar)
                 {
                     if (QC.IsReady() && Config.Item("UseQLane").GetValue<bool>() && Player.Distance(Minion) < QC.Range)
@@ -1039,12 +1037,77 @@ namespace D_Nidalee
                     R.Cast();
                 else if (E.IsReady() && !Config.Item("farm_R").GetValue<KeyBind>().Active &&
                          Config.Item("farm_E1").GetValue<bool>() &&
-                         (100 * (Player.Mana / Player.MaxMana)) > Config.Item("Lane").GetValue<Slider>().Value)
+                         (100*(Player.Mana/Player.MaxMana)) > Config.Item("Lane").GetValue<Slider>().Value)
                     E.CastOnUnit(Player);
                 return;
             }
         }
 
+        private static void Jungleclear()
+        {
+            var Humanq = Config.Item("UseQJungle").GetValue<bool>();
+            var Humanw = Config.Item("UseWJungle").GetValue<bool>();
+            var Cougarq = Config.Item("UseQCJungle").GetValue<bool>();
+            var Cougarw = Config.Item("UseWCJungle").GetValue<bool>();
+            var Cougare = Config.Item("UseECJungle").GetValue<bool>();
+            var Switch = Config.Item("Switchungle").GetValue<bool>();
+            var junglemana = Player.Mana >= (Player.MaxMana * (Config.Item("junglemana").GetValue<Slider>().Value) / 100);
+            var mobs = MinionManager.GetMinions(Player.ServerPosition, 700,
+                   MinionTypes.All,
+                   MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            _humaQcd = ((_humQcd - Game.Time) > 0) ? (_humQcd - Game.Time) : 0;
+            _humaWcd = ((_humWcd - Game.Time) > 0) ? (_humWcd - Game.Time) : 0;
+            _humaEcd = ((_humEcd - Game.Time) > 0) ? (_humEcd - Game.Time) : 0;
+            _spideQcd = ((_spidQcd - Game.Time) > 0) ? (_spidQcd - Game.Time) : 0;
+            _spideWcd = ((_spidWcd - Game.Time) > 0) ? (_spidWcd - Game.Time) : 0;
+            _spideEcd = ((_spidEcd - Game.Time) > 0) ? (_spidEcd - Game.Time) : 0;
+            if (mobs.Count > 0)
+            {
+                var mob = mobs[0];
+                if (IsHuman)
+                {
+                    if (Humanq && !mob.Name.Contains("Mini") && junglemana && Q.IsReady())
+                    {
+                        var prediction = Q.GetPrediction(mob);
+                        if (prediction.Hitchance >= HitChance.Low)
+                            Q.Cast(mob.ServerPosition);
+                    }
+                    if (Humanw && junglemana && W.IsReady() && !mob.Name.Contains("Mini"))
+                    {
+                        var prediction = W.GetPrediction(mob);
+                        if (prediction.Hitchance >= HitChance.Low)
+                            W.Cast(mob.ServerPosition);
+                    }
+                    if ((Switch &&!Q.IsReady()&& !W.IsReady()) || !junglemana)
+                    {
+                        if (R.IsReady())
+                        {
+                            R.Cast();
+                        }
+                    }
+                }
+                if (IsCougar)
+                {
+                    if (Cougarq && mob.IsValidTarget(QC.Range) && QC.IsReady())
+                    {
+                        QC.Cast();
+                    }
+                    if (Cougarw && mob.IsValidTarget(WC.Range) && WC.IsReady())
+                    {
+                        WC.Cast(mob.ServerPosition);
+                    }
+                    if (Cougare && mob.IsValidTarget(EC.Range) && EC.IsReady())
+                    {
+                        EC.Cast(mob.ServerPosition);
+                    }
+                    if (Switch && junglemana && !QC.IsReady()&& !WC.IsReady() && !EC.IsReady() && R.IsReady())
+                    {
+                        R.Cast();
+                    }
+                }
+            }
+
+        }
         private static void AutoE()
         {
             if (Player.Spellbook.CanUseSpell(SpellSlot.E) == SpellState.Ready && Player.IsMe)

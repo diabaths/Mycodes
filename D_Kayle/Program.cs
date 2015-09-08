@@ -34,10 +34,10 @@ namespace D_Kayle
 
         private static Items.Item _rand, _lotis, _dfg, _frostqueen, _mikael;
         //Credits to Kurisu
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3726, 3723 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
+        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
+        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
+        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
+        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
 
         private static int[] kayleEqw = { 3, 1, 2, 3, 3, 4, 3, 1, 3, 1, 4, 1, 1, 2, 2, 4, 2, 2 };
         private static int[] kayleEwq = { 3, 1, 2, 3, 3, 4, 3, 2, 3, 2, 4, 2, 2, 1, 1, 4, 1, 1 };
