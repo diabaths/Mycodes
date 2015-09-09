@@ -35,10 +35,10 @@ namespace D_RekSai
         //private static bool burrowed = false;
 
         //Credits to Kurisu
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
+        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
+        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
+        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
+        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
 
 
         private static void Main(string[] args)
@@ -335,11 +335,7 @@ namespace D_RekSai
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Draw E")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(dmgAfterComboItem);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawsmite", "Draw smite")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("CircleLag", "Lag Free Circles").SetValue(true));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleQuality", "Circles Quality").SetValue(new Slider(100, 100, 10)));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleThickness", "Circles Thickness").SetValue(new Slider(1, 10, 1)));
+            _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
 
             _config.AddToMainMenu();
 
@@ -351,7 +347,7 @@ namespace D_RekSai
                 "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
 
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
-            Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             //Orbwalking.AfterAttack += Orbwalking_AfterAttack;
 
@@ -595,7 +591,8 @@ namespace D_RekSai
             }
         }
 
-        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit,
+            Interrupter2.InterruptableTargetEventArgs args)
         {
             if (_player.burrowed() && _bw.IsReady() && unit.IsValidTarget(_q.Range) &&
                 _config.Item("Inter_W").GetValue<bool>())
@@ -850,7 +847,7 @@ namespace D_RekSai
                     var te = TargetSelector.GetTarget(_e.Range + _bw.Range, TargetSelector.DamageType.Physical);
                     if (_be.IsReady() && te.IsValidTarget(_e.Range + _bw.Range) && _player.Distance(te) > _q.Range)
                     {
-                        _be.Cast(te.Position - 100);
+                        _be.Cast(te.Position+100);
                     }
                 }
                 if (_config.Item("UseQCombo").GetValue<bool>())
@@ -1411,56 +1408,49 @@ namespace D_RekSai
         private static void Drawing_OnDraw(EventArgs args)
         {
 
+            var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
+            if (_config.Item("Drawharass").GetValue<bool>())
+            {
+                if (harass)
+                {
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
+                        "Auto harass Enabled");
+                }
+                else
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
+                        "Auto harass Disabled");
+            }
+
             if (_config.Item("Drawsmite").GetValue<bool>())
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
-                if (_config.Item("smitecombo").GetValue<bool>())
+                if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.DarkOrange,
-                        "Smite Target On");
+                    if (_config.Item("smitecombo").GetValue<bool>())
+                    {
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                            "Smite Target On");
+                    }
+                    else
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                            "Smite Target Off");
                 }
-                else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.DarkRed,
-                        "Smite Target Off");
             }
-
-            if (_config.Item("CircleLag").GetValue<bool>())
+            if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed())
             {
-                if (_config.Item("DrawQ").GetValue<bool>())
-                {
-                    if (_player.burrowed())
-                        Utility.DrawCircle(ObjectManager.Player.Position, _bq.Range, System.Drawing.Color.DarkOrange,
-                            _config.Item("CircleThickness").GetValue<Slider>().Value,
-                            _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-
-                if (_config.Item("DrawE").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _player.burrowed() ? _be.Range : _e.Range,
-                        System.Drawing.Color.DarkOrange,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _bq.Range, Color.GreenYellow);
             }
-            else
+            if (_config.Item("DrawE").GetValue<bool>())
             {
-                if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _bq.Range, System.Drawing.Color.White);
-                }
-                if (_config.Item("DrawE").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _player.burrowed() ? _be.Range : _e.Range,
-                        System.Drawing.Color.White);
-                }
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _player.burrowed() ? _be.Range : _e.Range,
+                    System.Drawing.Color.GreenYellow);
             }
         }
     }
