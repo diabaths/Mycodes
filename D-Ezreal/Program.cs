@@ -278,16 +278,13 @@ namespace D_Ezreal
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawR", "Draw R")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(dmgAfterComboItem);
             _config.SubMenu("Drawings").AddItem(new MenuItem("damagetest", "Damage Text")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("CircleLag", "Lag Free Circles").SetValue(true));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleQuality", "Circles Quality").SetValue(new Slider(100, 100, 10)));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleThickness", "Circles Thickness").SetValue(new Slider(1, 10, 1)));
+            _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
+
 
             _config.AddToMainMenu();
             Game.PrintChat("<font color='#881df2'>D-Ezreal by Diabaths</font> Loaded.");
             Game.PrintChat(
-                "<font color='#FF0000'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#FF9900'>ssssssssssmith@hotmail.com</font> (10) S");
+               "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
             if (_config.Item("skinez").GetValue<bool>())
             {
                 GenModelPacket(_player.ChampionName, _config.Item("skinezreal").GetValue<Slider>().Value);
@@ -962,55 +959,39 @@ namespace D_Ezreal
                         "Unkillable");
                 }
             }
-            if (_config.Item("CircleLag").GetValue<bool>())
+            var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
+
+            if (_config.Item("Drawharass").GetValue<bool>())
             {
-                if (_config.Item("DrawQ").GetValue<bool>())
+                if (harass)
                 {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
+                        "Auto harass Enabled");
                 }
-                if (_config.Item("DrawW").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-                if (_config.Item("DrawE").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-                if (_config.Item("DrawR").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
+                else
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
+                        "Auto harass Disabled");
             }
-            else
-            {
-                if (_config.Item("DrawQ").GetValue<bool>())
+                if (_config.Item("DrawQ").GetValue<bool>()&& _q.Level>0)
                 {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.White);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
                 }
-                if (_config.Item("DrawW").GetValue<bool>())
+                if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
                 {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.White);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
                 }
-                if (_config.Item("DrawE").GetValue<bool>())
+                if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
                 {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.White);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
                 }
 
-                if (_config.Item("DrawR").GetValue<bool>())
+                if (_config.Item("DrawR").GetValue<bool>() && _r.Level > 0)
                 {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.White);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
                 }
             }
         }
     }
-}
+
 
 
