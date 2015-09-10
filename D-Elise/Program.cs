@@ -258,11 +258,8 @@ namespace D_Elise
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawsmite", "Draw Smite")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(new MenuItem("drawmode", "Draw Smite Mode")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawCooldown", "Draw Cooldown")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("CircleLag", "Lag Free Circles").SetValue(true));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleQuality", "Circles Quality").SetValue(new Slider(100, 100, 10)));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleThickness", "Circles Thickness").SetValue(new Slider(1, 10, 1)));
+            _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
+
 
             _config.AddToMainMenu();
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
@@ -272,7 +269,7 @@ namespace D_Elise
             Drawing.OnDraw += Drawing_OnDraw;
             Game.PrintChat("<font color='#881df2'>D-Elise by Diabaths</font> Loaded.");
             Game.PrintChat(
-              "<font color='#FF0000'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#FF9900'>ssssssssssmith@hotmail.com</font> (10) S");
+                 "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
 
         }
         private static void Switchcombo(object sender, OnValueChangeEventArgs e)
@@ -993,87 +990,54 @@ namespace D_Elise
             }
         }
 
-        static void Drawing_OnDraw(EventArgs args)
+        private static void Drawing_OnDraw(EventArgs args)
         {
             var elise = Drawing.WorldToScreen(_player.Position);
-            if (_config.Item("drawmode").GetValue<bool>() && _config.Item("Usesmite").GetValue<KeyBind>().Active)
+
+            if (_config.Item("drawmode").GetValue<bool>())
             {
-                if (_config.Item("smitecombo").GetValue<bool>())
+                if (_config.Item("smitecombo").GetValue<bool>() && (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i))))
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkOrange,
-                      "Smite Tagret");
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                        "Smite Tagret");
                 }
-                else Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkRed,
-                     "Smite minion in Human E Path");
+                else 
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                        "Smite minion in Human E Path");
             }
 
             if (_config.Item("Drawsmite").GetValue<bool>())
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkOrange,
-                        "Smite Is On");
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                        "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkRed,
-                        "Smite Is Off");
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.DarkRed,
+                        "Smite Jungle On");
             }
-            if (_config.Item("CircleLag").GetValue<bool>())
+            if (_human && _config.Item("DrawQ").GetValue<bool>())
             {
-                if (_human && _config.Item("DrawQ").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _humanQ.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-                if (_human && _config.Item("DrawW").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _humanW.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-                if (_human && _config.Item("DrawE").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _humanE.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-                if (_spider && _config.Item("SpiderDrawQ").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _spiderQ.Range, System.Drawing.Color.Gray,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-                if (_spider && _config.Item("SpiderDrawE").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _spiderE.Range, System.Drawing.Color.Gray,
-                   _config.Item("CircleThickness").GetValue<Slider>().Value,
-                   _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _humanQ.Range, System.Drawing.Color.GreenYellow);
             }
-            else
+            if (_human && _config.Item("DrawW").GetValue<bool>())
             {
-                if (_human && _config.Item("DrawQ").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _humanQ.Range, System.Drawing.Color.LightGray);
-                }
-                if (_human && _config.Item("DrawW").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _humanW.Range, System.Drawing.Color.LightGray);
-                }
-                if (_human && _config.Item("DrawE").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _humanE.Range, System.Drawing.Color.LightGray);
-                }
-                if (_spider && _config.Item("SpiderDrawQ").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _spiderQ.Range, System.Drawing.Color.LightGray);
-                }
-                if (_spider && _config.Item("SpiderDrawE").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _spiderE.Range, System.Drawing.Color.LightGray);
-                }
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _humanW.Range, System.Drawing.Color.GreenYellow);
             }
+            if (_human && _config.Item("DrawE").GetValue<bool>())
+            {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _humanE.Range, System.Drawing.Color.GreenYellow);
+            }
+            if (_spider && _config.Item("SpiderDrawQ").GetValue<bool>())
+            {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _spiderQ.Range, System.Drawing.Color.GreenYellow);
+            }
+            if (_spider && _config.Item("SpiderDrawE").GetValue<bool>())
+            {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _spiderE.Range, System.Drawing.Color.GreenYellow);
+            }
+
             if (!_config.Item("DrawCooldown").GetValue<bool>()) return;
             if (!_spider)
             {
@@ -1107,7 +1071,8 @@ namespace D_Elise
             }
         }
 
-        private static void CheckSpells()
+        private static
+            void CheckSpells()
         {
             if (_player.Spellbook.GetSpell(SpellSlot.Q).Name == "EliseHumanQ" ||
                 _player.Spellbook.GetSpell(SpellSlot.W).Name == "EliseHumanW" ||
