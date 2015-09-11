@@ -56,7 +56,7 @@ namespace D_RekSai
             _w = new Spell(SpellSlot.W, 200f);
             _bw = new Spell(SpellSlot.W, 200f);
             _e = new Spell(SpellSlot.E, 250f);
-            _be = new Spell(SpellSlot.E, 500);
+            _be = new Spell(SpellSlot.E, 700);
             _r = new Spell(SpellSlot.R);
 
             _bq.SetSkillshot(0.5f, 60, 1950, true, SkillshotType.SkillshotLine);
@@ -518,11 +518,11 @@ namespace D_RekSai
                     if (currentStep == 0)
                     {
                         currentStep = step;
-                        checkPoint = wallPosition + (_be.Range + 200)*direction.To3D();
+                        checkPoint = wallPosition + (_be.Range)*direction.To3D();
                     }
                     // Rotated check
                     else
-                        checkPoint = wallPosition + (_be.Range + 200)*direction.Rotated(currentAngle).To3D();
+                        checkPoint = wallPosition + (_be.Range)*direction.Rotated(currentAngle).To3D();
 
                     // Check if the point is not a wall
                     if (!checkPoint.IsWall())
@@ -844,10 +844,15 @@ namespace D_RekSai
             {
                 if (_config.Item("UseECombo").GetValue<bool>())
                 {
-                    var te = TargetSelector.GetTarget(_e.Range + _bw.Range, TargetSelector.DamageType.Physical);
-                    if (_be.IsReady() && te.IsValidTarget(_e.Range + _bw.Range) && _player.Distance(te) > _q.Range)
+                    var te = TargetSelector.GetTarget(_be.Range + _bw.Range, TargetSelector.DamageType.Physical);
+                    if (_be.IsReady() && te.IsValidTarget(_be.Range + _bw.Range) && _player.Distance(te) > _q.Range)
                     {
-                        _be.Cast(te.Position+100);
+                        var predE = _be.GetPrediction(te, true);
+                        if (predE.Hitchance >= Echange())
+                            _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -50));
+                        // else if (_player.IsFacing(te) && te.IsFacing(_player))
+                        //       _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -200));
+                        //_be.Cast(te.Position+100);
                     }
                 }
                 if (_config.Item("UseQCombo").GetValue<bool>())
@@ -1320,7 +1325,7 @@ namespace D_RekSai
                             _e.Cast(mob);
                         }
                     }
-                    if (useW && !mob.HasBuff("reksaiknockupimmune") && _w.IsReady() && !_q.IsReady() &&
+                    if (useW && !(mob as Obj_AI_Base).HasBuff("reksaiknockupimmune") && _w.IsReady() && !_q.IsReady() &&
                         !_e.IsReady() &&
                         mob.IsValidTarget(_w.Range))
                     {
