@@ -348,7 +348,7 @@ namespace D_Zyra
             _config.SubMenu("Drawing").AddItem(dmgAfterComboItem);
             _config.SubMenu("Drawing").AddItem(new MenuItem("damagetest", "Damage Text")).SetValue(true);
             _config.SubMenu("Drawing").AddItem(new MenuItem("Drawsmite", "Draw smite")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
+            _config.SubMenu("Drawing").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
 
             _config.AddToMainMenu();
 
@@ -1211,11 +1211,11 @@ namespace D_Zyra
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }
