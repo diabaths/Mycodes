@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orianna_by_trelli", "Oriana
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debug", "Debug\Debug.csproj", "{A0145921-506D-458C-BFD5-FE1C99E0169C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_Rengar", "D_Rengar\D_Rengar.csproj", "{E278539B-FB9E-427B-BD60-C8B6D50991DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{A0145921-506D-458C-BFD5-FE1C99E0169C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0145921-506D-458C-BFD5-FE1C99E0169C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0145921-506D-458C-BFD5-FE1C99E0169C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
