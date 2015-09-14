@@ -412,7 +412,7 @@ namespace D_RekSai
                  !_config.Item("escapeterino").GetValue<KeyBind>().Active) &&
                 _config.Item("turnburrowed").GetValue<bool>() && !_player.burrowed())
             {
-                autoburrowed();
+               autoburrowed();
             }
         }
 
@@ -729,6 +729,8 @@ namespace D_RekSai
 
         private static void Smiteontarget()
         {
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" ||
+                         _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
