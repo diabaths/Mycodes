@@ -131,14 +131,7 @@ namespace D_Rengar
             _config.SubMenu("items")
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
-            _config.SubMenu("items")
-                .SubMenu("Potions")
-                .AddItem(new MenuItem("usemppotions", "Use Mana potion/Flask/Biscuit"))
-                .SetValue(true);
-            _config.SubMenu("items")
-                .SubMenu("Potions")
-                .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
-
+           
             //Harass
             _config.AddSubMenu(new Menu("Harass", "Harass"));
             _config.SubMenu("Harass").AddItem(
@@ -382,9 +375,6 @@ namespace D_Rengar
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
                                (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
-            var iusemppotion = _config.Item("usemppotions").GetValue<bool>();
-            var iusepotionmp = _player.Mana <=
-                               (_player.MaxMana*(_config.Item("usepotionmp").GetValue<Slider>().Value)/100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
@@ -417,26 +407,6 @@ namespace D_Rengar
                     else if (Items.HasItem(2003) && Items.CanUseItem(2003))
                     {
                         Items.UseItem(2003);
-                    }
-                }
-
-
-                if (iusepotionmp && iusemppotion &&
-                    !(ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)))
-                {
-                    if (Items.HasItem(2041) && Items.CanUseItem(2041))
-                    {
-                        Items.UseItem(2041);
-                    }
-                    else if (Items.HasItem(2010) && Items.CanUseItem(2010))
-                    {
-                        Items.UseItem(2010);
-                    }
-                    else if (Items.HasItem(2004) && Items.CanUseItem(2004))
-                    {
-                        Items.UseItem(2004);
                     }
                 }
             }
@@ -698,8 +668,8 @@ namespace D_Rengar
             {
                 var igniteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
                 var qDmg = _player.GetSpellDamage(hero, SpellSlot.Q);
-                var wDmg = _player.GetSpellDamage(hero, SpellSlot.Q);
-                var eDmg = _player.GetSpellDamage(hero, SpellSlot.Q);
+                var wDmg = _player.GetSpellDamage(hero, SpellSlot.W);
+                var eDmg = _player.GetSpellDamage(hero, SpellSlot.E);
 
                 if (hero.IsValidTarget(600) && _config.Item("UseIgnite").GetValue<bool>() &&
                     _igniteSlot != SpellSlot.Unknown &&
