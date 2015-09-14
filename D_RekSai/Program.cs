@@ -1448,11 +1448,11 @@ namespace D_RekSai
                             "Smite Target Off");
                 }
             }
-            if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed())
+            if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed()&& _q.Level>0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _bq.Range, Color.GreenYellow);
             }
-            if (_config.Item("DrawE").GetValue<bool>())
+            if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _player.burrowed() ? _be.Range : _e.Range,
                     System.Drawing.Color.GreenYellow);

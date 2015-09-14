@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SPrediction;
 
 
 namespace D_Corki
@@ -60,7 +61,7 @@ namespace D_Corki
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             _config.AddSubMenu(targetSelectorMenu);
-
+            SPrediction.Prediction.Initialize(_config);
             //Orbwalker
             _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
             _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
@@ -253,9 +254,7 @@ namespace D_Corki
             _config.SubMenu("Misc").AddItem(new MenuItem("UseQM", "Use Q KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("UseEM", "Use E KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("UseRM", "Use R KillSteal")).SetValue(true);
-            _config.SubMenu("Misc").AddItem(new MenuItem("skinC", "Use Custom Skin").SetValue(false));
-            _config.SubMenu("Misc").AddItem(new MenuItem("skinCorki", "Skin Changer").SetValue(new Slider(4, 1, 7)));
-            //_config.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Usepackes")).SetValue(true);
+           
 
             //HitChance
             _config.AddSubMenu(new Menu("HitChance", "HitChance"));
@@ -297,11 +296,7 @@ namespace D_Corki
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-            if (_config.Item("skinC").GetValue<bool>())
-            {
-                GenModelPacket(_player.ChampionName, _config.Item("skinCorki").GetValue<Slider>().Value);
-                _lastSkin = _config.Item("skinCorki").GetValue<Slider>().Value;
-            }
+           
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -310,11 +305,7 @@ namespace D_Corki
                 _r.Range = _r2.Range;
             else
                 _r.Range = _r1.Range;
-            if (_config.Item("skinC").GetValue<bool>() && SkinChanged())
-            {
-                GenModelPacket(_player.ChampionName, _config.Item("skinCorki").GetValue<Slider>().Value);
-                _lastSkin = _config.Item("skinCorki").GetValue<Slider>().Value;
-            }
+           
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
@@ -470,11 +461,7 @@ namespace D_Corki
                 .Process();
         }
 
-        private static bool SkinChanged()
-        {
-            return (_config.Item("skinCorki").GetValue<Slider>().Value != _lastSkin);
-        }
-
+       
         private static void Combo()
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
@@ -486,8 +473,9 @@ namespace D_Corki
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= Qchangecombo())
-                    _q.Cast(t, false, true);
+                if (t.IsValidTarget(_q.Range)) //&& _q.GetPrediction(t).Hitchance >= Qchangecombo())
+                   // _q.Cast(t, false, true);
+                _q.SPredictionCast(t, Qchangecombo());
             }
             if (useW)
             {
@@ -498,14 +486,16 @@ namespace D_Corki
             if (useE && _e.IsReady())
             {
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangecombo())
-                    _e.Cast(t, false, true);
+                if (t.IsValidTarget(_e.Range))// && _e.GetPrediction(t).Hitchance >= Echangecombo())
+                    //_e.Cast(t, false, true);
+                    _e.SPredictionCast(t, Echangecombo());
             }
             if (useR && _r.IsReady())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangecombo())
-                    _r.Cast(t, false, true);
+                if (t.IsValidTarget(_r.Range))// && _r.GetPrediction(t).Hitchance >= Rchangecombo())
+                    //_r.Cast(t, false, true);
+                    _r.SPredictionCast(t, Rchangecombo());
             }
             UseItemes();
         }
@@ -559,20 +549,23 @@ namespace D_Corki
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= Qchangehar())
-                    _q.Cast(t, false, true);
+                if (t.IsValidTarget(_q.Range))// && _q.GetPrediction(t).Hitchance >= Qchangehar())
+                    //_q.Cast(t, false, true);
+                    _q.SPredictionCast(t, Qchangehar());
             }
             if (useE && _e.IsReady())
             {
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangehar())
-                    _e.Cast(t, false, true);
+                if (t.IsValidTarget(_e.Range))// && _e.GetPrediction(t).Hitchance >= Echangehar())
+                   // _e.Cast(t, false, true);
+                    _e.SPredictionCast(t, Echangehar());
             }
             if (useR && _r.IsReady() && rlimH < UltiStucks())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangehar())
-                    _r.Cast(t, false, true);
+                if (t.IsValidTarget(_r.Range)) //&& _r.GetPrediction(t).Hitchance >= Rchangehar())
+                    //_r.Cast(t, false, true);
+                _r.SPredictionCast(t, Rchangehar());
             }
         }
 
@@ -588,20 +581,23 @@ namespace D_Corki
                     if (useQ && _q.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                        if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= Qchangecombo())
-                            _q.Cast(t, false, true);
+                        if (t.IsValidTarget(_q.Range))// && _q.GetPrediction(t).Hitchance >= Qchangecombo())
+                           // _q.Cast(t, false, true);
+                            _q.SPredictionCast(t, Qchangecombo());
                     }
                     if (useE && _e.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                        if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangecombo())
-                            _e.Cast(t, false, true);
+                        if (t.IsValidTarget(_e.Range))// && _e.GetPrediction(t).Hitchance >= Echangecombo())
+                           // _e.Cast(t, false, true);
+                            _e.SPredictionCast(t, Echangecombo());
                     }
                     if (useR && _r.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                        if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangecombo())
-                            _r.Cast(t, false, true);
+                        if (t.IsValidTarget(_r.Range))// && _r.GetPrediction(t).Hitchance >= Rchangecombo())
+                            _r.SPredictionCast(t, Rchangecombo());
+                            //_r.Cast(t, false, true);
                     }
                 }
             }
@@ -739,15 +735,17 @@ namespace D_Corki
             {
                 if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
                 {
-                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range) &&
-                        _q.GetPrediction(hero).Hitchance >= Qchangekil())
-                        _q.Cast(hero, false, true);
+                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range))
+                   // && _q.GetPrediction(hero).Hitchance >= Qchangekil())
+                        //_q.Cast(hero, false, true);
+                        _q.SPredictionCast(hero, Qchangekil());
                 }
                 if (_e.IsReady() && _config.Item("UseEM").GetValue<bool>())
                 {
-                    if (_e.GetDamage(hero) > hero.Health && hero.IsValidTarget(_e.Range) &&
-                        _e.GetPrediction(hero).Hitchance >= Echangekil())
-                        _e.Cast(hero, false, true);
+                    if (_e.GetDamage(hero) > hero.Health && hero.IsValidTarget(_e.Range))
+                       // && _e.GetPrediction(hero).Hitchance >= Echangekil())
+                       // _e.Cast(hero, false, true);
+                        _e.SPredictionCast(hero, Echangekil());
                 }
                 if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>())
                 {
@@ -755,8 +753,9 @@ namespace D_Corki
                     var bigRocket = HasBigRocket();
                     if (hero.IsValidTarget(bigRocket ? _r2.Range : _r1.Range) &&
                         _r1.GetDamage(hero) * (bigRocket ? 1.5f : 1f) > hero.Health)
-                        if (_r.GetPrediction(t).Hitchance >= Rchangekil())
-                            _r.Cast(t, false, true);
+                       // if (_r.GetPrediction(t).Hitchance >= Rchangekil())
+                        _r.SPredictionCast(t, Rchangekil());    
+                      //  _r.Cast(t, false, true);
                 }
             }
         }
@@ -1030,20 +1029,20 @@ namespace D_Corki
                     Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
-            if (_config.Item("DrawQ").GetValue<bool>())
+            if (_config.Item("DrawQ").GetValue<bool>() && _q.Level>0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
             }
-            if (_config.Item("DrawW").GetValue<bool>())
+            if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
             }
-            if (_config.Item("DrawE").GetValue<bool>())
+            if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
             }
 
-            if (_config.Item("DrawR").GetValue<bool>())
+            if (_config.Item("DrawR").GetValue<bool>() && _r.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
             }

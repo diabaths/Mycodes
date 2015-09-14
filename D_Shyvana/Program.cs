@@ -20,8 +20,6 @@ namespace D_Shyvana
 
         private static Obj_AI_Hero _player;
 
-        private static Int32 _lastSkin;
-
         private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
 
         private static SpellSlot _igniteSlot;
