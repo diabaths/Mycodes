@@ -11,7 +11,7 @@ namespace D_Rengar
     {
         private static Obj_AI_Hero _player;
         private static Spell _q, _w, _e, _r;
-       
+
         private static Orbwalking.Orbwalker _orbwalker;
         private static SpellSlot _igniteSlot;
         private static Items.Item _youmuu, _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
@@ -23,6 +23,7 @@ namespace D_Rengar
         private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
         private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
         private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
+        private static int _lastTick;
 
         private static void Main(string[] args)
         {
@@ -66,14 +67,21 @@ namespace D_Rengar
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo")
-                .AddItem(new MenuItem("ComboPrio", "Empowered Priority").SetValue(new StringList(new[] {"Q", "W", "E"}, 2)));
+                .AddItem(
+                    new MenuItem("Switch", "Switch Empowered Priority").SetValue(new KeyBind("M".ToCharArray()[0],
+                        KeyBindType.Press)));
+            _config.SubMenu("Combo")
+                .AddItem(
+                    new MenuItem("ComboPrio", "Empowered Priority").SetValue(new StringList(new[] {"Q", "W", "E"}, 2)));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseIgnite", "Use Ignite")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("smitecombo", "Use Smite in target")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseEC", "Use E")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseEEC", "Use Empower E when Q range<target ")).SetValue(true);
-           _config.SubMenu("Combo")
+            _config.SubMenu("Combo")
+                .AddItem(new MenuItem("UseEEC", "Use Empower E when Q range<target "))
+                .SetValue(true);
+            _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
             _config.AddSubMenu(new Menu("items", "items"));
@@ -131,11 +139,11 @@ namespace D_Rengar
             _config.SubMenu("items")
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
-           
+
             //Harass
             _config.AddSubMenu(new Menu("Harass", "Harass"));
             _config.SubMenu("Harass").AddItem(
-                  new MenuItem("HarrPrio", "Empowered Priority").SetValue(new StringList(new[] { "Q", "W", "E" }, 0)));
+                new MenuItem("HarrPrio", "Empowered Priority").SetValue(new StringList(new[] {"Q", "W", "E"}, 0)));
             _config.SubMenu("Harass").AddItem(new MenuItem("UseQH", "Use Q")).SetValue(true);
             _config.SubMenu("Harass").AddItem(new MenuItem("UseWH", "Use W")).SetValue(true);
             _config.SubMenu("Harass").AddItem(new MenuItem("UseEH", "Use E")).SetValue(true);
@@ -152,9 +160,9 @@ namespace D_Rengar
             _config.AddSubMenu(new Menu("Farm", "Farm"));
             _config.SubMenu("Farm").AddSubMenu(new Menu("LastHit", "LastHit"));
             _config.SubMenu("Farm")
-               .SubMenu("LastHit")
-               .AddItem(
-                   new MenuItem("LastPrio", "Empowered Priority").SetValue(new StringList(new[] { "Q", "W", "E" }, 0)));
+                .SubMenu("LastHit")
+                .AddItem(
+                    new MenuItem("LastPrio", "Empowered Priority").SetValue(new StringList(new[] {"Q", "W", "E"}, 0)));
 
             _config.SubMenu("Farm")
                 .SubMenu("LastHit")
@@ -259,6 +267,7 @@ namespace D_Rengar
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawsmite", "Draw smite")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(dmgAfterComboItem);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("combomode", "Draw Combo Mode")).SetValue(true);
             _config.AddToMainMenu();
 
             Game.PrintChat("<font color='#881df2'>D-Rengar by Diabaths</font> Loaded.");
@@ -311,20 +320,51 @@ namespace D_Rengar
             _orbwalker.SetAttack(true);
 
             KillSteal();
+            ChangeComboMode();
 
         }
 
-        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
+        private static void ChangeComboMode()
+        {
+
+            var changetime = Environment.TickCount - _lastTick;
+
+            if (_config.Item("Switch").GetValue<KeyBind>().Active && changetime >= 350)
+            {
+                switch (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex)
+                {
+                    case 0:
+                        _config.Item("ComboPrio")
+                            .SetValue(new StringList(new[] {"Q", "W", "E"}, 2));
+                        _lastTick = Environment.TickCount;
+                        break;
+                    case 1:
+                        _config.Item("ComboPrio")
+                            .SetValue(new StringList(new[] {"Q", "W", "E"}, 0));
+                        _lastTick = Environment.TickCount;
+                        break;
+                    case 2:
+                        _config.Item("ComboPrio")
+                            .SetValue(new StringList(new[] {"Q", "W", "E"}, 1));
+                        _lastTick = Environment.TickCount;
+                        break;
+                }
+            }
+        }
+
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit,
+            Interrupter2.InterruptableTargetEventArgs args)
         {
             if (_player.Mana < 5) return;
             if (_e.IsReady() && unit.IsValidTarget(_e.Range) &&
                 _config.Item("UseEInt").GetValue<bool>())
             {
                 var predE = _e.GetPrediction(unit);
-                if  (predE.Hitchance >= Echange() && predE.CollisionObjects.Count == 0)
+                if (predE.Hitchance >= Echange() && predE.CollisionObjects.Count == 0)
                     _e.Cast(unit);
             }
         }
+
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender.IsMe)
@@ -340,31 +380,31 @@ namespace D_Rengar
         private static void Smiteontarget()
         {
             if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" ||
-                      _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
-            {
-                var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
-                var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+                _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
+                foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
                 {
-                    if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
+                    var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+                    var usesmite = _config.Item("smitecombo").GetValue<bool>();
+                    if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
                     {
-                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
+                        else if (smiteDmg >= hero.Health)
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
                     }
-                    else if (smiteDmg >= hero.Health)
+                    if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                     }
                 }
-                if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
-                {
-                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                }
-            }
         }
 
         private static void Usepotion()
@@ -415,7 +455,16 @@ namespace D_Rengar
         private static void Drawing_OnDraw(EventArgs args)
         {
             var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
-            
+            var Rengar = Drawing.WorldToScreen(_player.Position);
+            if (_config.Item("combomode").GetValue<bool>())
+            {
+                if (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0)
+                    Drawing.DrawText(Rengar[0]-45, Rengar[1]+20, Color.PaleTurquoise, "Empower:Q");
+                else if (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 1)
+                    Drawing.DrawText(Rengar[0]-45, Rengar[1]+20, Color.PaleTurquoise, "Empower:W");
+                else if (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2)
+                    Drawing.DrawText(Rengar[0] - 45, Rengar[1]+20, Color.PaleTurquoise, "Empower:E");
+            }
             if (_config.Item("Drawharass").GetValue<bool>())
             {
                 if (harass)
@@ -452,17 +501,18 @@ namespace D_Rengar
 
             if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.White);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
             }
-            if (_config.Item("DrawW").GetValue<bool>()&&_w.Level>0)
+            if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.White);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
             }
             if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.White);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
             }
         }
+
         private static float ComboDamage(Obj_AI_Base enemy)
         {
             var damage = 0d;
@@ -478,16 +528,17 @@ namespace D_Rengar
             if (Items.HasItem(3144) && Items.CanUseItem(3144))
                 damage += _player.GetItemDamage(enemy, Damage.DamageItems.Bilgewater);
             if (_q.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.Q) * 1.2;
+                damage += _player.GetSpellDamage(enemy, SpellSlot.Q)*1.2;
             if (_q.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.W) * 3;
+                damage += _player.GetSpellDamage(enemy, SpellSlot.W)*3;
             if (_e.IsReady())
                 damage += _player.GetSpellDamage(enemy, SpellSlot.E);
             if (_r.IsReady())
                 damage += _player.GetSpellDamage(enemy, SpellSlot.R);
-            damage += _player.GetAutoAttackDamage(enemy, true) * 2;
-            return (float)damage;
+            damage += _player.GetAutoAttackDamage(enemy, true)*2;
+            return (float) damage;
         }
+
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(2000, TargetSelector.DamageType.Magical);
@@ -498,7 +549,7 @@ namespace D_Rengar
             var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
             Smiteontarget();
             if (target != null && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown &&
-               _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+                _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
                 if (ComboDamage(target) > target.Health)
                 {
@@ -513,7 +564,8 @@ namespace D_Rengar
                 }
                 else if (target.IsValidTarget())
                 {
-                    _youmuu.Cast();}
+                    _youmuu.Cast();
+                }
             }
             if (_player.Mana <= 4)
             {
@@ -534,7 +586,8 @@ namespace D_Rengar
                 {
                     var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
                     var predE = _e.GetPrediction(te);
-                    if (!_player.HasBuff("rengarpassivebuff")&& te.IsValidTarget(_e.Range) && _e.IsReady() && predE.Hitchance >= Echange() && predE.CollisionObjects.Count == 0)
+                    if (!_player.HasBuff("rengarpassivebuff") && te.IsValidTarget(_e.Range) && _e.IsReady() &&
+                        predE.Hitchance >= Echange() && predE.CollisionObjects.Count == 0)
                         _e.Cast(te);
                 }
             }
@@ -556,23 +609,26 @@ namespace D_Rengar
                         _w.Cast();
                 }
                 if (useE &&
-                    _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2 )
+                    _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2)
                 {
                     var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
                     var predE = _e.GetPrediction(te);
-                    if (te.IsValidTarget(_e.Range) && _e.IsReady() && predE.Hitchance >= Echange() && predE.CollisionObjects.Count == 0)
+                    if (te.IsValidTarget(_e.Range) && _e.IsReady() && predE.Hitchance >= Echange() &&
+                        predE.CollisionObjects.Count == 0)
                         _e.Cast(te);
                 }
-                if (useEE && !_player.HasBuff("RengarR")&&(_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 1 ||
-                              _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0))
+                if (useEE && !_player.HasBuff("RengarR") &&
+                    (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 1 ||
+                     _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0))
                 {
                     var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
 
                     if (_player.Distance(te) > _q.Range + 100f)
                     {
                         var predE = _e.GetPrediction(te);
-                        if (te.IsValidTarget(_e.Range) && _e.IsReady() && predE.Hitchance >= Echange() && predE.CollisionObjects.Count == 0)
-                        _e.Cast(te);
+                        if (te.IsValidTarget(_e.Range) && _e.IsReady() && predE.Hitchance >= Echange() &&
+                            predE.CollisionObjects.Count == 0)
+                            _e.Cast(te);
                     }
                 }
             }
@@ -646,6 +702,7 @@ namespace D_Rengar
                 _hydra.Cast();
             }
         }
+
         private static HitChance Echange()
         {
             switch (_config.Item("Echange").GetValue<StringList>().SelectedIndex)
@@ -662,6 +719,7 @@ namespace D_Rengar
                     return HitChance.Medium;
             }
         }
+
         private static void KillSteal()
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
@@ -902,7 +960,7 @@ namespace D_Rengar
                     {
                         _q.Cast();
                     }
-                    if (_w.IsReady() && useW&& mob.IsValidTarget(_w.Range))
+                    if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range))
                     {
                         _w.Cast();
                     }
@@ -914,21 +972,24 @@ namespace D_Rengar
                 if (_player.Mana == 5)
                 {
                     if (save) return;
-                    if (mob.IsValidTarget(_q.Range)&&_q.IsReady() && _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 0 && useQ)
+                    if (mob.IsValidTarget(_q.Range) && _q.IsReady() &&
+                        _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 0 && useQ)
                     {
                         _q.Cast();
                     }
-                    if (mob.IsValidTarget(_w.Range)&&_w.IsReady() && _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 1 && useW)
+                    if (mob.IsValidTarget(_w.Range) && _w.IsReady() &&
+                        _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 1 && useW)
                     {
                         _w.Cast();
                     }
-                    if (mob.IsValidTarget(_e.Range)&&_e.IsReady() && _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 2 && useE)
+                    if (mob.IsValidTarget(_e.Range) && _e.IsReady() &&
+                        _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 2 && useE)
                     {
 
                         _e.Cast(mob);
 
                     }
-                  
+
                 }
             }
         }
