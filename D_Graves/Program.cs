@@ -30,7 +30,7 @@ namespace D_Graves
         private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719};
         private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714};
         private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707};
-       
+
 
         private static void Main(string[] args)
         {
@@ -43,13 +43,13 @@ namespace D_Graves
             if (ObjectManager.Player.BaseSkinName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 950F);
-            _w = new Spell(SpellSlot.W, 950f);
+            _w = new Spell(SpellSlot.W, 850f);
             _e = new Spell(SpellSlot.E, 425f);
             _r = new Spell(SpellSlot.R, 1200f);
 
-            _q.SetSkillshot(0.25f, 15f*2*(float) Math.PI/180, 2000, false, SkillshotType.SkillshotCone);
-            _w.SetSkillshot(0.30f, 250f, 1650f, false, SkillshotType.SkillshotCircle);
-            _r.SetSkillshot(0.22f, 150f, 2100, true, SkillshotType.SkillshotLine);
+            _q.SetSkillshot(0.25f, (float) (15*Math.PI/180), 2000f, false, SkillshotType.SkillshotCone);
+            _w.SetSkillshot(0.25f, 250f, 1650f, false, SkillshotType.SkillshotCircle);
+            _r.SetSkillshot(0.25f, 100f, 2100f, false, SkillshotType.SkillshotLine);
 
             _youmuu = new Items.Item(3142, 10);
             _bilge = new Items.Item(3144, 450f);
@@ -68,63 +68,26 @@ namespace D_Graves
 
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
-            _config.SubMenu("Combo")
-                .AddItem(new MenuItem("qrange", "Your Q when Enemy range <").SetValue(new Slider(600, 450, 950)));
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
             _config.SubMenu("Combo").AddSubMenu(new Menu("Use E", "Use E"));
-            _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("UseEC", "Use E")).SetValue(true);
+            _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("UseEC", "Use E")).SetValue(false);
             _config.SubMenu("Combo")
                 .SubMenu("Use E")
                 .AddItem(new MenuItem("diveintower", "Dive In tower with E"))
                 .SetValue(false);
             _config.SubMenu("Combo")
                 .SubMenu("Use E")
-                .AddItem(new MenuItem("UseWHE", "Your HP% to Use E >").SetValue(new Slider(65, 1, 100)));
+                .AddItem(new MenuItem("UseWHE", "Use E to Target if HP% >").SetValue(new Slider(65, 1, 100)));
             _config.SubMenu("Combo")
                 .SubMenu("Use E")
-                .AddItem(new MenuItem("EnemyC", "Enemy in R.Range <").SetValue(new Slider(2, 1, 5)));
+                .AddItem(new MenuItem("EnemyC", "Enemy in Range <").SetValue(new Slider(2, 1, 5)));
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRC", "Use R")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use R if Hit X Enemys")).SetValue(true);
+            _config.SubMenu("Combo")
+                .AddItem(new MenuItem("MinTargets", "Use R if Hit Enemys >=").SetValue(new Slider(2, 1, 5)));
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
-
-            //Ulti Factions
-            _config.AddSubMenu(new Menu("R Factions", "R Factions"));
-            _config.SubMenu("R Factions").AddSubMenu(new Menu("Use R combo", "Use R combo"));
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRcombo", "Use R in Combo"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRrush", "Rush R if ComboDmg>=Tagret HP"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRC", "Use R if R.Dmg>Targ. HP"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRE", "Auto R if Hit X Enemys"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("MinTargets", "Auto R if Hit X Enemys").SetValue(new Slider(2, 1, 5)));
-            _config.SubMenu("R Factions").SubMenu("Use R combo").AddItem(new MenuItem("", "Use R in Targets Below"));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != _player.Team))
-                _config.SubMenu("R Factions")
-                    .SubMenu("Use R combo")
-                    .AddItem(new MenuItem("castR" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(true));
-            _config.SubMenu("R Factions").AddSubMenu(new Menu("Use R killsteal", "Use R killsteal"));
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R killsteal")
-                .AddItem(new MenuItem("UseRM", "Use R KillSteal"))
-                .SetValue(true);
-            _config.SubMenu("R Factions").SubMenu("Use R killsteal").AddItem(new MenuItem("", "Use R in Targets Below"));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != _player.Team))
-                _config.SubMenu("R Factions")
-                    .SubMenu("Use R killsteal")
-                    .AddItem(new MenuItem("castRkill" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(false));
-
 
             //Harass
             _config.AddSubMenu(new Menu("Harass", "Harass"));
@@ -135,7 +98,7 @@ namespace D_Graves
                     new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
                         KeyBindType.Toggle)));
             _config.SubMenu("Harass")
-                .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+                .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(70, 1, 100)));
             _config.SubMenu("Harass")
                 .AddItem(
                     new MenuItem("ActiveHarass", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
@@ -145,10 +108,10 @@ namespace D_Graves
             //Last Hit
             _config.SubMenu("Farm").AddSubMenu(new Menu("LastHit", "LastHit"));
             _config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("UseQLH", "Q LastHit")).SetValue(true);
-            _config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("UseWLH", "W LastHit")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("UseWLH", "W LastHit")).SetValue(false);
             _config.SubMenu("Farm")
                 .SubMenu("LastHit")
-                .AddItem(new MenuItem("Lastmana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+                .AddItem(new MenuItem("Lastmana", "Minimum Mana").SetValue(new Slider(70, 1, 100)));
             _config.SubMenu("Farm")
                 .SubMenu("LastHit")
                 .AddItem(
@@ -159,17 +122,13 @@ namespace D_Graves
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(new MenuItem("minminions", "Minimum minions to use Q").SetValue(new Slider(3, 1, 6)));
-            _config.SubMenu("Farm")
-                .SubMenu("LaneClear")
-                .AddItem(new MenuItem("Qinautoattack range", "Use Q to last hit in autoattack range"))
-                .SetValue(true);
-            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseWL", "W LaneClear")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseWL", "W LaneClear")).SetValue(false);
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(new MenuItem("minminionsw", "Minimum minions to use W").SetValue(new Slider(3, 1, 5)));
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
-                .AddItem(new MenuItem("Lanemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+                .AddItem(new MenuItem("Lanemana", "Minimum Mana").SetValue(new Slider(70, 1, 100)));
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(
@@ -178,7 +137,7 @@ namespace D_Graves
             //Jungle clear
             _config.SubMenu("Farm").AddSubMenu(new Menu("JungleClear", "JungleClear"));
             _config.SubMenu("Farm").SubMenu("JungleClear").AddItem(new MenuItem("UseQJ", "Q Jungle")).SetValue(true);
-            _config.SubMenu("Farm").SubMenu("JungleClear").AddItem(new MenuItem("UseWJ", "W Jungle")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("JungleClear").AddItem(new MenuItem("UseWJ", "W Jungle")).SetValue(false);
             _config.SubMenu("Farm")
                 .SubMenu("JungleClear")
                 .AddItem(new MenuItem("Junglemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
@@ -197,17 +156,17 @@ namespace D_Graves
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilge", "Use Bilge")).SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Offensive")
-                .AddItem(new MenuItem("BilgeEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
+                .AddItem(new MenuItem("BilgeEnemyhp", "If Enemy Hp <").SetValue(new Slider(60, 1, 100)));
             _config.SubMenu("items")
                 .SubMenu("Offensive")
-                .AddItem(new MenuItem("Bilgemyhp", "Or your Hp < ").SetValue(new Slider(85, 1, 100)));
+                .AddItem(new MenuItem("Bilgemyhp", "Or your Hp < ").SetValue(new Slider(60, 1, 100)));
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Blade", "Use Blade")).SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Offensive")
-                .AddItem(new MenuItem("BladeEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
+                .AddItem(new MenuItem("BladeEnemyhp", "If Enemy Hp <").SetValue(new Slider(60, 1, 100)));
             _config.SubMenu("items")
                 .SubMenu("Offensive")
-                .AddItem(new MenuItem("Blademyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
+                .AddItem(new MenuItem("Blademyhp", "Or Your  Hp <").SetValue(new Slider(60, 1, 100)));
 
             //Deffensive
             _config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
@@ -286,22 +245,24 @@ namespace D_Graves
                 .SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Potions")
-                .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
+                .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(40, 1, 100)));
             _config.SubMenu("items")
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usemppotions", "Use Mana potion/Flask/Biscuit"))
                 .SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Potions")
-                .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
+                .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(40, 1, 100)));
 
             //Misc
             _config.AddSubMenu(new Menu("Misc", "Misc"));
+            _config.SubMenu("Misc").AddItem(new MenuItem("qrange", "Q range").SetValue(new Slider(800, 450, 950)));
             _config.SubMenu("Misc").AddItem(new MenuItem("UseQM", "Use Q KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("UseWM", "Use W KillSteal")).SetValue(true);
+            _config.SubMenu("Misc").AddItem(new MenuItem("UseRM", "Use R KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "GapClosers W")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_E", "GapClosers E")).SetValue(true);
-            
+
             //HitChance
             _config.AddSubMenu(new Menu("HitChance", "HitChance"));
             _config.SubMenu("HitChance").AddSubMenu(new Menu("Combo", "Combo"));
@@ -354,7 +315,7 @@ namespace D_Graves
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Draw E")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawR", "Draw R")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw Auto Harass").SetValue(true));
-           
+
             _config.AddToMainMenu();
             Game.PrintChat("<font color='#881df2'>D-Graves by Diabaths</font> Loaded.");
             Game.OnUpdate += Game_OnGameUpdate;
@@ -363,12 +324,12 @@ namespace D_Graves
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
 
             Game.PrintChat(
-                 "<font color='#f2f21d'>If You like my work and want to support, and keep it always up to date plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
+                "<font color='#f2f21d'>If You like my work and want to support, and keep it always up to date plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            
+            _q.Range = _config.Item("qrange").GetValue<Slider>().Value;
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
@@ -405,7 +366,7 @@ namespace D_Graves
             Usepotion();
         }
 
-        
+
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (_w.IsReady() && gapcloser.Sender.IsValidTarget(_w.Range) && _config.Item("Gap_W").GetValue<bool>())
@@ -419,9 +380,9 @@ namespace D_Graves
                     //  Game.PrintChat("normal");
                     _w.Cast(gapcloser.Sender);
                 }
-            if (_e.IsReady() && gapcloser.Sender.IsValidTarget(_e.Range) && _config.Item("Gap_E").GetValue<bool>())
+            if (_e.IsReady() && gapcloser.Sender.IsValidTarget(1000) && _config.Item("Gap_E").GetValue<bool>())
             {
-                _e.Cast(Game.CursorPos);
+                _e.Cast(gapcloser.Sender);
             }
         }
 
@@ -533,13 +494,6 @@ namespace D_Graves
             return cc;
         }
 
-        private static void GenModelPacket(string champ, int skinId)
-        {
-            Packet.S2C.UpdateModel.Encoded(new Packet.S2C.UpdateModel.Struct(_player.NetworkId, skinId, champ))
-                .Process();
-        }
-
-       
         private static float ComboDamage(Obj_AI_Base enemy)
         {
             var damage = 0d;
@@ -570,54 +524,47 @@ namespace D_Graves
             var useR = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
             var customq = _config.Item("qrange").GetValue<Slider>().Value;
-            var rushUlti = _config.Item("UseRrush").GetValue<bool>();
-            var useRcombo = _config.Item("UseRcombo").GetValue<bool>();
             if (useQ && _q.IsReady())
             {
-                var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range - 70) && _q.GetPrediction(t).Hitchance >= Qchange())
-                    _q.Cast(t, false, true);
+                var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget(_q.Range))
+                    _q.CastIfHitchanceEquals(t, Qchange(), true);
             }
             if (useW && _w.IsReady())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_w.Range) && _w.GetPrediction(t).Hitchance >= Wchange())
-                    _w.Cast(t, false, true);
+                if (t.IsValidTarget(_w.Range))
+                    _w.CastIfHitchanceEquals(t, Wchange(), true);
             }
             if (useE)
             {
-                var t = TargetSelector.GetTarget(_q.Range + _e.Range, TargetSelector.DamageType.Magical);
+                var t = TargetSelector.GetTarget(_q.Range + _e.Range, TargetSelector.DamageType.Physical);
                 if (t != null)
                     Fuckinge(t);
             }
-            if (_r.IsReady() && useRcombo)
+            if (_r.IsReady() && useR)
             {
-                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_r.Range) && _config.Item("castR" + t.BaseSkinName) != null &&
-                    _config.Item("castR" + t.BaseSkinName).GetValue<bool>() == true &&
-                    !t.HasBuff("JudicatorIntervention") && !t.HasBuff("Undying Rage") &&
-                    _r.GetPrediction(t).Hitchance >= Rchange())
+                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
+                if (t.IsInvulnerable) return;
+                if (t.IsValidTarget(_r.Range))
                 {
-                    if (_q.IsReady() &&
+                    if (_q.IsReady() && t.IsValidTarget(customq) &&
                         (_q.GetDamage(t) > t.Health || _player.GetAutoAttackDamage(t, true)*2 > t.Health)) return;
-                    if (ComboDamage(t) > t.Health && rushUlti)
+                    if (ComboDamage(t) > t.Health)
                     {
-                        _r.Cast(t, false, true);
+                        _r.CastIfHitchanceEquals(t, Rchange(), true);
                     }
-                    if (_r.GetDamage(t) > t.Health && useR)
+                    if (_r.GetDamage(t) > t.Health)
                     {
-                        _r.Cast(t, false, true);
+                        _r.CastIfHitchanceEquals(t, Rchange(), true);
                     }
                 }
-            }
-
-            if (_r.IsReady() && autoR && useRcombo)
-            {
-                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (ObjectManager.Get<Obj_AI_Hero>().Count(hero => hero.IsValidTarget(_r.Range)) >=
-                    _config.Item("MinTargets").GetValue<Slider>().Value
-                    && _r.GetPrediction(t).Hitchance >= Rchange())
-                    _r.Cast(t, false, true);
+                if (autoR)
+                {
+                    var fuckr = _r.GetPrediction(t, true);
+                    if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value)
+                        _r.CastIfHitchanceEquals(t, Rchange(), true);
+                }
             }
             UseItemes();
         }
@@ -656,19 +603,20 @@ namespace D_Graves
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
             var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
+            var customq = _config.Item("qrange").GetValue<Slider>().Value;
             if (combo && unit.IsMe && (target is Obj_AI_Hero))
             {
                 if (useQ && _q.IsReady())
                 {
-                    var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                    if (t.IsValidTarget(_q.Range - 70) && _q.GetPrediction(t).Hitchance >= Qchange())
-                        _q.Cast(t, false, true);
+                    var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
+                    if (t.IsValidTarget(_q.Range - 70))
+                        _q.CastIfHitchanceEquals(t, Qchange(), true);
                 }
                 if (useW && _w.IsReady())
                 {
                     var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (t.IsValidTarget(_w.Range) && _w.GetPrediction(t).Hitchance >= Wchange())
-                        _w.Cast(t, false, true);
+                    if (t.IsValidTarget(_w.Range))
+                        _w.CastIfHitchanceEquals(t, Wchange(), true);
                 }
             }
         }
@@ -677,18 +625,19 @@ namespace D_Graves
         {
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
+            var customq = _config.Item("qrange").GetValue<Slider>().Value;
 
             if (useQ && _q.IsReady())
             {
-                var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range - 70) && _q.GetPrediction(t).Hitchance >= Qchangeharass())
-                    _q.Cast(t, false, true);
+                var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget(_q.Range - 70))
+                    _q.CastIfHitchanceEquals(t, Qchangeharass(), true);
             }
             if (useW && _w.IsReady())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_w.Range) && _w.GetPrediction(t).Hitchance >= Wchangeharass())
-                    _w.Cast(t, false, true);
+                if (t.IsValidTarget(_w.Range))
+                    _w.CastIfHitchanceEquals(t, Wchangeharass(), true);
             }
         }
 
@@ -705,8 +654,7 @@ namespace D_Graves
             var minionhitw = _config.Item("minminionsw").GetValue<Slider>().Value;
             var useQl = _config.Item("UseQL").GetValue<bool>();
             var useWl = _config.Item("UseWL").GetValue<bool>();
-            var qinAuto = _config.Item("Qinautoattack").GetValue<bool>();
-
+           
 
             if (_q.IsReady() && useQl)
             {
@@ -719,7 +667,7 @@ namespace D_Graves
                 else
                 {
                     foreach (var minion in allMinionsQ)
-                        if (Orbwalking.InAutoAttackRange(minion) && qinAuto &&
+                        if (Orbwalking.InAutoAttackRange(minion)&&
                             minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
                         {
                             _q.Cast(minion);
@@ -904,7 +852,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -921,7 +869,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -938,7 +886,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -955,7 +903,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -972,7 +920,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -989,7 +937,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -1006,7 +954,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -1023,7 +971,7 @@ namespace D_Graves
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -1038,29 +986,25 @@ namespace D_Graves
             {
                 if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
                 {
-                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range - 30) &&
-                        _q.GetPrediction(hero).Hitchance >= Qchangekill())
+                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range - 30))
                     {
-                        _q.Cast(hero, false, true);
+                        _q.CastIfHitchanceEquals(hero, Qchangekill(), true);
                     }
                 }
                 if (_w.IsReady() && _config.Item("UseWM").GetValue<bool>())
                 {
-                    if (_w.GetDamage(hero) > hero.Health && hero.IsValidTarget(_w.Range) &&
-                        _q.GetPrediction(hero).Hitchance >= Wchangekill())
+                    if (_w.GetDamage(hero) > hero.Health && hero.IsValidTarget(_w.Range))
                     {
-                        _w.Cast(hero, false, true);
+                        _w.CastIfHitchanceEquals(hero, Wchangekill(), true);
                     }
                 }
                 if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>() && hero.IsValidTarget(_r.Range))
                 {
-                    if (_q.IsReady() && _q.GetDamage(hero) > hero.Health) return;
-                    if (_config.Item("castRkill" + hero.BaseSkinName) != null &&
-                        _config.Item("castRkill" + hero.BaseSkinName).GetValue<bool>() == true &&
-                        !hero.HasBuff("JudicatorIntervention") && !hero.HasBuff("Undying Rage") &&
-                        _r.GetDamage(hero) > hero.Health && _r.GetPrediction(hero).Hitchance >= Rchangekill())
+                    if (_q.IsReady() && _q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range)) return;
+                    if (!hero.IsInvulnerable &&
+                        _r.GetDamage(hero) > hero.Health)
                     {
-                        _r.Cast(hero, false, true);
+                        _r.CastIfHitchanceEquals(hero, Rchangekill(), true);
                     }
                 }
             }
@@ -1098,7 +1042,6 @@ namespace D_Graves
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
             }
-
         }
     }
 }
