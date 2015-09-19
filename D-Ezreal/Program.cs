@@ -22,21 +22,16 @@ namespace D_Ezreal
 
         private static SpellSlot _igniteSlot;
 
-        private static Int32 _lastSkin;
         private static Vector2 _pingLocation;
 
         private static int _lastPingT = 0;
 
+        private static int _lastTick;
 
-        private static readonly int[] Ezrealap = { 2, 3, 2, 1, 2, 4, 2, 3, 2, 3, 4, 3, 3, 1, 1, 4, 1, 1 };
-        private static readonly int[] Ezrealad = { 1, 3, 1, 2, 1, 4, 1, 3, 1, 3, 4, 3, 2, 3, 2, 4, 2, 2 };
-        private static readonly int[] EzrealQwe = { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-        private static readonly int[] EzrealWqe = { 1, 3, 2, 2, 2, 4, 2, 1, 2, 1, 4, 1, 1, 3, 3, 4, 3, 3 };
-
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
+        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
+        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
+        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
+        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
         private static Items.Item _youmuu, _blade, _bilge, _hextech, _archangel;
 
         private static void Main(string[] args)
@@ -46,7 +41,7 @@ namespace D_Ezreal
 
         private static void Ping(Vector2 position)
         {
-            if (Environment.TickCount - _lastPingT < 30 * 1000) return;
+            if (Environment.TickCount - _lastPingT < 30*1000) return;
             _lastPingT = Environment.TickCount;
             _pingLocation = position;
             SimplePing();
@@ -76,9 +71,9 @@ namespace D_Ezreal
             _r.SetSkillshot(1.1f, 160f, 2000f, false, SkillshotType.SkillshotLine);
 
             _archangel = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ||
-              Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
-           ? new Items.Item(3048, float.MaxValue)
-           : new Items.Item(3040, float.MaxValue);
+                         Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
+                ? new Items.Item(3048, float.MaxValue)
+                : new Items.Item(3040, float.MaxValue);
 
             _hextech = new Items.Item(3146, 700);
             _youmuu = new Items.Item(3142, 10);
@@ -103,100 +98,16 @@ namespace D_Ezreal
             _config.SubMenu("Combo").AddItem(new MenuItem("UseIgnitecombo", "Use Ignite(rush for it)")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRC", "Use R")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use R if  hit x Enemys")).SetValue(true);
+            _config.SubMenu("Combo")
+                .AddItem(new MenuItem("MinTargets", "Auto R if Hit X Enemys").SetValue(new Slider(2, 1, 5)));
+            _config.SubMenu("Combo")
+                .AddItem(new MenuItem("Minrange", "Min R range to Use").SetValue(new Slider(800, 0, 1500)));
+            _config.SubMenu("Combo")
+                .AddItem(new MenuItem("Maxrange", "Max R range to Use").SetValue(new Slider(3000, 1500, 5000)));
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
-
-            //Ulti Factions
-            _config.AddSubMenu(new Menu("R Factions", "R Factions"));
-            _config.SubMenu("R Factions").AddSubMenu(new Menu("Use R combo", "Use R combo"));
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRcombo", "Use R in Combo"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRrush", "Rush R if ComboDmg>=Tagret HP"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRC", "Use R if R.Dmg>Targ. HP"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("UseRE", "Auto R if Hit X Enemys"))
-                .SetValue(true);
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R combo")
-                .AddItem(new MenuItem("MinTargets", "Auto R if Hit X Enemys").SetValue(new Slider(2, 1, 5)));
-            _config.SubMenu("R Factions").SubMenu("Use R combo").AddItem(new MenuItem("", "Use R in Targets Below"));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != _player.Team))
-                _config.SubMenu("R Factions")
-                    .SubMenu("Use R combo")
-                    .AddItem(new MenuItem("castRezreal" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(true));
-            _config.SubMenu("R Factions").AddSubMenu(new Menu("Use R killsteal", "Use R killsteal"));
-            _config.SubMenu("R Factions")
-                .SubMenu("Use R killsteal")
-                .AddItem(new MenuItem("UseRM", "Use R KillSteal"))
-                .SetValue(true);
-            _config.SubMenu("R Factions").SubMenu("Use R killsteal").AddItem(new MenuItem("", "Use R in Targets Below"));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != _player.Team))
-                _config.SubMenu("R Factions")
-                    .SubMenu("Use R killsteal")
-                    .AddItem(new MenuItem("castRkill" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(true));
-            _config.SubMenu("R Factions")
-                .AddItem(new MenuItem("Minrange", "Min R range to Use").SetValue(new Slider(800, 0, 1500)));
-            _config.SubMenu("R Factions")
-                .AddItem(new MenuItem("Maxrange", "Max R range to Use").SetValue(new Slider(3000, 1500, 5000)));
-
-            //items
-            _config.AddSubMenu(new Menu("items", "items"));
-            _config.SubMenu("items").AddSubMenu(new Menu("Offensive", "Offensive"));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("usemuramana", "Use Muramana")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("muramanamin", "Use Muramana until MP < %").SetValue(new Slider(25, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Youmuu", "Use Youmuu's")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilge", "Use Bilge")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("BilgeEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilgemyhp", "Or your Hp < ").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Blade", "Use Blade")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("BladeEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Blademyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hextech", "Hextech Gunblade")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("HextechEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hextechmyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
-            
-            _config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
-            _config.SubMenu("items").SubMenu("Deffensive").AddSubMenu(new Menu("Cleanse", "Cleanse"));
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("useqss", "Use QSS/Mercurial Scimitar/Dervish Blade")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("blind", "Blind")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("charm", "Charm")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("fear", "Fear")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("flee", "Flee")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("snare", "Snare")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("taunt", "Taunt")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("suppression", "Suppression")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("stun", "Stun")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("polymorph", "Polymorph")).SetValue(false);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("silence", "Silence")).SetValue(false);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("zedultexecute", "Zed Ult")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").SubMenu("Cleanse").AddItem(new MenuItem("Cleansemode", "Use Cleanse")).SetValue(new StringList(new string[2] { "Always", "In Combo" }));
-            _config.SubMenu("items").SubMenu("Deffensive").AddItem(new MenuItem("Archangel", "Seraph's Embrace")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Deffensive").AddItem(new MenuItem("Archangelmyhp", "If My HP% <").SetValue(new Slider(85, 1, 100)));
-
-            _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
-            _config.SubMenu("items")
-                .SubMenu("Potions")
-                .AddItem(new MenuItem("usehppotions", "Use Health potion/Flask/Biscuit"))
-                .SetValue(true);
-            _config.SubMenu("items")
-                .SubMenu("Potions")
-                .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
-            _config.SubMenu("items")
-                .SubMenu("Potions")
-                .AddItem(new MenuItem("usemppotions", "Use Mana potion/Flask/Biscuit"))
-                .SetValue(true);
-            _config.SubMenu("items")
-                .SubMenu("Potions")
-                .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
 
             //Harass
             _config.AddSubMenu(new Menu("Harass", "Harass"));
@@ -242,23 +153,146 @@ namespace D_Ezreal
                 .AddItem(
                     new MenuItem("ActiveJungle", "Jungle key").SetValue(new KeyBind("V".ToCharArray()[0],
                         KeyBindType.Press)));
+            //items
+            _config.AddSubMenu(new Menu("items", "items"));
+            _config.SubMenu("items").AddSubMenu(new Menu("Offensive", "Offensive"));
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("usemuramana", "Use Muramana"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("muramanamin", "Use Muramana until MP < %").SetValue(new Slider(25, 1, 100)));
+            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Youmuu", "Use Youmuu's")).SetValue(true);
+            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilge", "Use Bilge")).SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("BilgeEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("Bilgemyhp", "Or your Hp < ").SetValue(new Slider(85, 1, 100)));
+            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Blade", "Use Blade")).SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("BladeEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("Blademyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("Hextech", "Hextech Gunblade"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("HextechEnemyhp", "If Enemy Hp <").SetValue(new Slider(85, 1, 100)));
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("Hextechmyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
+
+            _config.SubMenu("items").AddSubMenu(new Menu("Deffensive", "Deffensive"));
+            _config.SubMenu("items").SubMenu("Deffensive").AddSubMenu(new Menu("Cleanse", "Cleanse"));
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("useqss", "Use QSS/Mercurial Scimitar/Dervish Blade"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("blind", "Blind"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("charm", "Charm"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("fear", "Fear"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("flee", "Flee"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("snare", "Snare"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("taunt", "Taunt"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("suppression", "Suppression"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("stun", "Stun"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("polymorph", "Polymorph"))
+                .SetValue(false);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("silence", "Silence"))
+                .SetValue(false);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("zedultexecute", "Zed Ult"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .SubMenu("Cleanse")
+                .AddItem(new MenuItem("Cleansemode", "Use Cleanse"))
+                .SetValue(new StringList(new string[2] {"Always", "In Combo"}));
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .AddItem(new MenuItem("Archangel", "Seraph's Embrace"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Deffensive")
+                .AddItem(new MenuItem("Archangelmyhp", "If My HP% <").SetValue(new Slider(85, 1, 100)));
+
+            _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
+            _config.SubMenu("items")
+                .SubMenu("Potions")
+                .AddItem(new MenuItem("usehppotions", "Use Health potion/Flask/Biscuit"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Potions")
+                .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
+            _config.SubMenu("items")
+                .SubMenu("Potions")
+                .AddItem(new MenuItem("usemppotions", "Use Mana potion/Flask/Biscuit"))
+                .SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Potions")
+                .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
+
 
             //Misc
             _config.AddSubMenu(new Menu("Misc", "Misc"));
             _config.SubMenu("Misc")
-                .AddItem(new MenuItem("pingulti", "Ping If R Dmg>Enemy Health (only local)").SetValue(false));
+                .AddItem(new MenuItem("pingulti", "Ping If R Dmg>Enemy Health").SetValue(false));
             _config.SubMenu("Misc").AddItem(new MenuItem("useQK", "Use Q KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useWK", "Use W KillSteal")).SetValue(true);
+            _config.SubMenu("Misc").AddItem(new MenuItem("UseRM", "Use R KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useEK", "Use (E-Q) or (E-W) KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useQdash", "Auto Q dashing")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useQimmo", "Auto Q Immobile")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useQstun", "Auto Q Taunt/Fear/Charm/Snare")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_E", "Use E to Gapcloser")).SetValue(true);
-            _config.SubMenu("Misc").AddItem(new MenuItem("EZAutoLevel", "Auto Level")).SetValue(false);
-            _config.SubMenu("Misc").AddItem(new MenuItem("EZStyle", "Level Sequence").SetValue(
-                new StringList(new[] { "W-E-Q", "W-Q-E", "Q-E-W", "Q-W-E" })));
-            _config.SubMenu("Misc").AddItem(new MenuItem("skinez", "Use Custom Skin").SetValue(false));
-            _config.SubMenu("Misc").AddItem(new MenuItem("skinezreal", "Skin Changer").SetValue(new Slider(4, 1, 8)));
 
             //Damage after combo:
             MenuItem dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Draw damage after combo").SetValue(true);
@@ -284,22 +318,13 @@ namespace D_Ezreal
             _config.AddToMainMenu();
             Game.PrintChat("<font color='#881df2'>D-Ezreal by Diabaths</font> Loaded.");
             Game.PrintChat(
-               "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
-            if (_config.Item("skinez").GetValue<bool>())
-            {
-                GenModelPacket(_player.ChampionName, _config.Item("skinezreal").GetValue<Slider>().Value);
-                _lastSkin = _config.Item("skinezreal").GetValue<Slider>().Value;
-            }
+                "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
+
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            _config.Item("EZAutoLevel").ValueChanged += LevelUpMode;
-            if (_config.Item("EZAutoLevel").GetValue<bool>())
-            {
-                new AutoLevel(Style());
-            }
-
+            
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -313,20 +338,16 @@ namespace D_Ezreal
                                 hero =>
                                     ObjectManager.Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
                                     hero.IsValidTarget(30000) &&
-                                    _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health)
+                                    _player.GetSpellDamage(hero, SpellSlot.R)*0.9 > hero.Health)
                     )
                 {
-                    Game.PrintChat("ping");
+
                     Ping(enemy.Position.To2D());
                 }
             }
-            if (_config.Item("skinez").GetValue<bool>() && SkinChanged())
-            {
-                GenModelPacket(_player.ChampionName, _config.Item("skinezreal").GetValue<Slider>().Value);
-                _lastSkin = _config.Item("skinezreal").GetValue<Slider>().Value;
-            }
+
             if (_config.Item("ActiveLane").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
             {
                 Laneclear();
             }
@@ -337,29 +358,32 @@ namespace D_Ezreal
                             _player.Spellbook.GetSpell(SpellSlot.E).ManaCost;
             if (target.IsValidTarget(_q.Range) && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
-                if (_player.Mana >= manacheck && qpred.Hitchance == HitChance.Immobile && _q.IsReady() &&
+                if (_player.Mana >= manacheck  &&
+                    qpred.CollisionObjects.Count == 0 && _q.IsReady() &&
                     _config.Item("useQimmo").GetValue<bool>())
                 {
-                    _q.Cast(qpred.CastPosition);
+                    _q.CastIfHitchanceEquals(target, HitChance.Immobile, true);
                 }
-                if (_player.Mana >= manacheck && qpred.Hitchance == HitChance.Dashing && _q.IsReady() &&
+                if (_player.Mana >= manacheck &&
+                    qpred.CollisionObjects.Count == 0 && _q.IsReady() &&
                     _config.Item("useQdash").GetValue<bool>())
                 {
-                    _q.Cast(qpred.CastPosition);
+                    _q.CastIfHitchanceEquals(target, HitChance.Dashing, true);
                 }
-                if (_player.Mana >= manacheck && qpred.Hitchance == HitChance.High && _q.IsReady() &&
+                if (_player.Mana >= manacheck && qpred.CollisionObjects.Count == 0 &&
+                    _q.IsReady() &&
                     _config.Item("useQstun").GetValue<bool>() &&
                     (target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Charm) ||
                      target.HasBuffOfType(BuffType.Fear) ||
                      target.HasBuffOfType(BuffType.Taunt)))
                 {
-                    _q.Cast(qpred.CastPosition);
+                    _q.CastIfHitchanceEquals(target, HitChance.High, true);
                 }
             }
             _player = ObjectManager.Player;
             _orbwalker.SetAttack(true);
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
@@ -369,13 +393,14 @@ namespace D_Ezreal
             }
             if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value &&
+                !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Harass();
             }
 
             if (_config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value)
             {
                 LastHit();
             }
@@ -385,85 +410,76 @@ namespace D_Ezreal
             Usecleanse();
 
         }
+
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (_e.IsReady() && gapcloser.Sender.IsValidTarget(_e.Range) && _config.Item("Gap_E").GetValue<bool>())
+            if (_e.IsReady() && _config.Item("Gap_E").GetValue<bool>() && gapcloser.Sender.IsValidTarget(1000))
             {
-                _e.Cast(Game.CursorPos);
+              _e.Cast(gapcloser.Sender);
             }
         }
-        private static int[] Style()
-        {
-            switch (_config.Item("EZStyle").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return Ezrealap;
-                case 1:
-                    return EzrealWqe;
-                case 2:
-                    return Ezrealad;
-                case 3:
-                    return EzrealQwe;
-                default:
-                    return null;
-            }
-        }
-        private static void LevelUpMode(object sender, OnValueChangeEventArgs e)
-        {
-            AutoLevel.Enabled(e.GetNewValue<bool>());
-        }
-        private static void GenModelPacket(string champ, int skinId)
-        {
-            Packet.S2C.UpdateModel.Encoded(new Packet.S2C.UpdateModel.Struct(_player.NetworkId, skinId, champ))
-                .Process();
-        }
-
-        private static bool SkinChanged()
-        {
-            return (_config.Item("skinezreal").GetValue<Slider>().Value != _lastSkin);
-        }
-
+        
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
+            var combo = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
+            var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
+            var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
             if (combo && unit.IsMe && (target is Obj_AI_Hero))
             {
                 if (useQ && _q.IsReady())
                 {
-                    var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-
-                    if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= HitChance.High)
+                    var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+                    var qpred = _q.GetPrediction(t);
+                    if (t.IsValidTarget(_q.Range) && qpred.CollisionObjects.Count == 0)
                     {
-                        _q.Cast(t);
+                        _q.CastIfHitchanceEquals(t, HitChance.High, true);
                     }
                 }
                 if (useW && _w.IsReady())
                 {
                     var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (t.IsValidTarget(_w.Range) && _w.GetPrediction(t).Hitchance >= HitChance.High)
+                    if (t.IsValidTarget(_w.Range))
                     {
-                        _w.Cast(t, false, true);
+                        _w.CastIfHitchanceEquals(t, HitChance.High, true);
                     }
                 }
+            }
+            //Creditc FlapperDoodle
+            if (lastHit || laneClear)
+            {
+                foreach (
+                    var minionDie in
+                        MinionManager.GetMinions(_q.Range)
+                            .Where(
+                                minion =>
+                                    target.NetworkId != minion.NetworkId && minion.IsEnemy &&
+                                    HealthPrediction.GetHealthPrediction(minion,
+                                        (int) ((_player.AttackDelay*1000)*2.65f + Game.Ping/2), 0) <= 0 &&
+                                    _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
+                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High)
+                        _q.Cast(minionDie, true);
             }
         }
 
         private static void Muramana()
         {
+            var changetime = Environment.TickCount - _lastTick;
             var muranama = _player.Mana >=
-                           (_player.MaxMana * (_config.Item("muramanamin").GetValue<Slider>().Value) / 100);
+                           (_player.MaxMana*(_config.Item("muramanamin").GetValue<Slider>().Value)/100);
             if (!_config.Item("usemuramana").GetValue<bool>()) return;
             if (muranama && _player.Buffs.Count(buf => buf.Name == "Muramana") == 0 &&
-                _config.Item("ActiveCombo").GetValue<KeyBind>().Active)
+                _config.Item("ActiveCombo").GetValue<KeyBind>().Active && changetime >= 350)
             {
                 Items.UseItem(3042);
+                _lastTick = Environment.TickCount;
             }
             if ((!muranama || !_config.Item("ActiveCombo").GetValue<KeyBind>().Active) &&
-                _player.Buffs.Count(buf => buf.Name == "Muramana") == 1)
+                _player.Buffs.Count(buf => buf.Name == "Muramana") == 1 && changetime >= 350)
             {
                 Items.UseItem(3042);
+                _lastTick = Environment.TickCount;
             }
         }
 
@@ -473,9 +489,8 @@ namespace D_Ezreal
             var ignitecombo = _config.Item("UseIgnitecombo").GetValue<bool>();
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            var useR = _config.Item("UseRcombo").GetValue<bool>();
             UseItemes();
-            
+
             if (target.IsValidTarget(600) && _igniteSlot != SpellSlot.Unknown && ignitecombo &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
@@ -483,44 +498,49 @@ namespace D_Ezreal
                 {
                     _player.Spellbook.CastSpell(_igniteSlot, target);
                 }
+
+                if (_q.IsReady() && useQ)
+                {
+                    var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+                    if (tq.IsValidTarget(_q.Range - 50) &&
+                        _q.GetPrediction(tq).CollisionObjects.Count == 0)
+                    {
+                        _q.CastIfHitchanceEquals(tq, HitChance.High, true);
+                    }
+                }
             }
-            if (target.IsValidTarget(_q.Range - 50) && _q.IsReady() && useQ &&
-                _q.GetPrediction(target).Hitchance >= HitChance.High)
+            if (_w.IsReady() && useW)
             {
-
-                _q.Cast(target);
-
+                var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
+                if (tw.IsValidTarget(_w.Range - 50))
+                {
+                    _w.CastIfHitchanceEquals(tw, HitChance.High, true);
+                }
             }
-            if (target.IsValidTarget(_w.Range - 50) && _w.IsReady() && useW &&
-                _w.GetPrediction(target).Hitchance >= HitChance.High)
-            {
 
-                _w.Cast(target, false, true);
-
-            }
-            if (useR)
-            {
-                UseRcombo();
-            }
+            UseRcombo();
         }
 
         private static void Harass()
         {
-            var target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
-            if (_q.IsReady() && useQ && _q.GetPrediction(target).Hitchance >= HitChance.High)
+            if (_q.IsReady() && useQ)
             {
-                if (target.IsValidTarget(_q.Range - 50))
+                var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+                if (tq.IsValidTarget(_q.Range - 50) &&
+                    _q.GetPrediction(tq).CollisionObjects.Count == 0)
                 {
-                    _q.Cast(target);
+                    _q.CastIfHitchanceEquals(tq, HitChance.High, true);
                 }
             }
-            if (target != null && _w.IsReady() && useW && _w.GetPrediction(target).Hitchance >= HitChance.High)
+
+            if (_w.IsReady() && useW)
             {
-                if (target.IsValidTarget(_w.Range - 50))
+                var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
+                if (tw.IsValidTarget(_w.Range - 50) )
                 {
-                    _w.Cast(target, false, true);
+                    _w.CastIfHitchanceEquals(tw, HitChance.High, true);
                 }
             }
         }
@@ -560,7 +580,7 @@ namespace D_Ezreal
             if (_e.IsReady())
                 dmg += _player.GetSpellDamage(hero, SpellSlot.E);
             if (_r.IsReady())
-                dmg += _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
+                dmg += _player.GetSpellDamage(hero, SpellSlot.R)*0.9;
             if (Items.HasItem(3144) && Items.CanUseItem(3144))
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Bilgewater);
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
@@ -573,10 +593,10 @@ namespace D_Ezreal
             }
             if (ObjectManager.Player.HasBuff("LichBane"))
             {
-                dmg += _player.BaseAttackDamage * 0.75 + _player.FlatMagicDamageMod * 0.5;
+                dmg += _player.BaseAttackDamage*0.75 + _player.FlatMagicDamageMod*0.5;
             }
-            dmg += _player.GetAutoAttackDamage(hero, true) * 2;
-            return (float)dmg;
+            dmg += _player.GetAutoAttackDamage(hero, true)*2;
+            return (float) dmg;
         }
 
         private static void Usepotion()
@@ -586,10 +606,10 @@ namespace D_Ezreal
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
             var iusemppotion = _config.Item("usemppotions").GetValue<bool>();
             var iusepotionmp = _player.Mana <=
-                               (_player.MaxMana * (_config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxMana*(_config.Item("usepotionmp").GetValue<Slider>().Value)/100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
@@ -652,24 +672,24 @@ namespace D_Ezreal
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
                 var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth * (_config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
+                                    (hero.MaxHealth*(_config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
                 var iBilgemyhp = _player.Health <=
-                                 (_player.MaxHealth * (_config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
+                                 (_player.MaxHealth*(_config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
                 var iBlade = _config.Item("Blade").GetValue<bool>();
                 var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth * (_config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
+                                    (hero.MaxHealth*(_config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
                 var iBlademyhp = _player.Health <=
-                                 (_player.MaxHealth * (_config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
+                                 (_player.MaxHealth*(_config.Item("Blademyhp").GetValue<Slider>().Value)/100);
                 var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
                 var iHextech = _config.Item("Hextech").GetValue<bool>();
                 var iHextechEnemyhp = hero.Health <=
-                                      (hero.MaxHealth * (_config.Item("HextechEnemyhp").GetValue<Slider>().Value) / 100);
+                                      (hero.MaxHealth*(_config.Item("HextechEnemyhp").GetValue<Slider>().Value)/100);
                 var iHextechmyhp = _player.Health <=
-                                   (_player.MaxHealth * (_config.Item("Hextechmyhp").GetValue<Slider>().Value) / 100);
+                                   (_player.MaxHealth*(_config.Item("Hextechmyhp").GetValue<Slider>().Value)/100);
 
                 var iArchange = _config.Item("Archangel").GetValue<bool>();
                 var iArchangelmyhp = _player.Health <=
-                                   (_player.MaxHealth * (_config.Item("Archangelmyhp").GetValue<Slider>().Value) / 100);
+                                     (_player.MaxHealth*(_config.Item("Archangelmyhp").GetValue<Slider>().Value)/100);
 
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
                 {
@@ -712,114 +732,107 @@ namespace D_Ezreal
                 var wmana = _player.Spellbook.GetSpell(SpellSlot.W).ManaCost;
                 var qmana = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost;
                 var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
-                if (usew && _w.IsReady() && whDmg - 20 > hero.Health)
+                if (usew && _w.IsReady() && whDmg - 20 > hero.Health && !hero.IsInvulnerable)
                 {
-                    if (hero.IsValidTarget(_w.Range) && _player.Mana > wmana &&
-                        _w.GetPrediction(hero).Hitchance >= HitChance.High)
+                    if (hero.IsValidTarget(_w.Range) && _player.Mana > wmana + emana )
                     {
-                        _w.Cast(hero, false, true);
+                        _w.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
-                    else if (usee && !hero.IsValidTarget(_w.Range) && _player.Mana > wmana + emana &&
+                    else if (usee && !hero.IsValidTarget(_w.Range)&&hero.IsValidTarget(_w.Range+_e.Range) && _player.Mana > wmana + emana &&
                              _e.IsReady()
-                             && _w.GetPrediction(hero).CollisionObjects.Count > 0)
+                        )
                     {
                         _e.Cast(hero.Position);
-                        _w.Cast(hero.ServerPosition);
+                        _w.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
                 }
-                if (useq && _q.IsReady() && qhDmg - 20 > hero.Health)
+                if (useq && _q.IsReady() && qhDmg - 20 > hero.Health && !hero.IsInvulnerable)
                 {
                     if (_player.Mana > qmana && hero.IsValidTarget(_q.Range) &&
-                        _q.GetPrediction(hero).Hitchance >= HitChance.High)
+                        
+                        _q.GetPrediction(hero).CollisionObjects.Count == 0)
                     {
-                        _q.Cast(hero);
+                        _q.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
-                    else if (_e.IsReady() && usee && !hero.IsValidTarget(_w.Range) &&
-                             _player.Mana > qmana + emana &&
-                             _q.GetPrediction(hero).CollisionObjects.Count > 0)
+                    else if (_e.IsReady() && usee && !hero.IsValidTarget(_q.Range) &&
+                             _player.Mana > qmana + emana && hero.IsValidTarget(_q.Range + _e.Range) && _q.GetPrediction(hero).Hitchance >= HitChance.VeryHigh)
                     {
                         _e.Cast(hero.Position);
-                        _q.Cast(hero.ServerPosition);
+                        _q.Cast(hero, true);
                     }
                 }
-                if (user && _player.Mana > rmana && _r.IsReady())
+                if (user && _player.Mana > rmana && _r.IsReady() && !hero.IsInvulnerable)
                 {
-                    if (hero.IsValidTarget(_r.Range) && _r.GetPrediction(hero).Hitchance >= HitChance.High &&
-                        rhDmg - 20 > hero.Health &&
-                        _config.Item("castRkill" + hero.BaseSkinName) != null &&
-                        _config.Item("castRkill" + hero.BaseSkinName).GetValue<bool>() == true &&
-                        !hero.HasBuff("JudicatorIntervention") && !hero.HasBuff("Undying Rage"))
-                        _r.Cast(hero, false, true);
+                    if (hero.IsValidTarget(_r.Range)  &&
+                        rhDmg - 20 > hero.Health)
+                        _r.CastIfHitchanceEquals(hero, HitChance.High, true);
                 }
             }
         }
 
-        
+
         private static void UseRcombo()
         {
             var target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
             if (!_r.IsReady()) return;
             var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
-            var rDmg = _player.GetSpellDamage(target, SpellSlot.R) * 0.9;
-            var rrush = _config.Item("UseRrush").GetValue<bool>();
+            var rDmg = _player.GetSpellDamage(target, SpellSlot.R)*0.9;
             var rsolo = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
             if (target == null) return;
-            if (target.HasBuff("JudicatorIntervention") || target.HasBuff("Undying Rage")) return;
+            if (target.IsInvulnerable) return;
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
             {
-                if (_player.Distance(target) >= minrange && _r.GetPrediction(target).Hitchance >= HitChance.High)
+                if (!hero.IsInvulnerable && _player.Distance(target) >= minrange)
                 {
-                    if (_config.Item("castRezreal" + target.BaseSkinName) != null &&
-                        _config.Item("castRezreal" + target.BaseSkinName).GetValue<bool>() == true)
+                    if (rsolo)
                     {
-                        if (rDmg > target.Health && rsolo)
+                        if (rDmg > target.Health)
+                            _r.CastIfHitchanceEquals(hero, HitChance.High, true);
+
+                        else if (ComboDamage(target) > target.Health)
                         {
-                            _r.Cast(target);
-                        }
-                        else if (ComboDamage(target) > target.Health && rrush)
-                        {
-                            _r.Cast(target);
+                            _r.CastIfHitchanceEquals(hero, HitChance.High, true);
                         }
                     }
                 }
-                if (!autoR) return;
-                var fuckr = _r.GetPrediction(hero, true);
-                if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value &&
-                    _r.GetPrediction(hero).Hitchance >= HitChance.High)
+                if (autoR)
                 {
-                    _r.Cast(hero, false, true);
+                    var fuckr = _r.GetPrediction(hero, true);
+                    if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value )
+                    {
+                        _r.CastIfHitchanceEquals(hero, HitChance.High, true);
+                    }
                 }
             }
         }
 
+        //Creditcs FlapperDoodle
         private static void Farm_skills(Spell spell, bool skillshot = false)
         {
-            if (!_q.IsReady())
-                return;
-            var allMinions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All);
-            foreach (var minion in allMinions)
+
+            var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
+            var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
+            if (lastHit && _player.ManaPercent > _config.Item("lastmana").GetValue<Slider>().Value)
             {
-                if (!minion.IsValidTarget())
-                    continue;
-                var minionInRangeAa = Orbwalking.InAutoAttackRange(minion);
-                var minionInRangeSpell = minion.Distance(ObjectManager.Player) <= spell.Range;
-                var minionKillableAa = _player.GetAutoAttackDamage(minion, true) - 30 >= minion.Health;
-                var minionKillableSpell = _player.GetSpellDamage(minion, SpellSlot.Q) - 30 >= minion.Health;
-                var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
-                var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
-                if ((lastHit && minionInRangeSpell && minionKillableSpell) &&
-                    _q.GetPrediction(minion).CollisionObjects.Count > 0 && skillshot)
-                {
-                    spell.Cast(minion.Position);
-                }
-                if (laneClear && minionInRangeSpell)
-                {
-                    if (minionKillableSpell && _q.GetPrediction(minion).CollisionObjects.Count > 0 && skillshot)
-                        spell.Cast(minion.Position);
-                    else
-                        spell.Cast(minion);
-                }
+                var minion =
+                    MinionManager.GetMinions(_q.Range, MinionTypes.All, MinionTeam.Enemy)
+                        .FirstOrDefault(
+                            min =>
+                                min.IsValidTarget(_q.Range) &&
+                                _player.GetSpellDamage(min, SpellSlot.Q) >= min.Health);
+                if (minion != null)
+                    _q.CastIfHitchanceEquals(minion, HitChance.High, true);
+            }
+            if (laneClear && _player.ManaPercent > _config.Item("Lanemana").GetValue<Slider>().Value)
+            {
+                var minion =
+                    MinionManager.GetMinions(_q.Range, MinionTypes.All, MinionTeam.Enemy,
+                        MinionOrderTypes.MaxHealth)
+                        .OrderBy(min => min.Distance(_player))
+                        .FirstOrDefault(min => min.IsValidTarget(_q.Range));
+                if (minion != null)
+                    _q.CastIfHitchanceEquals(minion, HitChance.High, true);
             }
         }
 
@@ -937,26 +950,26 @@ namespace D_Ezreal
             if (_config.Item("damagetest").GetValue<bool>())
             {
                 foreach (
-                var enemyVisible in
-                ObjectManager.Get<Obj_AI_Hero>().Where(enemyVisible => enemyVisible.IsValidTarget()))
+                    var enemyVisible in
+                        ObjectManager.Get<Obj_AI_Hero>().Where(enemyVisible => enemyVisible.IsValidTarget()))
                 {
                     if (ComboDamage(enemyVisible) > enemyVisible.Health)
                     {
                         Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                        Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Red,
-                        "Combo=Rekt");
+                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Red,
+                            "Combo=Rekt");
                     }
-                    else if (ComboDamage(enemyVisible) + _player.GetAutoAttackDamage(enemyVisible, true) * 2 >
-                    enemyVisible.Health)
+                    else if (ComboDamage(enemyVisible) + _player.GetAutoAttackDamage(enemyVisible, true)*2 >
+                             enemyVisible.Health)
                     {
                         Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                        Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Orange,
-                        "Combo+AA=Rekt");
+                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Orange,
+                            "Combo+AA=Rekt");
                     }
                     else
                         Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                        Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Green,
-                        "Unkillable");
+                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Green,
+                            "Unkillable");
                 }
             }
             var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
@@ -965,33 +978,33 @@ namespace D_Ezreal
             {
                 if (harass)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
                         "Auto harass Enabled");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
-                if (_config.Item("DrawQ").GetValue<bool>()&& _q.Level>0)
-                {
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
-                }
-                if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
-                {
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
-                }
-                if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
-                {
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
-                }
+            if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
+            {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
+            }
+            if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
+            {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
+            }
+            if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
+            {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
+            }
 
-                if (_config.Item("DrawR").GetValue<bool>() && _r.Level > 0)
-                {
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
-                }
+            if (_config.Item("DrawR").GetValue<bool>() && _r.Level > 0)
+            {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
             }
         }
     }
+}
 
 
 
