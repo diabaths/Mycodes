@@ -17,13 +17,13 @@ namespace D_Diana
 
         private static Obj_SpellMissile _qpos;
 
+        private static int _lastTick;
+
         private static bool _qcreated = false;
 
         public static Menu _config;
 
         public static Menu TargetSelectorMenu;
-
-        private static Items.Item _dfg;
 
         private static Obj_AI_Hero _player;
 
@@ -36,7 +36,6 @@ namespace D_Diana
 
         private static Spell _smite;
 
-        private static readonly int[] DianaQwe = { 1, 2, 3, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
         
         //Credits to Kurisu
         private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
@@ -57,7 +56,6 @@ namespace D_Diana
             _w = new Spell(SpellSlot.W, 200f);
             _e = new Spell(SpellSlot.E, 450f);
             _r = new Spell(SpellSlot.R, 825f);
-
             _q.SetSkillshot(0.35f, 190f, 1800, false, SkillshotType.SkillshotCircle);
 
             SpellList.Add(_q);
@@ -71,7 +69,6 @@ namespace D_Diana
             _tiamat = new Items.Item(3077, 250f);
             _rand = new Items.Item(3143, 490f);
             _lotis = new Items.Item(3190, 590f);
-            _dfg = new Items.Item(3128, 750f);
             _zhonya = new Items.Item(3157, 0);
 
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
@@ -97,14 +94,20 @@ namespace D_Diana
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseRSecond", "Use Second R")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("Normalcombo", "Q-R Combo")).SetValue(true);
-            _config.Item("Normalcombo").ValueChanged += SwitchCombo;
-            _config.SubMenu("Combo").AddItem(new MenuItem("Misayacombo", "R-Q Combo").SetValue(false));
-            _config.Item("Misayacombo").ValueChanged += SwitchMisaya;
-            _config.SubMenu("Combo")
-                .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
-            //_config.SubMenu("Combo").AddItem(new MenuItem("ActiveCombo2", "Combo2!").SetValue(new KeyBind(32, KeyBindType.Press)));
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRSecond", "Use Second R")).SetValue(false);
+            _config.SubMenu("Combo").AddItem(new MenuItem("Switch", "Switch Combo").SetValue(new KeyBind("M".ToCharArray()[0],KeyBindType.Press)));
+            _config.SubMenu("Combo").AddItem(new MenuItem("ComboPrio", "Combo Style").SetValue(new StringList(new[] { "Q-R", "R-Q"}, 1)));
+            _config.SubMenu("Combo").AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
+            
+            
+            _config.AddSubMenu(new Menu("Harass", "Harass"));
+            _config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q")).SetValue(true);
+            _config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W")).SetValue(true);
+            _config.SubMenu("Harass").AddItem(new MenuItem("ActiveHarass", "Harass key").SetValue(new KeyBind("X".ToCharArray()[0],
+                        KeyBindType.Press)));
+            _config.SubMenu("Harass").AddItem(new MenuItem("harasstoggle", "Harass(toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
+                        KeyBindType.Toggle)));
+            _config.SubMenu("Harass").AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
 
 
             //Items public static Int32 Tiamat = 3077, Hydra = 3074, Blade = 3153, Bilge = 3144, Rand = 3143, lotis = 3190;
@@ -173,27 +176,14 @@ namespace D_Diana
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
 
-            _config.AddSubMenu(new Menu("Harass", "Harass"));
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q")).SetValue(true);
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W")).SetValue(true);
-            _config.SubMenu("Harass")
-                .AddItem(
-                    new MenuItem("ActiveHarass", "Harass key").SetValue(new KeyBind("X".ToCharArray()[0],
-                        KeyBindType.Press)));
-            _config.SubMenu("Harass")
-                .AddItem(
-                    new MenuItem("harasstoggle", "Harass(toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
-            _config.SubMenu("Harass")
-                .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
-
+           
             _config.AddSubMenu(new Menu("Farm", "Farm"));
             _config.SubMenu("Farm").AddSubMenu(new Menu("LastHit", "LastHit"));
             _config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("UseQLH", "Q LastHit")).SetValue(true);
-            _config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("UseWLH", "W LaneClear")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("LastHit").AddItem(new MenuItem("UseWLH", "W LastHit")).SetValue(false);
             _config.SubMenu("Farm")
                 .SubMenu("LastHit")
-                .AddItem(new MenuItem("lastmana", "Minimum Mana% >").SetValue(new Slider(35, 1, 100)));
+                .AddItem(new MenuItem("lastmana", "Minimum Mana% >").SetValue(new Slider(70, 1, 100)));
             _config.SubMenu("Farm")
                 .SubMenu("LastHit")
                 .AddItem(
@@ -208,7 +198,7 @@ namespace D_Diana
                     new MenuItem("ActiveLane", "Farm key").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Farm")
                 .SubMenu("Lane")
-                .AddItem(new MenuItem("Lanemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+                .AddItem(new MenuItem("Lanemana", "Minimum Mana").SetValue(new Slider(70, 1, 100)));
 
             //jungle
             _config.SubMenu("Farm").AddSubMenu(new Menu("Jungle", "Jungle"));
@@ -222,7 +212,7 @@ namespace D_Diana
                         KeyBindType.Press)));
             _config.SubMenu("Farm")
                 .SubMenu("Jungle")
-                .AddItem(new MenuItem("Junglemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+                .AddItem(new MenuItem("Junglemana", "Minimum Mana").SetValue(new Slider(30, 1, 100)));
 
             //Smite 
             _config.AddSubMenu(new Menu("Smite", "Smite"));
@@ -232,36 +222,27 @@ namespace D_Diana
                         KeyBindType.Toggle)));
             _config.SubMenu("Smite").AddItem(new MenuItem("Useblue", "Smite Blue Early ")).SetValue(true);
             _config.SubMenu("Smite")
-                .AddItem(new MenuItem("manaJ", "Smite Blue Early if MP% <").SetValue(new Slider(35, 1, 100)));
+                .AddItem(new MenuItem("manaJ", "Smite Blue Early if MP% <").SetValue(new Slider(30, 1, 100)));
             _config.SubMenu("Smite").AddItem(new MenuItem("Usered", "Smite Red Early ")).SetValue(true);
             _config.SubMenu("Smite")
-                .AddItem(new MenuItem("healthJ", "Smite Red Early if HP% <").SetValue(new Slider(35, 1, 100)));
+                .AddItem(new MenuItem("healthJ", "Smite Red Early if HP% <").SetValue(new Slider(30, 1, 100)));
 
             //Extra
             _config.AddSubMenu(new Menu("Misc", "Misc"));
             //_config.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Usepackes")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("AutoShield", "Auto W")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Shieldper", "Self Health %")).SetValue(new Slider(25, 1, 100));
-            _config.SubMenu("Misc")
-                .AddItem(
-                    new MenuItem("Escape", "Escape Key!").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+            _config.SubMenu("Misc").AddItem(new MenuItem("Escape", "Escape Key!").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Misc").AddItem(new MenuItem("Inter_E", "Interrupter E")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "GapClosers W")).SetValue(true);
-            _config.SubMenu("Misc").AddItem(new MenuItem("dianaAutoLevel", "Auto Level")).SetValue(false);
-            _config.SubMenu("Misc").AddItem(new MenuItem("dianaStyle", "Level Sequence").SetValue(
-               new StringList(new[] { "Q-W-E" })));
-
-            //Kill Steal
-            _config.AddSubMenu(new Menu("KillSteal", "Ks"));
-            _config.SubMenu("Ks").AddItem(new MenuItem("ActiveKs", "Use KillSteal")).SetValue(true);
-            _config.SubMenu("Ks").AddItem(new MenuItem("UseQKs", "Use Q")).SetValue(true);
-            _config.SubMenu("Ks").AddItem(new MenuItem("UseRKs", "Use R")).SetValue(true);
-            _config.SubMenu("Ks")
-                .AddItem(new MenuItem("TargetRange", "R use if range >").SetValue(new Slider(400, 200, 600)));
-            _config.SubMenu("Ks").AddItem(new MenuItem("UseIgnite", "Use Ignite")).SetValue(true);
+            _config.SubMenu("Misc").AddItem(new MenuItem("UseQKs", "Use Q")).SetValue(true);
+            _config.SubMenu("Misc").AddItem(new MenuItem("UseRKs", "Use R")).SetValue(true);
+            _config.SubMenu("Misc").AddItem(new MenuItem("TargetRange", "Use R  if Target Range >=").SetValue(new Slider(400, 200, 825)));
+            _config.SubMenu("Misc").AddItem(new MenuItem("UseIgnite", "Use Ignite")).SetValue(true);
+            
 
             //Damage after combo:
-            MenuItem dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Draw damage after combo").SetValue(true);
+            MenuItem dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Draw damage after combo").SetValue(false);
             Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
             Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
             dmgAfterComboItem.ValueChanged +=
@@ -278,46 +259,28 @@ namespace D_Diana
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawR", "Draw R")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(dmgAfterComboItem);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawsmite", "Draw smite")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("ShowPassive", "Show Passive")).SetValue(true);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("ShowPassive", "Show Passive")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("combotext", "Show Selected Combo")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("CircleLag", "Lag Free Circles").SetValue(true));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleQuality", "Circles Quality").SetValue(new Slider(100, 100, 10)));
-            _config.SubMenu("Drawings")
-                .AddItem(new MenuItem("CircleThickness", "Circles Thickness").SetValue(new Slider(1, 10, 1)));
+            _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
 
+           
             _config.AddToMainMenu();
 
-            //new AssassinManager();
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             GameObject.OnCreate += OnCreate;
             GameObject.OnDelete += OnDelete;
             Game.PrintChat("<font color='#881df2'>Diana By Diabaths With Misaya Combo</font>Loaded!");
             Game.PrintChat(
-                "<font color='#FF0000'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#FF9900'>ssssssssssmith@hotmail.com</font> (10) S");
+               "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
 
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
-            Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             //Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-            _config.Item("dianaAutoLevel").ValueChanged += LevelUpMode;
-            if (_config.Item("dinaAutoLevel").GetValue<bool>())
-            {
-                new AutoLevel(Style());
-            }
+           
         }
-        private static void SwitchCombo(object sender, OnValueChangeEventArgs e)
-        {
-            if (e.GetNewValue<bool>())
-                _config.Item("Misayacombo").SetValue(false);
-        }
-
-        private static void SwitchMisaya(object sender, OnValueChangeEventArgs e)
-        {
-            if (e.GetNewValue<bool>())
-                _config.Item("Normalcombo").SetValue(false);
-        }
+        
         private static void Game_OnGameUpdate(EventArgs args)
         {
             _player = ObjectManager.Player;
@@ -334,31 +297,11 @@ namespace D_Diana
             }
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
-                /*int assassinRange = TargetSelectorMenu.Item("AssassinSearchRange").GetValue<Slider>().Value;
-
-                IEnumerable<Obj_AI_Hero> xEnemy = ObjectManager.Get<Obj_AI_Hero>()
-                    .Where(
-                        enemy =>
-                            enemy.Team != ObjectManager.Player.Team && !enemy.IsDead && enemy.IsVisible &&
-                            TargetSelectorMenu.Item("Assassin" + enemy.ChampionName) != null &&
-                            TargetSelectorMenu.Item("Assassin" + enemy.ChampionName).GetValue<bool>() &&
-                            ObjectManager.Player.Distance(enemy) < assassinRange);
-
-                Obj_AI_Hero[] objAiHeroes = xEnemy as Obj_AI_Hero[] ?? xEnemy.ToArray();
-
-                if (objAiHeroes.Length > 2)
-                {
-                    Game.PrintChat(objAiHeroes[0].Distance(objAiHeroes[1]).ToString());
-                }
-
-                Obj_AI_Hero t = !objAiHeroes.Any()
-                    ? TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical)
-                    : objAiHeroes[0];*/
-                if (_config.Item("Misayacombo").GetValue<bool>())
+                if (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 1)
                 {
                     Misaya();
                 }
-                else if (_config.Item("Normalcombo").GetValue<bool>())
+                if (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0)
                 {
                     Combo();
                 }
@@ -384,31 +327,39 @@ namespace D_Diana
             {
                 Tragic();
             }
-            if (_config.Item("ActiveKs").GetValue<bool>())
-            {
-                KillSteal();
-            }
+            
             Usecleanse();
             if (_config.Item("AutoShield").GetValue<bool>() && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 AutoW();
             }
+            ChangeComboMode();
+            KillSteal();
         }
-       
-        private static int[] Style()
+
+        private static void ChangeComboMode()
         {
-            switch (_config.Item("dianaStyle").GetValue<StringList>().SelectedIndex)
+
+            var changetime = Environment.TickCount - _lastTick;
+
+            if (_config.Item("Switch").GetValue<KeyBind>().Active && changetime >= 350)
             {
-                case 0:
-                    return DianaQwe;
-                default:
-                    return null;
+                switch (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex)
+                {
+                    case 0:
+                        _config.Item("ComboPrio")
+                            .SetValue(new StringList(new[] {"Q-R", "R-Q"}, 1));
+                        _lastTick = Environment.TickCount;
+                        break;
+                    case 1:
+                        _config.Item("ComboPrio")
+                            .SetValue(new StringList(new[] {"Q-R", "R-Q"}, 0));
+                        _lastTick = Environment.TickCount;
+                        break;
+                }
             }
         }
-        private static void LevelUpMode(object sender, OnValueChangeEventArgs e)
-        {
-            AutoLevel.Enabled(e.GetNewValue<bool>());
-        }
+
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (_w.IsReady() && gapcloser.Sender.IsValidTarget(_w.Range) && _config.Item("Gap_W").GetValue<bool>())
@@ -417,9 +368,10 @@ namespace D_Diana
             }
         }
 
-        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
         {
             if (_e.IsReady() && unit.IsValidTarget(_e.Range) && _config.Item("Inter_E").GetValue<bool>())
+                //Console.WriteLine("Cast E");
                 _e.Cast();
         }
 
@@ -584,30 +536,32 @@ namespace D_Diana
 
         private static void Smiteontarget()
         {
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
-            {
-                var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
-                var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" ||
+              _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
+                foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
                 {
-                    if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
+                    var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+                    var usesmite = _config.Item("smitecombo").GetValue<bool>();
+                    if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
                     {
-                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
+                        else if (smiteDmg >= hero.Health)
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
                     }
-                    else if (smiteDmg >= hero.Health)
+                    if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                     }
                 }
-                if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
-                {
-                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                }
-            }
         }
 
         private static void Misaya()
@@ -633,12 +587,12 @@ namespace D_Diana
                 }
             }
 
-            if (target.IsValidTarget(_q.Range) && useQ && useR && _q.IsReady() && _r.IsReady())
+            if (target.IsValidTarget(_r.Range) && useQ && useR && _q.IsReady() && _r.IsReady())
             {
                 if (_q.GetPrediction(target).Hitchance >= HitChance.High && _player.Mana > qmana + rmana)
                 {
                     _r.Cast(target);
-                    _q.CastIfHitchanceEquals(target, HitChance.High);
+                    _q.Cast(target, true);
 
                 }
             }
@@ -686,10 +640,9 @@ namespace D_Diana
                     _player.Spellbook.CastSpell(_igniteSlot, target);
                 }
             }
-            if (target.IsValidTarget(_q.Range) && _config.Item("UseQCombo").GetValue<bool>() && _q.IsReady() &&
-                _q.GetPrediction(target).Hitchance >= HitChance.High)
+            if (target.IsValidTarget(_q.Range) && _config.Item("UseQCombo").GetValue<bool>() && _q.IsReady())
             {
-                _q.CastIfHitchanceEquals(target, HitChance.High);
+                _q.CastIfHitchanceEquals(target, HitChance.High, true);
             }
             if (target.IsValidTarget(_r.Range) && _config.Item("UseRCombo").GetValue<bool>() && _r.IsReady() &&
                 ((_qcreated == true)
@@ -905,7 +858,7 @@ namespace D_Diana
                 {
                     _q.Cast(fl1.Position);
                 }
-                else if (fl2.MinionsHit >= 2 || allMinionsQ.Count == 1)
+                else if (fl2.MinionsHit >= 2)
                 {
                     _q.Cast(fl2.Position);
                 }
@@ -1021,12 +974,15 @@ namespace D_Diana
         }
         private static void Tragic()
         {
+            var qmana = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost;
+            var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
             var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range + _q.Width + 30,
                 MinionTypes.All);
             var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
                 MinionTypes.All,
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            if (qmana + rmana > _player.Mana) return;
             if (_q.IsReady()) _q.Cast(Game.CursorPos);
             if (_r.IsReady())
             {
@@ -1051,7 +1007,7 @@ namespace D_Diana
             foreach (var minion in allMinions)
             {
                 if (useQ && _q.IsReady() && _player.Distance(minion) < _q.Range &&
-                    minion.Health < 0.95 * _player.GetSpellDamage(minion, SpellSlot.Q))
+                    minion.Health < 0.95 * _player.GetSpellDamage(minion, SpellSlot.Q) && !Orbwalking.InAutoAttackRange(minion))
                 {
                     _q.Cast(minion);
                 }
@@ -1075,15 +1031,15 @@ namespace D_Diana
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (useQ && _q.IsReady() && _player.Distance(mob) < _q.Range)
+                if (useQ && _q.IsReady() && _player.Distance(mob) < _q.Range&&!mob.Name.Contains("Mini"))
                 {
                     _q.Cast(mob);
                 }
-                if (_w.IsReady() && useW && _player.Distance(mob) < _w.Range)
+                if (_w.IsReady() && useW && _player.Distance(mob) < _w.Range&&!mob.Name.Contains("Mini"))
                 {
                     _w.Cast();
                 }
-                if (_r.IsReady() && useR && _player.Distance(mob) < _r.Range && mob.HasBuff("dianamoonlight", true))
+                if (_r.IsReady() && useR && _player.Distance(mob) < _r.Range && mob.HasBuff("dianamoonlight", true)&&!mob.Name.Contains("Mini"))
                 {
                     _r.Cast(mob);
                 }
@@ -1112,7 +1068,7 @@ namespace D_Diana
                 {
                     if (hero.Health <= qhDmg)
                     {
-                        _q.Cast(hero);
+                        _q.CastIfHitchanceEquals(hero, HitChance.High);
                     }
                 }
 
@@ -1159,71 +1115,9 @@ namespace D_Diana
                     _qcreated = true;
                     return;
                 }
-                // credits 100% to brian0305
-                /*if (missile.IsValid)
-                 {
-                     if (caster.IsEnemy)
-                     {
-                         if (_config.Item("AutoShield").GetValue<bool>() && _w.IsReady())
-                         {
-                             var shieldBuff = new Int32[] {40, 55, 70, 85, 100}[_w.Level - 1] +
-                                              1.3*_player.FlatMagicDamageMod;
-                             if (spell.SData.Name.Contains("BasicAttack"))
-                             {
-                                 if (spell.Target.IsMe && _player.Health <= caster.GetAutoAttackDamage(_player, true) &&
-                                     _player.Health + shieldBuff > caster.GetAutoAttackDamage(_player, true) &&
-                                     caster.IsValidTarget(_w.Range) && _w.IsReady()) _w.Cast();
-                             }
-                             else if (spell.Target.IsMe || spell.EndPosition.Distance(_player.Position) <= 130)
-                             {
-                                 if (spell.SData.Name == "summonerdot")
-                                 {
-                                     if (_player.Health <=
-                                         (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
-                                             Damage.SummonerSpell.Ignite) &&
-                                         _player.Health + shieldBuff >
-                                         (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
-                                             Damage.SummonerSpell.Ignite) && _w.IsReady())
-                                         _w.Cast();
-                                 }
-                                 else if (_player.Health <=
-                                          (caster as Obj_AI_Hero).GetSpellDamage(_player,
-                                              (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) &&
-                                          _player.Health + shieldBuff >
-                                          (caster as Obj_AI_Hero).GetSpellDamage(_player,
-                                              (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) && _w.IsReady())
-                                     _w.Cast();
-                             }
-                         }
-
-                         /*  if (_config.Item("zhonyas").GetValue<bool>() && _zhonya.IsReady())
-                           {
-                               if (spell.SData.Name.Contains("BasicAttack"))
-                               {
-                                   if (spell.Target.IsMe && _player.Health+150 <= caster.GetAutoAttackDamage(_player, true))
-                                   _zhonya.Cast();
-
-                               }
-                               else if (spell.Target.IsMe || spell.EndPosition.Distance(_player.Position) <= 130)
-                               {
-                                   if (spell.SData.Name == "summonerdot")
-                                   {
-                                       if (_player.Health +150<=
-                                           (caster as Obj_AI_Hero).GetSummonerSpellDamage(_player,
-                                               Damage.SummonerSpell.Ignite))
-                                           _zhonya.Cast();
-                                   }
-                                   else if (_player.Health +150<=
-                                            (caster as Obj_AI_Hero).GetSpellDamage(_player,
-                                                (caster as Obj_AI_Hero).GetSpellSlot(spell.SData.Name), 1) )
-                                       _zhonya.Cast();
-                               }
-                           }
-                     }
-                 }*/
             }
         }
-        
+
         private static void OnDelete(GameObject sender, EventArgs args)
         {//if (sender is Obj_SpellMissile)
             var missile = sender as Obj_SpellMissile;
@@ -1243,97 +1137,80 @@ namespace D_Diana
         private static void Drawing_OnDraw(EventArgs args)
         {
             var diana = Drawing.WorldToScreen(_player.Position);
+            var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
+            if (_config.Item("Drawharass").GetValue<bool>())
+            {
+                if (harass)
+                {
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.94f, System.Drawing.Color.GreenYellow,
+                        "Auto harass Enabled");
+                }
+                else
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.94f, System.Drawing.Color.OrangeRed,
+                        "Auto harass Disabled");
+            }
             if (_config.Item("combotext").GetValue<bool>())
             {
-                if (_config.Item("Misayacombo").GetValue<bool>())
-                {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.DarkOrange,
-                        "R-Q Combo On");
-                }
-                else if (_config.Item("Normalcombo").GetValue<bool>())
-                {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.DarkOrange,
-                        "Q-R Combo On");
-                }
-            }
+                if (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 1)
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
+                        "Combo: R-Q");
+                else if (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0)
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
+                        "Combo: Q-R");
+               }
 
             if (_config.Item("Drawsmite").GetValue<bool>())
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                     Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkOrange,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.DarkRed,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
-                if (_config.Item("smitecombo").GetValue<bool>())
+                if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkOrange,
-                        "Smite Target On");
+                    if (_config.Item("smitecombo").GetValue<bool>())
+                    {
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                            "Smite Target On");
+                    }
+                    else
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                            "Smite Target Off");
                 }
-                else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.DarkRed,
-                        "Smite Target Off");
             }
             if (_qpos != null)
                 Utility.DrawCircle(_qpos.Position, _qpos.BoundingRadius, System.Drawing.Color.Tomato, 5, 30, false);
             if (_config.Item("ShowPassive").GetValue<bool>())
             {
                 if (_player.HasBuff("dianaarcready"))
-                    Drawing.DrawText(diana[0] - 10, diana[1], Color.White, "P On");
+                    Drawing.DrawText(diana[0] - 10, diana[1], Color.GreenYellow, "P On");
                 else
-                    Drawing.DrawText(diana[0] - 10, diana[1], Color.Orange, "P Off");
+                    Drawing.DrawText(diana[0] - 10, diana[1], Color.OrangeRed, "P Off");
             }
-            if (_config.Item("CircleLag").GetValue<bool>())
-            {
-                if (_config.Item("DrawQ").GetValue<bool>())
+            
+                if (_config.Item("DrawQ").GetValue<bool>()&& _q.Level>0)
                 {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.DarkOrange,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
                 }
-                if (_config.Item("DrawW").GetValue<bool>())
+                if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
                 {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.DarkOrange,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
                 }
-                if (_config.Item("DrawE").GetValue<bool>())
+                if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
                 {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.DarkOrange,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-                if (_config.Item("DrawR").GetValue<bool>())
-                {
-                    Utility.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.DarkOrange,
-                        _config.Item("CircleThickness").GetValue<Slider>().Value,
-                        _config.Item("CircleQuality").GetValue<Slider>().Value);
-                }
-            }
-            else
-            {
-                if (_config.Item("DrawQ").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.White);
-                }
-                if (_config.Item("DrawW").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.White);
-                }
-                if (_config.Item("DrawE").GetValue<bool>())
-                {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.White);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
                 }
 
-                if (_config.Item("DrawR").GetValue<bool>())
+                if (_config.Item("DrawR").GetValue<bool>() && _r.Level > 0)
                 {
-                    Drawing.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.White);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
                 }
             }
         }
     }
-}
+
 
 

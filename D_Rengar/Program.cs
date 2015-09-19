@@ -528,14 +528,13 @@ namespace D_Rengar
             if (Items.HasItem(3144) && Items.CanUseItem(3144))
                 damage += _player.GetItemDamage(enemy, Damage.DamageItems.Bilgewater);
             if (_q.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.Q)*1.2;
+                damage += _player.GetSpellDamage(enemy, SpellSlot.Q)*2;
             if (_q.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.W)*3;
+                damage += _player.GetSpellDamage(enemy, SpellSlot.W);
             if (_e.IsReady())
                 damage += _player.GetSpellDamage(enemy, SpellSlot.E);
-            if (_r.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.R);
-            damage += _player.GetAutoAttackDamage(enemy, true)*2;
+            
+            damage += _player.GetAutoAttackDamage(enemy, true)*3;
             return (float) damage;
         }
 
@@ -562,7 +561,7 @@ namespace D_Rengar
                 {
                     Utility.DelayAction.Add(300, () => _youmuu.Cast());
                 }
-                else if (target.IsValidTarget())
+                else if (target.IsValidTarget(500))
                 {
                     _youmuu.Cast();
                 }
@@ -637,7 +636,7 @@ namespace D_Rengar
 
         private static void Harass()
         {
-            var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
             var useE = _config.Item("UseEH").GetValue<bool>();
@@ -716,7 +715,7 @@ namespace D_Rengar
                 case 3:
                     return HitChance.VeryHigh;
                 default:
-                    return HitChance.Medium;
+                    return HitChance.High;
             }
         }
 
@@ -989,7 +988,6 @@ namespace D_Rengar
                         _e.Cast(mob);
 
                     }
-
                 }
             }
         }

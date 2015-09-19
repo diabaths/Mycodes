@@ -591,8 +591,7 @@ namespace D_RekSai
             }
         }
 
-        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit,
-            Interrupter2.InterruptableTargetEventArgs args)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
         {
             if (_player.burrowed() && _bw.IsReady() && unit.IsValidTarget(_q.Range) &&
                 _config.Item("Inter_W").GetValue<bool>())
