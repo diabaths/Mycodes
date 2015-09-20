@@ -307,7 +307,7 @@ namespace D_Jarvan
                 _lastSkin = _config.Item("skinjarvan").GetValue<Slider>().Value;
             }
             Game.PrintChat(
-                "<font color='#FF0000'>If You like my work and want to support, and keep it always up to date plz donate via paypal in </font> <font color='#FF9900'>ssssssssssmith@hotmail.com</font> (10) S");
+                "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -1143,9 +1143,10 @@ namespace D_Jarvan
                 else
                     Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
-                if (_config.Item("smitecombo").GetValue<bool>())
+                if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
                 {
-                    if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
+                    if (_config.Item("smitecombo").GetValue<bool>())
+
                     {
                         Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
                             "Smite Target On");

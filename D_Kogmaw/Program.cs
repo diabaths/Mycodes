@@ -85,6 +85,24 @@ namespace D_Kogmaw
             _config.SubMenu("Combo").AddItem(new MenuItem("RlimC", "R Limit").SetValue(new Slider(3, 1, 5)));
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
+            
+            //Harass
+            _config.AddSubMenu(new Menu("Harass", "Harass"));
+            _config.SubMenu("Harass").AddItem(new MenuItem("UseQH", "Use Q")).SetValue(true);
+            _config.SubMenu("Harass").AddItem(new MenuItem("UseWH", "Use W")).SetValue(true);
+            _config.SubMenu("Harass").AddItem(new MenuItem("UseEH", "Use E")).SetValue(true);
+            _config.SubMenu("Harass").AddItem(new MenuItem("UseRH", "Use R")).SetValue(true);
+            _config.SubMenu("Harass").AddItem(new MenuItem("RlimH", "R Limit").SetValue(new Slider(2, 1, 5)));
+            _config.SubMenu("Harass")
+                .AddItem(
+                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
+                        KeyBindType.Toggle)));
+            _config.SubMenu("Harass")
+                .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(65, 1, 100)));
+            _config.SubMenu("Harass")
+                .AddItem(
+                    new MenuItem("ActiveHarass", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
+
 
             //Items
             _config.AddSubMenu(new Menu("items", "items"));
@@ -200,23 +218,7 @@ namespace D_Kogmaw
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
 
-            //Harass
-            _config.AddSubMenu(new Menu("Harass", "Harass"));
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseQH", "Use Q")).SetValue(true);
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseWH", "Use W")).SetValue(true);
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseEH", "Use E")).SetValue(true);
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseRH", "Use R")).SetValue(true);
-            _config.SubMenu("Harass").AddItem(new MenuItem("RlimH", "R Limit").SetValue(new Slider(2, 1, 5)));
-            _config.SubMenu("Harass")
-                .AddItem(
-                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
-            _config.SubMenu("Harass")
-                .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(65, 1, 100)));
-            _config.SubMenu("Harass")
-                .AddItem(
-                    new MenuItem("ActiveHarass", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
-
+           
             //Farm
             _config.AddSubMenu(new Menu("Farm", "Farm"));
             _config.SubMenu("Farm").AddSubMenu(new Menu("Lasthit", "Lasthit"));
@@ -536,15 +538,7 @@ namespace D_Kogmaw
             return (float) dmg;
         }
 
-        //By Trelli
-        private static void GenerateSkinPacket(string currentChampion, int skinNumber)
-        {
-            int netid = ObjectManager.Player.NetworkId;
-            GamePacket model =
-                Packet.S2C.UpdateModel.Encoded(new Packet.S2C.UpdateModel.Struct(ObjectManager.Player.NetworkId,
-                    skinNumber, currentChampion));
-            model.Process(PacketChannel.S2C);
-        }
+       
 
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
@@ -587,8 +581,8 @@ namespace D_Kogmaw
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
                 var prediction = _q.GetPrediction(t);
-                if (t.IsValidTarget(_q.Range) && prediction.Hitchance >= Qchangecombo())
-                    _q.Cast(prediction.CastPosition);
+                if (t.IsValidTarget(_q.Range) && prediction.Hitchance >= Qchangecombo() && _q.GetPrediction(t).CollisionObjects.Count == 0)
+                    _q.Cast(t);
             }
             if (useE && _e.IsReady())
             {
@@ -726,29 +720,33 @@ namespace D_Kogmaw
             var rLim = _config.Item("RlimC").GetValue<Slider>().Value;
             if (combo && unit.IsMe && (target is Obj_AI_Hero))
             {
-                if (useW && _w.IsReady())
+               if (useW && _w.IsReady())
                 {
-                    _w.CastOnUnit(ObjectManager.Player);
+                    foreach (
+                        var hero in
+                            ObjectManager.Get<Obj_AI_Hero>()
+                                .Where(hero => hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(_player) + _w.Range)))
+                        _w.CastOnUnit(ObjectManager.Player);
                 }
                 if (useQ && _q.IsReady())
                 {
                     var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
                     var prediction = _q.GetPrediction(t);
-                    if (_player.Distance(target) < _q.Range && prediction.Hitchance >= HitChance.Medium)
-                        _q.Cast(prediction.CastPosition);
+                    if (t.IsValidTarget(_q.Range) && prediction.Hitchance >= Qchangecombo() && _q.GetPrediction(t).CollisionObjects.Count == 0)
+                        _q.Cast(t);
                 }
                 if (useE && _e.IsReady())
                 {
                     var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
                     var predictione = _e.GetPrediction(t);
-                    if (_player.Distance(target) < _e.Range && predictione.Hitchance >= HitChance.Medium)
+                    if (t != null && t.IsValidTarget(_e.Range) && predictione.Hitchance >= Echangecombo())
                         _e.Cast(t, false, true);
                 }
                 if (useR && _r.IsReady() && GetBuffStacks() < rLim)
                 {
                     var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                     var predictionr = _r.GetPrediction(t);
-                    if (_player.Distance(target) < _r.Range && predictionr.Hitchance >= HitChance.Medium)
+                    if (t.IsValidTarget(_r.Range) && predictionr.Hitchance >= Rchangecombo())
                         _r.Cast(t, false, true);
                 }
             }
@@ -763,7 +761,7 @@ namespace D_Kogmaw
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (t != null && _player.Distance(t) < _q.Range && _q.GetPrediction(t).Hitchance >= Qchangehar())
+                if (t != null && _player.Distance(t) < _q.Range && _q.GetPrediction(t).Hitchance >= Qchangehar() && _q.GetPrediction(t).CollisionObjects.Count == 0)
                     _q.Cast(t);
             }
 

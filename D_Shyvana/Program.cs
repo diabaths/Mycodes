@@ -301,12 +301,7 @@ namespace D_Shyvana
             KillSteal();
         }
 
-        private static void GenModelPacket(string champ, int skinId)
-        {
-            Packet.S2C.UpdateModel.Encoded(new Packet.S2C.UpdateModel.Struct(_player.NetworkId, skinId, champ))
-                .Process();
-        }
-
+      
         private static float ComboDamage(Obj_AI_Base enemy)
         {
             var damage = 0d;
@@ -335,18 +330,34 @@ namespace D_Shyvana
 
         private static void Smiteontarget()
         {
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
-            {
-                var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                var itemscheck = SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i));
-                if (itemscheck && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" ||
+                _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
+                foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
                 {
-                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                    var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+                    var usesmite = _config.Item("smitecombo").GetValue<bool>();
+                    if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
+                    {
+                        if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
+                        else if (smiteDmg >= hero.Health)
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
+                    }
+                    if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                    }
                 }
-            }
         }
+
 
         private static void Combo()
         {
@@ -539,7 +550,7 @@ namespace D_Shyvana
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (useQ && _q.IsReady())
+                if (useQ && _q.IsReady() && !mob.Name.Contains("Mini"))
                 {
                     _q.Cast();
                 }
