@@ -18,10 +18,10 @@ namespace D_Nidalee
 
         public static List<Spell> SpellList = new List<Spell>();
 
-        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
-        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
-        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
-        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
+        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
+        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
+        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
+        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
 
 
         private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis, _zhonya, _dfg, _archangel;
@@ -36,13 +36,13 @@ namespace D_Nidalee
 
         private static bool IsCougar;
 
-        private static readonly float[] HumanQcd = {6, 6, 6, 6, 6};
+        private static readonly float[] HumanQcd = { 6, 6, 6, 6, 6 };
 
-        private static readonly float[] HumanWcd = {12, 12, 12, 12, 12};
+        private static readonly float[] HumanWcd = { 12, 12, 12, 12, 12 };
 
-        private static readonly float[] HumanEcd = {13, 12, 11, 10, 9};
+        private static readonly float[] HumanEcd = { 13, 12, 11, 10, 9 };
 
-        private static readonly float[] CougarQcd, CougarWcd, CougarEcd = {5, 5, 5, 5, 5};
+        private static readonly float[] CougarQcd, CougarWcd, CougarEcd = { 5, 5, 5, 5, 5 };
 
         private static float _humQcd = 0, _humWcd = 0, _humEcd = 0;
 
@@ -132,7 +132,7 @@ namespace D_Nidalee
             Config.SubMenu("Combo")
                 .AddItem(
                     new MenuItem("QHitCombo", "Q HitChange").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
 
             Config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
@@ -231,7 +231,7 @@ namespace D_Nidalee
             Config.SubMenu("Harass")
                 .AddItem(
                     new MenuItem("QHitharass", "Q HitChange").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
             Config.SubMenu("Harass")
                 .AddItem(
                     new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
@@ -377,7 +377,7 @@ namespace D_Nidalee
 
             CheckSpells();
             if (Config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100*(Player.Mana/Player.MaxMana)) > Config.Item("lastmana").GetValue<Slider>().Value)
+                (100 * (Player.Mana / Player.MaxMana)) > Config.Item("lastmana").GetValue<Slider>().Value)
             {
                 LastHit();
             }
@@ -387,7 +387,7 @@ namespace D_Nidalee
             }
             if ((Config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  Config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100*(Player.Mana/Player.MaxMana)) > Config.Item("Harrasmana").GetValue<Slider>().Value)
+                (100 * (Player.Mana / Player.MaxMana)) > Config.Item("Harrasmana").GetValue<Slider>().Value)
             {
                 Harass();
             }
@@ -421,11 +421,11 @@ namespace D_Nidalee
 
             for (float d = 0; d < from.Distance(to); d = d + step)
             {
-                var testPoint = from + d*direction;
+                var testPoint = from + d * direction;
                 var flags = NavMesh.GetCollisionFlags(testPoint.X, testPoint.Y);
                 if (flags.HasFlag(CollisionFlags.Wall) || flags.HasFlag(CollisionFlags.Building))
                 {
-                    return from + (d - step)*direction;
+                    return from + (d - step) * direction;
                 }
             }
 
@@ -447,14 +447,14 @@ namespace D_Nidalee
 
             // Be more precise
             if (wallCheck != null)
-                wallCheck = GetFirstWallPoint((Vector3) wallCheck, Game.CursorPos, 5);
+                wallCheck = GetFirstWallPoint((Vector3)wallCheck, Game.CursorPos, 5);
 
             // Define more position point
-            var movePosition = wallCheck != null ? (Vector3) wallCheck : Game.CursorPos;
+            var movePosition = wallCheck != null ? (Vector3)wallCheck : Game.CursorPos;
 
             // Update fleeTargetPosition
             var tempGrid = NavMesh.WorldToGrid(movePosition.X, movePosition.Y);
-            var fleeTargetPosition = NavMesh.GridToWorld((short) tempGrid.X, (short) tempGrid.Y);
+            var fleeTargetPosition = NavMesh.GridToWorld((short)tempGrid.X, (short)tempGrid.Y);
 
             // Also check if we want to AA aswell
             Obj_AI_Base target = null;
@@ -471,7 +471,7 @@ namespace D_Nidalee
                 // Check 300 units to the cursor position in a 160 degree cone for a valid non-wall spot
                 Vector2 direction = (Game.CursorPos.To2D() - wallPosition.To2D()).Normalized();
                 float maxAngle = 80;
-                float step = maxAngle/20;
+                float step = maxAngle / 20;
                 float currentAngle = 0;
                 float currentStep = 0;
                 bool jumpTriggered = false;
@@ -484,7 +484,7 @@ namespace D_Nidalee
                     // Check next angle
                     if ((currentAngle == 0 || currentAngle < 0) && currentStep != 0)
                     {
-                        currentAngle = (currentStep)*(float) Math.PI/180;
+                        currentAngle = (currentStep) * (float)Math.PI / 180;
                         currentStep += step;
                     }
 
@@ -497,11 +497,11 @@ namespace D_Nidalee
                     if (currentStep == 0)
                     {
                         currentStep = step;
-                        checkPoint = wallPosition + WC.Range*direction.To3D();
+                        checkPoint = wallPosition + WC.Range * direction.To3D();
                     }
                     // Rotated check
                     else
-                        checkPoint = wallPosition + WC.Range*direction.Rotated(currentAngle).To3D();
+                        checkPoint = wallPosition + WC.Range * direction.Rotated(currentAngle).To3D();
 
                     // Check if the point is not a wall
                     if (!checkPoint.IsWall())
@@ -512,7 +512,7 @@ namespace D_Nidalee
                         {
                             // There is a wall inbetween, get the closes point to the wall, as precise as possible
                             Vector3 wallPositionOpposite =
-                                (Vector3) GetFirstWallPoint((Vector3) wallCheck, wallPosition, 5);
+                                (Vector3)GetFirstWallPoint((Vector3)wallCheck, wallPosition, 5);
 
                             // Check if it's worth to jump considering the path length
                             if (Player.GetPath(wallPositionOpposite).ToList().To2D().PathLength() -
@@ -520,7 +520,7 @@ namespace D_Nidalee
                             {
                                 // Check the distance to the opposite side of the wall
                                 if (Player.Distance(wallPositionOpposite, true) <
-                                    Math.Pow(WC.Range - Player.BoundingRadius/2, 2))
+                                    Math.Pow(WC.Range - Player.BoundingRadius / 2, 2))
                                 {
                                     // Make the jump happen
                                     WC.Cast(wallPositionOpposite);
@@ -585,7 +585,7 @@ namespace D_Nidalee
 
         private static float CalculateCd(float time)
         {
-            return time + (time*Player.PercentCooldownMod);
+            return time + (time * Player.PercentCooldownMod);
         }
 
         private static void Cooldowns()
@@ -722,9 +722,9 @@ namespace D_Nidalee
         private static int GetSmiteDmg()
         {
             int level = Player.Level;
-            int index = Player.Level/5;
-            float[] dmgs = {370 + 20*level, 330 + 30*level, 240 + 40*level, 100 + 50*level};
-            return (int) dmgs[index];
+            int index = Player.Level / 5;
+            float[] dmgs = { 370 + 20 * level, 330 + 30 * level, 240 + 40 * level, 100 + 50 * level };
+            return (int)dmgs[index];
         }
 
         //New map Monsters Name By SKO
@@ -734,12 +734,12 @@ namespace D_Nidalee
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var useblue = Config.Item("Useblue").GetValue<bool>();
             var usered = Config.Item("Usered").GetValue<bool>();
-            var health = (100*(Player.Health/Player.MaxHealth)) < Config.Item("healthJ").GetValue<Slider>().Value;
-            var mana = (100*(Player.Mana/Player.MaxMana)) < Config.Item("manaJ").GetValue<Slider>().Value;
+            var health = (100 * (Player.Health / Player.MaxHealth)) < Config.Item("healthJ").GetValue<Slider>().Value;
+            var mana = (100 * (Player.Mana / Player.MaxMana)) < Config.Item("manaJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {
-                jungleMinions = new string[] {"TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf"};
+                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
             }
             else
             {
@@ -900,7 +900,7 @@ namespace D_Nidalee
                 dmg += Player.GetSpellDamage(hero, SpellSlot.W);
             if (Q.IsReady() && !IsCougar)
                 dmg += Player.GetSpellDamage(hero, SpellSlot.Q);
-            return (float) dmg;
+            return (float)dmg;
         }
 
 
@@ -911,14 +911,14 @@ namespace D_Nidalee
             {
                 var iBilge = Config.Item("Bilge").GetValue<bool>();
                 var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(Config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
+                                    (hero.MaxHealth * (Config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
                 var iBilgemyhp = Player.Health <=
-                                 (Player.MaxHealth*(Config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
+                                 (Player.MaxHealth * (Config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
                 var iBlade = Config.Item("Blade").GetValue<bool>();
                 var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(Config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
+                                    (hero.MaxHealth * (Config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
                 var iBlademyhp = Player.Health <=
-                                 (Player.MaxHealth*(Config.Item("Blademyhp").GetValue<Slider>().Value)/100);
+                                 (Player.MaxHealth * (Config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
                 var iOmen = Config.Item("Omen").GetValue<bool>();
                 var iOmenenemys = hero.CountEnemiesInRange(450) >= Config.Item("Omenenemys").GetValue<Slider>().Value;
                 var iTiamat = Config.Item("Tiamat").GetValue<bool>();
@@ -929,10 +929,10 @@ namespace D_Nidalee
                     Config.Item("Righteousenemys").GetValue<Slider>().Value;
                 var iZhonyas = Config.Item("Zhonyas").GetValue<bool>();
                 var iZhonyashp = Player.Health <=
-                                 (Player.MaxHealth*(Config.Item("Zhonyashp").GetValue<Slider>().Value)/100);
+                                 (Player.MaxHealth * (Config.Item("Zhonyashp").GetValue<Slider>().Value) / 100);
                 var iArchange = Config.Item("Archangel").GetValue<bool>();
                 var iArchangelmyhp = Player.Health <=
-                                     (Player.MaxHealth*(Config.Item("Archangelmyhp").GetValue<Slider>().Value)/100);
+                                     (Player.MaxHealth * (Config.Item("Archangelmyhp").GetValue<Slider>().Value) / 100);
 
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
                 {
@@ -977,7 +977,7 @@ namespace D_Nidalee
             {
                 foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly || hero.IsMe))
                 {
-                    if (hero.Health <= (hero.MaxHealth*(Config.Item("lotisminhp").GetValue<Slider>().Value)/100) &&
+                    if (hero.Health <= (hero.MaxHealth * (Config.Item("lotisminhp").GetValue<Slider>().Value) / 100) &&
                         hero.Distance(Player.ServerPosition) <= _lotis.Range && _lotis.IsReady())
                         _lotis.Cast();
                 }
@@ -991,10 +991,10 @@ namespace D_Nidalee
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = Config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = Player.Health <=
-                               (Player.MaxHealth*(Config.Item("usepotionhp").GetValue<Slider>().Value)/100);
+                               (Player.MaxHealth * (Config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
             var iusemppotion = Config.Item("usemppotions").GetValue<bool>();
             var iusepotionmp = Player.Mana <=
-                               (Player.MaxMana*(Config.Item("usepotionmp").GetValue<Slider>().Value)/100);
+                               (Player.MaxMana * (Config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
             if (Player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
@@ -1096,7 +1096,7 @@ namespace D_Nidalee
                     R.Cast();
                 else if (E.IsReady() && !Config.Item("farm_R").GetValue<KeyBind>().Active &&
                          Config.Item("farm_E1").GetValue<bool>() &&
-                         (100*(Player.Mana/Player.MaxMana)) > Config.Item("Lane").GetValue<Slider>().Value)
+                         (100 * (Player.Mana / Player.MaxMana)) > Config.Item("Lane").GetValue<Slider>().Value)
                     E.CastOnUnit(Player);
                 return;
             }
@@ -1110,7 +1110,7 @@ namespace D_Nidalee
             var Cougarw = Config.Item("UseWCJungle").GetValue<bool>();
             var Cougare = Config.Item("UseECJungle").GetValue<bool>();
             var Switch = Config.Item("Switchungle").GetValue<bool>();
-            var junglemana = Player.Mana >= (Player.MaxMana*(Config.Item("junglemana").GetValue<Slider>().Value)/100);
+            var junglemana = Player.Mana >= (Player.MaxMana * (Config.Item("junglemana").GetValue<Slider>().Value) / 100);
             var mobs = MinionManager.GetMinions(Player.ServerPosition, 700,
                 MinionTypes.All,
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
@@ -1167,8 +1167,8 @@ namespace D_Nidalee
             if (Player.Spellbook.CanUseSpell(SpellSlot.E) == SpellState.Ready && Player.IsMe)
             {
                 var forms = Config.Item("AutoSwitchform").GetValue<bool>();
-                var health = Player.Health <= (Player.MaxHealth*(Config.Item("HPercent").GetValue<Slider>().Value)/100);
-                var mana = Player.Mana >= (Player.MaxMana*(Config.Item("MPPercent").GetValue<Slider>().Value)/100);
+                var health = Player.Health <= (Player.MaxHealth * (Config.Item("HPercent").GetValue<Slider>().Value) / 100);
+                var mana = Player.Mana >= (Player.MaxMana * (Config.Item("MPPercent").GetValue<Slider>().Value) / 100);
                 if (Player.HasBuff("Recall") || Player.InFountain()) return;
                 if (E.IsReady() && health)
                 {
@@ -1195,7 +1195,7 @@ namespace D_Nidalee
             foreach (var minion in allMinions)
             {
                 if (Q.IsReady() && IsHuman && useQ && Player.Distance(minion) < Q.Range &&
-                    minion.Health <= 0.95*Player.GetSpellDamage(minion, SpellSlot.Q))
+                    minion.Health <= 0.95 * Player.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     Q.Cast(minion);
                 }
@@ -1207,10 +1207,10 @@ namespace D_Nidalee
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly && !hero.IsMe))
             {
                 var forms = Config.Item("AutoSwitchform").GetValue<bool>();
-                var mana = Player.Mana >= (Player.MaxMana*(Config.Item("MPPercent").GetValue<Slider>().Value)/100);
+                var mana = Player.Mana >= (Player.MaxMana * (Config.Item("MPPercent").GetValue<Slider>().Value) / 100);
                 if (Player.HasBuff("Recall") || hero.HasBuff("Recall") || hero.InFountain()) return;
                 if (E.IsReady() &&
-                    (hero.Health/hero.MaxHealth)*100 <= Config.Item("AllyHPercent").GetValue<Slider>().Value &&
+                    (hero.Health / hero.MaxHealth) * 100 <= Config.Item("AllyHPercent").GetValue<Slider>().Value &&
                     Utility.CountEnemiesInRange(1200) > 0 &&
                     hero.Distance(Player.ServerPosition) <= E.Range)
                 {
@@ -1283,32 +1283,32 @@ namespace D_Nidalee
             {
                 if (harass)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
                         "Auto harass Enabled");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
             if (Config.Item("Drawsmite").GetValue<bool>())
             {
                 if (Config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.GreenYellow,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
                 if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
                 {
                     if (Config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }
