@@ -283,6 +283,8 @@ namespace D_Rengar
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            if (_player.IsDead)
+                return;
             if (_config.Item("AutoW").GetValue<bool>())
             {
                 AutoHeal();
@@ -345,7 +347,7 @@ namespace D_Rengar
                         break;
                     case 2:
                         _config.Item("ComboPrio")
-                            .SetValue(new StringList(new[] {"Q", "W", "E"}, 1));
+                            .SetValue(new StringList(new[] {"Q", "W", "E"}, 0));
                         _lastTick = Environment.TickCount;
                         break;
                 }
@@ -478,14 +480,17 @@ namespace D_Rengar
             }
             if (_config.Item("Drawsmite").GetValue<bool>())
             {
-                if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
+                if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
-                        "Smite Jungle On");
+                    if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
+                    {
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                            "Smite Jungle On");
+                    }
+                    else
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                            "Smite Jungle Off");
                 }
-                else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
-                        "Smite Jungle Off");
                 if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
@@ -582,7 +587,7 @@ namespace D_Rengar
                 if (useW)
                 {
                     var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (tw.IsValidTarget(_w.Range) && _w.IsReady())
+                    if (tw.IsValidTarget(_w.Range) && _w.IsReady() && !_player.HasBuff("rengarpassivebuff"))
                         _w.Cast();
                 }
                 if (useE)
@@ -608,7 +613,7 @@ namespace D_Rengar
                     _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 1)
                 {
                     var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (tw.IsValidTarget(_w.Range) && _w.IsReady())
+                    if (tw.IsValidTarget(_w.Range) && _w.IsReady() && !_player.HasBuff("rengarpassivebuff"))
                         _w.Cast();
                 }
                 if (useE &&
@@ -617,7 +622,7 @@ namespace D_Rengar
                     var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
                     var predE = _e.GetPrediction(te);
                     if (te.IsValidTarget(_e.Range) && _e.IsReady() && predE.Hitchance >= Echange() &&
-                        predE.CollisionObjects.Count == 0)
+                        predE.CollisionObjects.Count == 0 && !_player.HasBuff("rengarpassivebuff"))
                         _e.Cast(te);
                 }
                 if (useEE && !_player.HasBuff("RengarR") &&
@@ -683,7 +688,7 @@ namespace D_Rengar
                     _config.Item("HarrPrio").GetValue<StringList>().SelectedIndex == 1)
                 {
                     var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (tw.IsValidTarget(_w.Range) && _w.IsReady())
+                    if (tw.IsValidTarget(_w.Range) && _w.IsReady()&&!_player.HasBuff("rengarpassivebuff"))
                         _w.Cast();
                 }
                 if (useE &&
@@ -963,7 +968,7 @@ namespace D_Rengar
                     {
                         _q.Cast();
                     }
-                    if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range))
+                    if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && !_player.HasBuff("rengarpassivebuff"))
                     {
                         _w.Cast();
                     }
@@ -981,7 +986,7 @@ namespace D_Rengar
                         _q.Cast();
                     }
                     if (mob.IsValidTarget(_w.Range) && _w.IsReady() &&
-                        _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 1 && useW)
+                        _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 1 && useW && !_player.HasBuff("rengarpassivebuff"))
                     {
                         _w.Cast();
                     }
