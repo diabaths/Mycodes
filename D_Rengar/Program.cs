@@ -540,13 +540,17 @@ namespace D_Rengar
 
         private static void Combo()
         {
-            var target = TargetSelector.GetTarget(2000, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(2000, TargetSelector.DamageType.Physical);
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
             var useE = _config.Item("UseEC").GetValue<bool>();
             var useEE = _config.Item("UseEEC").GetValue<bool>();
             var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
-            Smiteontarget();
+
+            if (target != null)
+            {
+                Smiteontarget();
+            }
             if (target != null && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
@@ -561,7 +565,7 @@ namespace D_Rengar
                 {
                     Utility.DelayAction.Add(300, () => _youmuu.Cast());
                 }
-                else if (target.IsValidTarget(500))
+                else if (target.IsValidTarget(_e.Range))
                 {
                     _youmuu.Cast();
                 }

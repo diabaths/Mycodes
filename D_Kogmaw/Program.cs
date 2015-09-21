@@ -4,6 +4,8 @@ using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using ObjectManager = LeagueSharp.ObjectManager;
 
 namespace D_Kogmaw
 {
