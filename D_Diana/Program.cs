@@ -231,7 +231,7 @@ namespace D_Diana
             _config.AddSubMenu(new Menu("Misc", "Misc"));
             //_config.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Usepackes")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("AutoShield", "Auto W")).SetValue(true);
-            _config.SubMenu("Misc").AddItem(new MenuItem("Shieldper", "Self Health %")).SetValue(new Slider(25, 1, 100));
+           // _config.SubMenu("Misc").AddItem(new MenuItem("Shieldper", "Self Health %")).SetValue(new Slider(25, 1, 100));
             _config.SubMenu("Misc").AddItem(new MenuItem("Escape", "Escape Key!").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Misc").AddItem(new MenuItem("Inter_E", "Interrupter E")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "GapClosers W")).SetValue(true);
@@ -329,10 +329,7 @@ namespace D_Diana
             }
             
             Usecleanse();
-            if (_config.Item("AutoShield").GetValue<bool>() && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
-            {
-                AutoW();
-            }
+            
             ChangeComboMode();
             KillSteal();
         }
@@ -377,6 +374,20 @@ namespace D_Diana
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
+            var autoW = _config.Item("AutoShield").GetValue<bool>();
+            var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
+            try
+            {
+                if (sender.IsMe || sender == null || !sender.IsEnemy || sender.IsMinion || _w.Level < 1 ||
+                    !sender.IsValid) return;
+                if (sender.Distance(_player.Position) > 1100) return;
+
+                if (args.Target.IsMe && _w.IsReady() && sender.IsEnemy && autoW && !combo)
+                    _w.Cast();
+            }
+            catch (Exception)
+            {
+            }
             var spell = args.SData;
             if (!sender.IsMe)
             {
@@ -1082,17 +1093,7 @@ namespace D_Diana
             }
         }
 
-        private static void AutoW()
-        {
-            if (_player.HasBuff("Recall") || _player.InFountain()) return;
-            if (_w.IsReady() &&
-                _player.Health <= (_player.MaxHealth * (_config.Item("Shieldper").GetValue<Slider>().Value) / 100))
-            {
-                _w.Cast();
-            }
-
-        }
-
+     
         /* private static bool Packets()
          {
              return _config.Item("usePackets").GetValue<bool>();
