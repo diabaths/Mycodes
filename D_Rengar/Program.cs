@@ -552,11 +552,12 @@ namespace D_Rengar
             var useEE = _config.Item("UseEEC").GetValue<bool>();
             var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
 
-            if (target != null)
+            if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                target.IsValidTarget(_smite.Range))
             {
                 Smiteontarget();
             }
-            if (target != null && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown &&
+            if (target.IsValidTarget(600) && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
                 if (ComboDamage(target) > target.Health)
