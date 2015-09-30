@@ -773,24 +773,23 @@ namespace D_Ezreal
 
         private static void UseRcombo()
         {
-            var target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
             if (!_r.IsReady()) return;
             var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
-            var rDmg = _player.GetSpellDamage(target, SpellSlot.R)*0.9;
             var rsolo = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
-            if (target == null) return;
-            if (target.IsInvulnerable) return;
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
-            {
-                if (!hero.IsInvulnerable && _player.Distance(target) >= minrange)
+           foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
+           {
+               var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
+               if (hero == null) return;
+               if (hero.IsInvulnerable) return;
+                if (!hero.IsInvulnerable && _player.Distance(hero) >= minrange)
                 {
                     if (rsolo)
                     {
-                        if (rDmg > target.Health)
+                        if (rDmg > hero.Health)
                             _r.CastIfHitchanceEquals(hero, HitChance.High, true);
 
-                        else if (ComboDamage(target) > target.Health)
+                        else if (ComboDamage(hero) > hero.Health)
                         {
                             _r.CastIfHitchanceEquals(hero, HitChance.High, true);
                         }
