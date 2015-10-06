@@ -10,13 +10,13 @@ namespace D_Nidalee
 {
     internal class Program
     {
-        public const string ChampionName = "Nidalee";
+        private const string ChampionName = "Nidalee";
 
-        public static Orbwalking.Orbwalker Orbwalker;
+        private static Orbwalking.Orbwalker Orbwalker;
 
-        public static Spell Q, W, E, R, QC, WC, EC;
+        private static Spell Q, W, E, R, QC, WC, EC;
 
-        public static List<Spell> SpellList = new List<Spell>();
+        private static List<Spell> SpellList = new List<Spell>();
 
         private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
         private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
@@ -78,7 +78,8 @@ namespace D_Nidalee
 
             Q.SetSkillshot(0.125f, 40f, 1300, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.500f, 80f, 1450, false, SkillshotType.SkillshotCircle);
-
+            WC.SetSkillshot(0.50f, 400f, 1500f, false, SkillshotType.SkillshotCone);
+            EC.SetSkillshot(0.50f, 375f, 1500f, false, SkillshotType.SkillshotCone);
             SpellList.Add(Q);
             SpellList.Add(W);
             SpellList.Add(E);
@@ -92,10 +93,7 @@ namespace D_Nidalee
                 ? new Items.Item(3048, float.MaxValue)
                 : new Items.Item(3040, float.MaxValue);
 
-            _dfg = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ||
-                   Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
-                ? new Items.Item(3188, 750)
-                : new Items.Item(3128, 750);
+           
             _bilge = new Items.Item(3144, 450f);
             _blade = new Items.Item(3153, 450f);
             _hydra = new Items.Item(3074, 250f);
@@ -803,7 +801,7 @@ namespace D_Nidalee
                 Config.Item("UseQCombo").GetValue<bool>())
             {
                 var predictionq = Q.GetPrediction(target);
-                if (predictionq.Hitchance >= QHitChanceCombo())
+                if (predictionq.Hitchance >= QHitChanceCombo() && predictionq.CollisionObjects.Count == 0)
                     Q.Cast(predictionq.CastPosition);
 
             }
@@ -1061,7 +1059,7 @@ namespace D_Nidalee
                     Config.Item("UseQHarass").GetValue<bool>())
                 {
                     var prediction = Q.GetPrediction(target);
-                    if (prediction.Hitchance >= QHitChanceHarass())
+                    if (prediction.Hitchance >= QHitChanceHarass() && prediction.CollisionObjects.Count == 0)
                         Q.Cast(prediction.CastPosition);
 
                 }
