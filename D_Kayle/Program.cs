@@ -274,7 +274,7 @@ namespace D_Kayle
                         KeyBindType.Toggle)));
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("ActiveHarass", "Harass key").SetValue(new KeyBind("X".ToCharArray()[0],
+                    new MenuItem("ActiveHarass", "Harass key").SetValue(new KeyBind("C".ToCharArray()[0],
                         KeyBindType.Press)));
             _config.SubMenu("Harass")
                 .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
@@ -938,11 +938,11 @@ namespace D_Kayle
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (_config.Item("UseQjungle").GetValue<bool>() && _q.IsReady())
+                if (_config.Item("UseQjungle").GetValue<bool>() && _q.IsReady() && mob.IsValidTarget(_q.Range) && !mob.Name.Contains("Mini"))
                 {
                     _q.Cast(mob);
                 }
-                if (_config.Item("UseQjungle").GetValue<bool>() && _e.IsReady())
+                if (_config.Item("UseQjungle").GetValue<bool>() && _e.IsReady() && mob.IsValidTarget(_q.Range))
                 {
                     _e.Cast();
                 }
