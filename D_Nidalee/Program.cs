@@ -1247,7 +1247,8 @@ namespace D_Nidalee
                 if (Q.IsReady() && hero.IsValidTarget(Q.Range) && IsHuman &&
                     Config.Item("UseQKs").GetValue<bool>())
                 {
-                    if (hero.Health <= qhDmg && Q.GetPrediction(hero).Hitchance >= HitChance.High)
+                    var predictionq = Q.GetPrediction(hero);
+                    if (hero.Health <= qhDmg && predictionq.Hitchance >= HitChance.High && predictionq.CollisionObjects.Count == 0)
                     {
                         Q.Cast(hero);
                     }
