@@ -54,6 +54,7 @@ namespace D_Graves
             _youmuu = new Items.Item(3142, 10);
             _bilge = new Items.Item(3144, 450f);
             _blade = new Items.Item(3153, 450f);
+           
             //D Graves
             _config = new Menu("D-Graves", "D-Graves", true);
 
@@ -86,6 +87,8 @@ namespace D_Graves
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use R if Hit X Enemys")).SetValue(true);
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("MinTargets", "Use R if Hit Enemys >=").SetValue(new Slider(2, 1, 5)));
+           _config.SubMenu("Combo")
+                .AddItem(new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -330,6 +333,12 @@ namespace D_Graves
         private static void Game_OnGameUpdate(EventArgs args)
         {
             _q.Range = _config.Item("qrange").GetValue<Slider>().Value;
+            if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
+            {
+                var t = TargetSelector.GetTarget(_r.Range+300, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget())
+                    _r.Cast(t, true, true);
+            }
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
