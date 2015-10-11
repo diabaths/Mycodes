@@ -18,9 +18,7 @@ namespace D_Zyra
         private static Menu _config;
 
         private static Obj_AI_Hero _player;
-
-        private static Int32 _lastSkin;
-
+        
         private static SpellSlot _igniteSlot;
 
         private static Items.Item _rand, _lotis, _youmuu, _blade, _bilge, _dfg, _hextech, _frostqueen, _mikael;
@@ -129,8 +127,7 @@ namespace D_Zyra
             _config.SubMenu("items")
                 .SubMenu("Offensive")
                 .AddItem(new MenuItem("Hextechmyhp", "Or Your  Hp <").SetValue(new Slider(85, 1, 100)));
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("usedfg", "Use DFG")).SetValue(true);
-            _config.SubMenu("items")
+             _config.SubMenu("items")
                 .SubMenu("Offensive")
                 .AddItem(new MenuItem("frostQ", "Use Frost Queen"))
                 .SetValue(true);
@@ -354,7 +351,7 @@ namespace D_Zyra
 
             Game.PrintChat("<font color='#881df2'>D-Zyra by Diabaths </font> Loaded.");
             Game.PrintChat(
-                "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
+                  "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
 
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += Game_OnGameUpdate;
@@ -450,11 +447,7 @@ namespace D_Zyra
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
             if (Items.HasItem(3146) && Items.CanUseItem(3146))
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hexgun);
-            if (Items.HasItem(3128) && Items.CanUseItem(3128))
-            {
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Dfg);
-                dmg = dmg*1.2;
-            }
+          
             if (ObjectManager.Player.HasBuff("LichBane"))
             {
                 dmg += _player.BaseAttackDamage*0.75 + _player.FlatMagicDamageMod*0.5;
@@ -508,33 +501,42 @@ namespace D_Zyra
 
         private static void Smiteontarget()
         {
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
-            {
-                var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                var itemscheck = SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i));
-                if (itemscheck && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" ||
+                _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
+                foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
                 {
-                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                    var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+                    var usesmite = _config.Item("smitecombo").GetValue<bool>();
+                    if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
+                    {
+                        if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
+                        else if (smiteDmg >= hero.Health)
+                        {
+                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                        }
+                    }
+                    if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
+                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                        hero.IsValidTarget(_smite.Range))
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                    }
                 }
-            }
         }
-
         private static void Combo()
         {
-            var usedfg = _config.Item("usedfg").GetValue<bool>();
-            var useignite = _config.Item("useignite").GetValue<bool>();
+           var useignite = _config.Item("useignite").GetValue<bool>();
             var target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
             if (_config.Item("UseRE").GetValue<bool>() || _config.Item("use_ulti").GetValue<bool>())
                 CastREnemy();
             UseItemes();
             Smiteontarget();
-            if (target.IsValidTarget(_dfg.Range) && usedfg &&
-                _dfg.IsReady() && target.Health <= ComboDamage(target))
-            {
-                _dfg.Cast(target);
-            }
+          
             if (useignite && _igniteSlot != SpellSlot.Unknown && target.IsValidTarget(600) &&
                 _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
@@ -1245,20 +1247,20 @@ namespace D_Zyra
                 }
             }
 
-            if (_config.Item("DrawQ").GetValue<bool>())
+            if (_config.Item("DrawQ").GetValue<bool>()&& _q.Level>0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
             }
-            if (_config.Item("DrawW").GetValue<bool>())
+            if (_config.Item("DrawW").GetValue<bool>() && _w.Level>0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
             }
-            if (_config.Item("DrawE").GetValue<bool>())
+            if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
             }
 
-            if (_config.Item("DrawR").GetValue<bool>())
+            if (_config.Item("DrawR").GetValue<bool>() && _r.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
             }
