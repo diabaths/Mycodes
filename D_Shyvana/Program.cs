@@ -254,6 +254,7 @@ namespace D_Shyvana
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPosibleToInterrupt;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Game.PrintChat(
                 "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
 
@@ -301,7 +302,21 @@ namespace D_Shyvana
             KillSteal();
         }
 
-      
+      private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        { /* if (sender.IsMe)
+            {
+                 Game.PrintChat("Spell name: " + args.SData.Name.ToString());
+            }*/
+        if (!sender.IsMe)
+        {
+            return;
+        }
+        var spell = args.SData;
+        if (spell.Name.ToLower().Contains("shyvanadoubleattack"))
+        {
+           Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
+        }
+        }
         private static float ComboDamage(Obj_AI_Base enemy)
         {
             var damage = 0d;
@@ -938,20 +953,20 @@ namespace D_Shyvana
 
             if (_config.Item("DrawQ").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.White);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
             }
             if (_config.Item("DrawW").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.White);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
             }
             if (_config.Item("DrawE").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.White);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
             }
 
             if (_config.Item("DrawR").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.White);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
             }
         }
     }
