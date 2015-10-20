@@ -32,7 +32,7 @@ namespace D_Kayle
 
         private static Spell _smite;
 
-        private static Items.Item _rand, _lotis, _dfg, _frostqueen, _mikael;
+        private static Items.Item _rand, _lotis,  _frostqueen, _mikael;
         //Credits to Kurisu
         private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
         private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
@@ -69,10 +69,6 @@ namespace D_Kayle
             SpellList.Add(_e);
             SpellList.Add(_r);
 
-            _dfg = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ||
-                   Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
-                ? new Items.Item(3188, 750)
-                : new Items.Item(3128, 750);
             _rand = new Items.Item(3143, 490f);
             _lotis = new Items.Item(3190, 590f);
             _frostqueen = new Items.Item(3092, 800f);
@@ -826,7 +822,7 @@ namespace D_Kayle
                     _e.Cast();
                 }
 
-                if (_w.IsReady() && _config.Item("UseWCombo").GetValue<bool>() && target.IsValidTarget(_q.Range))
+                if (_w.IsReady() && _config.Item("UseWCombo").GetValue<bool>() && target.IsValidTarget(_w.Range) && _player.Distance(target.Position) > _q.Range)
                 {
                     _w.Cast(_player);
                 }
@@ -894,16 +890,11 @@ namespace D_Kayle
                 }
                 if (_config.Item("UseELane").GetValue<bool>() && _e.IsReady())
                 {
-                    if (minions.Count > 2)
+                    if (minions.Count > 4)
                     {
                         _e.Cast();
 
                     }
-                    else
-                        foreach (var minionE in minions)
-                            if (!Orbwalking.InAutoAttackRange(minion) &&
-                                minionE.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.E))
-                                _e.Cast();
                 }
             }
         }
