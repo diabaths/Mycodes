@@ -821,7 +821,7 @@ namespace D_Kayle
                     _q.Cast(target);
 
                 }
-                if (_config.Item("UseECombo").GetValue<bool>() && _e.IsReady() && target.CountEnemysInRange(650) > 0)
+                if (_config.Item("UseECombo").GetValue<bool>() && _e.IsReady() && target.IsValidTarget(525))
                 {
                     _e.Cast();
                 }
