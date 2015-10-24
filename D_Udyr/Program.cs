@@ -56,8 +56,8 @@ namespace D_Udyr
         private static void Game_OnGameLoad(EventArgs args)
         {
             _player = ObjectManager.Player;
-            //if (ObjectManager.Player.BaseSkinName != ChampionName) return;
-
+            if (_player.ChampionName != "Udyr")
+                return;
 
             _q = new Spell(SpellSlot.Q, 200);
             _w = new Spell(SpellSlot.W, 200);
