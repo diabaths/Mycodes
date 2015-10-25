@@ -64,7 +64,7 @@ namespace D_Elise
         {
 
             _player = ObjectManager.Player;
-            if (_player.CharData.BaseSkinName != "Elise" || _player.CharData.BaseSkinName != "elisespider") return;
+            if (ObjectManager.Player.BaseSkinName != ChampionName) return;
 
             _humanQ = new Spell(SpellSlot.Q, 625f);
             _humanW = new Spell(SpellSlot.W, 950f);
