@@ -369,9 +369,10 @@ namespace D_Rengar
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
+            var spell = args.SData;
             if (sender.IsMe)
             {
-                if (_player.Buffs.Any(x => x.Name.Contains("rengarq")))
+                if (spell.Name.ToLower().Contains("rengarq") || spell.Name.ToLower().Contains("rengare"))
                 {
 
                     Orbwalking.ResetAutoAttackTimer();
@@ -551,6 +552,8 @@ namespace D_Rengar
             var useE = _config.Item("UseEC").GetValue<bool>();
             var useEE = _config.Item("UseEEC").GetValue<bool>();
             var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
+            var iTiamat = _config.Item("Tiamat").GetValue<bool>();
+            var iHydra = _config.Item("Hydra").GetValue<bool>();
 
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
                 target.IsValidTarget(_smite.Range))
@@ -590,6 +593,18 @@ namespace D_Rengar
                     var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                     if (tw.IsValidTarget(_w.Range) && _w.IsReady() && !_player.HasBuff("rengarpassivebuff"))
                         _w.Cast();
+                  }
+                var th = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
+
+                if (iTiamat && _tiamat.IsReady() && th.IsValidTarget(_tiamat.Range))
+                {
+                    _tiamat.Cast();
+
+                }
+                if (iHydra && _hydra.IsReady() && th.IsValidTarget(_hydra.Range))
+                {
+                    _hydra.Cast();
+
                 }
                 if (useE)
                 {
@@ -617,6 +632,19 @@ namespace D_Rengar
                     if (tw.IsValidTarget(_w.Range) && _w.IsReady() && !_player.HasBuff("rengarpassivebuff"))
                         _w.Cast();
                 }
+                var th = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
+                
+                    if (iTiamat && _tiamat.IsReady() && th.IsValidTarget(_tiamat.Range))
+                    {
+                        _tiamat.Cast();
+
+                    }
+                    if (iHydra && _hydra.IsReady() && th.IsValidTarget(_hydra.Range))
+                    {
+                        _hydra.Cast();
+
+                    }
+                
                 if (useE &&
                     _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2)
                 {
@@ -1088,8 +1116,8 @@ namespace D_Rengar
                 var iRighteousenemys =
                     hero.CountEnemiesInRange(_config.Item("Righteousenemysrange").GetValue<Slider>().Value) >=
                     _config.Item("Righteousenemys").GetValue<Slider>().Value;
-                var iTiamat = _config.Item("Tiamat").GetValue<bool>();
-                var iHydra = _config.Item("Hydra").GetValue<bool>();
+               // var iTiamat = _config.Item("Tiamat").GetValue<bool>();
+               // var iHydra = _config.Item("Hydra").GetValue<bool>();
 
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
                 {
@@ -1101,7 +1129,7 @@ namespace D_Rengar
                     _blade.Cast(hero);
 
                 }
-                if (iTiamat && _tiamat.IsReady() && hero.IsValidTarget(_tiamat.Range))
+               /* if (iTiamat && _tiamat.IsReady() && hero.IsValidTarget(_tiamat.Range))
                 {
                     _tiamat.Cast();
 
@@ -1110,7 +1138,7 @@ namespace D_Rengar
                 {
                     _hydra.Cast();
 
-                }
+                }*/
                 if (iOmenenemys && iOmen && _rand.IsReady() && hero.IsValidTarget(450))
                 {
                     _rand.Cast();
