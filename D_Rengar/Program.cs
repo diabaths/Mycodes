@@ -275,7 +275,9 @@ namespace D_Rengar
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
-            //Interrupter.OnPossibleToInterrupt += Interrupter_OnPosibleToInterrupt;
+            Orbwalking.AfterAttack += OnAfterAttack;
+            Orbwalking.BeforeAttack += OnBeforeAttack;
+           
             Game.PrintChat(
                 "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
 
@@ -324,6 +326,32 @@ namespace D_Rengar
             KillSteal();
             ChangeComboMode();
 
+        }
+        private static void OnAfterAttack(AttackableUnit unit, AttackableUnit target)
+        {
+            var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
+            var Q = _config.Item("UseQC").GetValue<bool>();
+            if (!unit.IsMe)
+                return;
+            if (combo && _q.IsReady()&& Q&& target.IsValidTarget(_q.Range))
+            {
+                _q.Cast();
+            }
+        }
+
+        private static void OnBeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        {
+            var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
+            var Q = _config.Item("UseQC").GetValue<bool>();
+            var mode = _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2;
+            if (args.Target is Obj_AI_Hero)
+            {
+                if (combo && Q && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target) && mode &&
+                    args.Target.IsValidTarget(_q.Range))
+                {
+                    _q.Cast();
+                }
+            }
         }
 
         private static void ChangeComboMode()
@@ -481,7 +509,7 @@ namespace D_Rengar
             }
             if (_config.Item("Drawsmite").GetValue<bool>())
             {
-                if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
+                if (Items.HasItem(1039)||SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
                 {
                     if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                     {
@@ -555,8 +583,7 @@ namespace D_Rengar
             var iTiamat = _config.Item("Tiamat").GetValue<bool>();
             var iHydra = _config.Item("Hydra").GetValue<bool>();
 
-            if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                target.IsValidTarget(_smite.Range))
+            if (target.IsValidTarget(_smite.Range))
             {
                 Smiteontarget();
             }
@@ -617,11 +644,13 @@ namespace D_Rengar
             }
 
             if (_player.Mana == 5)
-            {
+            {var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
                 if (useQ &&
-                    _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0)
+                    (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0 ||
+                     (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2 &&
+                      Orbwalking.InAutoAttackRange(tq))))
                 {
-                    var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+
                     if (tq.IsValidTarget(_q.Range) && _q.IsReady())
                         _q.Cast();
                 }
@@ -983,15 +1012,7 @@ namespace D_Rengar
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (useItemsJ && _tiamat.IsReady() && mob.IsValidTarget(_tiamat.Range))
-                {
-                    _tiamat.Cast();
-                }
-                if (useItemsJ && _hydra.IsReady() && mob.IsValidTarget(_hydra.Range))
-                {
-                    _hydra.Cast();
-                }
-                if (_player.Mana <= 4)
+               if (_player.Mana <= 4)
                 {
                     if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range))
                     {
@@ -1000,6 +1021,14 @@ namespace D_Rengar
                     if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && !_player.HasBuff("rengarpassivebuff"))
                     {
                         _w.Cast();
+                    }
+                    if (useItemsJ && _tiamat.IsReady() && mob.IsValidTarget(_tiamat.Range))
+                    {
+                        _tiamat.Cast();
+                    }
+                    if (useItemsJ && _hydra.IsReady() && mob.IsValidTarget(_hydra.Range))
+                    {
+                        _hydra.Cast();
                     }
                     if (_e.IsReady() && useE && mob.IsValidTarget(_e.Range))
                     {
@@ -1018,6 +1047,14 @@ namespace D_Rengar
                         _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 1 && useW && !_player.HasBuff("rengarpassivebuff"))
                     {
                         _w.Cast();
+                    }
+                    if (useItemsJ && _tiamat.IsReady() && mob.IsValidTarget(_tiamat.Range))
+                    {
+                        _tiamat.Cast();
+                    }
+                    if (useItemsJ && _hydra.IsReady() && mob.IsValidTarget(_hydra.Range))
+                    {
+                        _hydra.Cast();
                     }
                     if (mob.IsValidTarget(_e.Range) && _e.IsReady() &&
                         _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 2 && useE)
