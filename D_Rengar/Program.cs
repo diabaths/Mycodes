@@ -927,7 +927,7 @@ namespace D_Rengar
         private static void Laneclear()
         {
             var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All);
-            var allMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range, MinionTypes.All);
+            var allMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range-100, MinionTypes.All);
             var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _e.Range, MinionTypes.All);
             var useItemsl = _config.Item("UseItemslane").GetValue<bool>();
             var useQl = _config.Item("UseQL").GetValue<bool>();
@@ -1018,7 +1018,7 @@ namespace D_Rengar
                     {
                         _q.Cast();
                     }
-                    if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && !_player.HasBuff("rengarpassivebuff"))
+                    if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range-100) && !_player.HasBuff("rengarpassivebuff"))
                     {
                         _w.Cast();
                     }

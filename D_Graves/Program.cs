@@ -43,12 +43,12 @@ namespace D_Graves
             if (ObjectManager.Player.BaseSkinName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 950F);
-            _w = new Spell(SpellSlot.W, 850f);
-            _e = new Spell(SpellSlot.E, 425f);
-            _r = new Spell(SpellSlot.R, 1200f);
+            _w = new Spell(SpellSlot.W, 950f);
+            _e = new Spell(SpellSlot.E, 450f);
+            _r = new Spell(SpellSlot.R, 1500f);
 
-            _q.SetSkillshot(0.25f, (float) (15*Math.PI/180), 2000f, false, SkillshotType.SkillshotCone);
-            _w.SetSkillshot(0.25f, 250f, 1650f, false, SkillshotType.SkillshotCircle);
+            _q.SetSkillshot(0.25f, 60f, 2000f, false, SkillshotType.SkillshotLine);
+            _w.SetSkillshot(0.35f, 150f, 1650f, false, SkillshotType.SkillshotCircle);
             _r.SetSkillshot(0.25f, 100f, 2100f, false, SkillshotType.SkillshotLine);
 
             _youmuu = new Items.Item(3142, 10);

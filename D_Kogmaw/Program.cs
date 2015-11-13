@@ -52,9 +52,9 @@ namespace D_Kogmaw
             _e = new Spell(SpellSlot.E, 1300f);
             _r = new Spell(SpellSlot.R, float.MaxValue);
 
-            _q.SetSkillshot(0.5f, 70f, 1200f, true, SkillshotType.SkillshotLine);
-            _e.SetSkillshot(0.5f, 120f, 1200f, false, SkillshotType.SkillshotLine);
-            _r.SetSkillshot(1.3f, 120f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            _q.SetSkillshot(0.25f, 70f, 1650f, true, SkillshotType.SkillshotLine);
+            _e.SetSkillshot(0.5f, 120f, 1400f, false, SkillshotType.SkillshotLine);
+            _r.SetSkillshot(1.2f, 120f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
 
             _hextech = new Items.Item(3146, 700);
@@ -331,16 +331,6 @@ namespace D_Kogmaw
                 (_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  _config.Item("harasstoggle").GetValue<KeyBind>().Active))
             {
-                var useW = _config.Item("UseWH").GetValue<bool>();
-                var eTarget = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
-                if (useW && _w.IsReady() && eTarget.Distance(_player.Position) < _e.Range)
-                {
-                    foreach (
-                        var hero in
-                            ObjectManager.Get<Obj_AI_Hero>()
-                                .Where(hero => hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(hero) + _w.Range)))
-                        _w.CastOnUnit(ObjectManager.Player);
-                }
                 if ((100*(_player.Mana/_player.MaxMana)) >
                     _config.Item("Harrasmana").GetValue<Slider>().Value)
                 {
@@ -349,32 +339,13 @@ namespace D_Kogmaw
             }
             if (_config.Item("ActiveLane").GetValue<KeyBind>().Active)
             {
-                var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range,
-                    MinionTypes.All);
-                var useW = _config.Item("UseWL").GetValue<bool>();
-                if (useW && _w.IsReady() && allMinionsQ.Count >= 3)
-                {
-                    _w.Cast();
-                }
-                if ((100*(_player.Mana/_player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
+              if ((100*(_player.Mana/_player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
                 {
                     Laneclear();
                 }
             }
             if (_config.Item("Activejungle").GetValue<KeyBind>().Active)
             {
-                var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
-                    MinionTypes.All,
-                    MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-                var useW = _config.Item("UseWJ").GetValue<bool>();
-                if (mobs.Count > 0)
-                {
-                    var mob = mobs[0];
-                    if (useW && _w.IsReady() && mob.Distance(_player.Position) < _q.Range)
-                    {
-                        _w.Cast();
-                    }
-                }
                 if ((100*(_player.Mana/_player.MaxMana)) > _config.Item("junglemana").GetValue<Slider>().Value)
                 {
                     JungleClear();
@@ -757,6 +728,7 @@ namespace D_Kogmaw
         private static void Harass()
         {
             var useQ = _config.Item("UseQH").GetValue<bool>();
+            var useW = _config.Item("UseWH").GetValue<bool>();
             var useE = _config.Item("UseEH").GetValue<bool>();
             var useR = _config.Item("UseRH").GetValue<bool>();
             var rLimH = _config.Item("RlimH").GetValue<Slider>().Value;
@@ -766,7 +738,17 @@ namespace D_Kogmaw
                 if (t != null && _player.Distance(t) < _q.Range && _q.GetPrediction(t).Hitchance >= Qchangehar() && _q.GetPrediction(t).CollisionObjects.Count == 0)
                     _q.Cast(t);
             }
-
+            if (useW && _w.IsReady())
+            { var eTarget = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
+               if( eTarget.Distance(_player.Position) < _e.Range)
+                {
+                    foreach (
+                        var hero in
+                            ObjectManager.Get<Obj_AI_Hero>()
+                                .Where(hero => hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(hero) + _w.Range)))
+                        _w.CastOnUnit(ObjectManager.Player);
+                }
+            }
             if (useE && _e.IsReady())
             {
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
@@ -789,6 +771,7 @@ namespace D_Kogmaw
                 MinionTypes.All);
             var rangedMinionsR = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range + _q.Width + 30,
                 MinionTypes.Ranged);
+            var useW = _config.Item("UseWL").GetValue<bool>();
             var useQ = _config.Item("UseQL").GetValue<bool>();
             var useE = _config.Item("UseEL").GetValue<bool>();
             var useR = _config.Item("UseRL").GetValue<bool>();
@@ -804,6 +787,10 @@ namespace D_Kogmaw
                              minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
                         _q.Cast(minion);
                 }
+            if (useW && _w.IsReady() && allMinionsQ.Count >= 3)
+            {
+                _w.Cast();
+            }
             if (_e.IsReady() && useE)
             {
                 var fl2 = _e.GetLineFarmLocation(allMinionsQ, _e.Width);
@@ -869,12 +856,17 @@ namespace D_Kogmaw
             var useE = _config.Item("UseEJ").GetValue<bool>();
             var useR = _config.Item("UseRJ").GetValue<bool>();
             var rLimJ = _config.Item("RlimJ").GetValue<Slider>().Value;
+            var useW = _config.Item("UseWJ").GetValue<bool>();
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
                 if (useQ && _q.IsReady())
                 {
                     _q.Cast(mob);
+                }
+                if (useW && _w.IsReady() && mob.Distance(_player.Position) < _q.Range)
+                {
+                    _w.Cast();
                 }
                 if (_e.IsReady() && useE)
                 {
