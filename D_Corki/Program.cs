@@ -23,10 +23,10 @@ namespace D_Corki
 
         private static Items.Item _youmuu, _blade, _bilge;
 
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
+        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
+        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
+        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
+        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
 
         private static void Main(string[] args)
         {
@@ -46,7 +46,7 @@ namespace D_Corki
             _r2 = new Spell(SpellSlot.R, 1500f);
 
             _q.SetSkillshot(0.35f, 250f, 1000f, false, SkillshotType.SkillshotCircle);
-            _e.SetSkillshot(0f, (float)(45 * Math.PI / 180), 1500, false, SkillshotType.SkillshotCone);
+            _e.SetSkillshot(0f, (float) (45*Math.PI/180), 1500, false, SkillshotType.SkillshotCone);
             _r.SetSkillshot(0.20f, 40f, 2000f, true, SkillshotType.SkillshotLine);
 
             _youmuu = new Items.Item(3142, 10);
@@ -60,7 +60,7 @@ namespace D_Corki
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             _config.AddSubMenu(targetSelectorMenu);
-           
+
             //Orbwalker
             _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
             _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
@@ -168,7 +168,7 @@ namespace D_Corki
                 .SubMenu("Deffensive")
                 .SubMenu("Cleanse")
                 .AddItem(new MenuItem("Cleansemode", "Use Cleanse"))
-                .SetValue(new StringList(new string[2] { "Always", "In Combo" }));
+                .SetValue(new StringList(new string[2] {"Always", "In Combo"}));
 
 
             _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
@@ -261,25 +261,25 @@ namespace D_Corki
 
             _config.SubMenu("HitChance").AddSubMenu(new Menu("Harass", "Harass"));
             _config.SubMenu("HitChance").SubMenu("Harass").AddItem(new MenuItem("QchangeHar", "Q Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").SubMenu("Harass").AddItem(new MenuItem("EchangeHar", "E Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").SubMenu("Harass").AddItem(new MenuItem("RchangeHar", "R Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("HitChance").SubMenu("Combo").AddItem(new MenuItem("Qchange", "Q Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").SubMenu("Combo").AddItem(new MenuItem("Echange", "E Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").SubMenu("Combo").AddItem(new MenuItem("Rchange", "R Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").AddSubMenu(new Menu("KillSteal", "KillSteal"));
             _config.SubMenu("HitChance").SubMenu("KillSteal").AddItem(new MenuItem("Qchangekil", "Q Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").SubMenu("KillSteal").AddItem(new MenuItem("Echangekil", "E Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             _config.SubMenu("HitChance").SubMenu("KillSteal").AddItem(new MenuItem("Rchangekil", "R Hit").SetValue(
-                new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                new StringList(new[] {"Low", "Medium", "High", "Very High"})));
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -312,23 +312,23 @@ namespace D_Corki
             }
             if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value)
             {
                 Harass();
 
             }
             if (_config.Item("ActiveLane").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
             {
                 Laneclear();
             }
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
             if (_config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lastmana").GetValue<Slider>().Value)
+                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Lastmana").GetValue<Slider>().Value)
             {
                 LastHit();
             }
@@ -473,9 +473,9 @@ namespace D_Corki
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range)&& _q.GetPrediction(t).Hitchance >= Qchangecombo())
-                     _q.Cast(t, false, true);
-                   }
+                if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= Qchangecombo())
+                    _q.Cast(t, false, true);
+            }
             if (useW)
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
@@ -487,14 +487,14 @@ namespace D_Corki
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangecombo())
                     _e.Cast(t, false, true);
-                   
+
             }
             if (useR && _r.IsReady())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangecombo())
                     _r.Cast(t, false, true);
-                  
+
             }
             UseItemes();
         }
@@ -508,12 +508,12 @@ namespace D_Corki
             var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
             var diveTower = _config.Item("diveintower").GetValue<bool>();
             if ((hero.UnderTurret() && !diveTower) || !_w.IsReady()) return;
-            var usewhE = (100 * (_player.Health / _player.MaxHealth)) > _config.Item("UseWHE").GetValue<Slider>().Value;
+            var usewhE = (100*(_player.Health/_player.MaxHealth)) > _config.Item("UseWHE").GetValue<Slider>().Value;
             if (usewhE && hero.IsValidTarget(_q.Range + _w.Range) &&
                 hero.CountEnemiesInRange(_q.Range + _w.Range) <= _config.Item("EnemyC").GetValue<Slider>().Value &&
                 _player.Distance(hero) > Orbwalking.GetRealAutoAttackRange(_player))
             {
-                if (hero.Health < (_player.GetAutoAttackDamage(hero, true) * 2))
+                if (hero.Health < (_player.GetAutoAttackDamage(hero, true)*2))
                 {
                     _w.Cast(hero.Position);
                 }
@@ -550,21 +550,21 @@ namespace D_Corki
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= Qchangehar())
                     _q.Cast(t, false, true);
-                    
+
             }
             if (useE && _e.IsReady())
             {
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangehar())
                     _e.Cast(t, false, true);
-                  
+
             }
             if (useR && _r.IsReady() && rlimH < UltiStucks())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_r.Range)&& _r.GetPrediction(t).Hitchance >= Rchangehar())
+                if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangehar())
                     _r.Cast(t, false, true);
-                  
+
             }
         }
 
@@ -580,23 +580,23 @@ namespace D_Corki
                     if (useQ && _q.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                        if (t.IsValidTarget(_q.Range)&& _q.GetPrediction(t).Hitchance >= Qchangecombo())
-                             _q.Cast(t, false, true);
-                          
+                        if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= Qchangecombo())
+                            _q.Cast(t, false, true);
+
                     }
                     if (useE && _e.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
                         if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangecombo())
                             _e.Cast(t, false, true);
-                            
+
                     }
                     if (useR && _r.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                         if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangecombo())
-                           
-                        _r.Cast(t, false, true);
+
+                            _r.Cast(t, false, true);
                     }
                 }
             }
@@ -634,7 +634,7 @@ namespace D_Corki
                 else
                     foreach (var minion in allMinionsQ)
                         if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q))
+                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
                             _q.Cast(minion);
             }
             if (_e.IsReady() && useEl)
@@ -648,7 +648,7 @@ namespace D_Corki
                 else
                     foreach (var minion in allMinionsE)
                         if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.E))
+                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.E))
                             _e.Cast(minion);
             }
             if (_r.IsReady() && useRl && rlimL < UltiStucks() && allMinionsR.Count > 3)
@@ -667,7 +667,7 @@ namespace D_Corki
                 else
                     foreach (var minion in allMinionsR)
                         if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.R))
+                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.R))
                             _r.Cast(minion);
             }
         }
@@ -680,12 +680,12 @@ namespace D_Corki
             if (allMinions.Count < 3) return;
             foreach (var minion in allMinions)
             {
-                if (useQ && _q.IsReady() && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q))
+                if (useQ && _q.IsReady() && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     _q.Cast(minion);
                 }
 
-                if (_w.IsReady() && useE && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.E))
+                if (_w.IsReady() && useE && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.E))
                 {
                     _e.Cast(minion);
                 }
@@ -734,25 +734,27 @@ namespace D_Corki
             {
                 if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
                 {
-                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range) && _q.GetPrediction(hero).Hitchance >= Qchangekil())
+                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range) &&
+                        _q.GetPrediction(hero).Hitchance >= Qchangekil())
                         _q.Cast(hero, false, true);
-                        
+
                 }
                 if (_e.IsReady() && _config.Item("UseEM").GetValue<bool>())
                 {
-                    if (_e.GetDamage(hero) > hero.Health && hero.IsValidTarget(_e.Range)&& _e.GetPrediction(hero).Hitchance >= Echangekil())
-                         _e.Cast(hero, false, true);
-                        
+                    if (_e.GetDamage(hero) > hero.Health && hero.IsValidTarget(_e.Range) &&
+                        _e.GetPrediction(hero).Hitchance >= Echangekil())
+                        _e.Cast(hero, false, true);
+
                 }
                 if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>())
                 {
                     var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                     var bigRocket = HasBigRocket();
                     if (hero.IsValidTarget(bigRocket ? _r2.Range : _r1.Range) &&
-                        _r1.GetDamage(hero) * (bigRocket ? 1.5f : 1f) > hero.Health)
-                         if (_r.GetPrediction(t).Hitchance >= Rchangekil())
-                       
-                     _r.Cast(t, false, true);
+                        _r1.GetDamage(hero)*(bigRocket ? 1.5f : 1f) > hero.Health)
+                        if (_r.GetPrediction(t).Hitchance >= Rchangekil())
+
+                            _r.Cast(t, false, true);
                 }
             }
         }
@@ -763,14 +765,14 @@ namespace D_Corki
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
                 var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth * (_config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
+                                    (hero.MaxHealth*(_config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
                 var iBilgemyhp = _player.Health <=
-                                 (_player.MaxHealth * (_config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
+                                 (_player.MaxHealth*(_config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
                 var iBlade = _config.Item("Blade").GetValue<bool>();
                 var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth * (_config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
+                                    (hero.MaxHealth*(_config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
                 var iBlademyhp = _player.Health <=
-                                 (_player.MaxHealth * (_config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
+                                 (_player.MaxHealth*(_config.Item("Blademyhp").GetValue<Slider>().Value)/100);
                 var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
 
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
@@ -797,24 +799,24 @@ namespace D_Corki
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
             var iusemppotion = _config.Item("usemppotions").GetValue<bool>();
             var iusepotionmp = _player.Mana <=
-                               (_player.MaxMana * (_config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxMana*(_config.Item("usepotionmp").GetValue<Slider>().Value)/100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("Activejungle").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteRed.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmitePurple.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteGrey.Any(
-                                                                                                   i => Items.HasItem(i))
+                (mobs.Count > 0 && _config.Item("ActiveLane").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
+                                                                                             SmiteBlue.Any(
+                                                                                                 i => Items.HasItem(i)) ||
+                                                                                             SmiteRed.Any(
+                                                                                                 i => Items.HasItem(i)) ||
+                                                                                             SmitePurple.Any(
+                                                                                                 i => Items.HasItem(i)) ||
+                                                                                             SmiteBlue.Any(
+                                                                                                 i => Items.HasItem(i)) ||
+                                                                                             SmiteGrey.Any(
+                                                                                                 i => Items.HasItem(i))
                     )))
             {
                 if (iusepotionhp && iusehppotion &&
@@ -1033,11 +1035,11 @@ namespace D_Corki
             {
                 if (harass)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
                         "Auto harass Enabled");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
             if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
