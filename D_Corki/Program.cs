@@ -3,7 +3,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SPrediction;
 
 
 namespace D_Corki
@@ -61,7 +60,7 @@ namespace D_Corki
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             _config.AddSubMenu(targetSelectorMenu);
-            SPrediction.Prediction.Initialize(_config);
+           
             //Orbwalker
             _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
             _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
@@ -175,18 +174,19 @@ namespace D_Corki
             _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
             _config.SubMenu("items")
                 .SubMenu("Potions")
-                .AddItem(new MenuItem("usehppotions", "Use Healt potion/Flask/Biscuit"))
+                .AddItem(new MenuItem("usehppotions", "Use Healt potion/Refillable/Hunters/Corrupting/Biscuit"))
                 .SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
             _config.SubMenu("items")
                 .SubMenu("Potions")
-                .AddItem(new MenuItem("usemppotions", "Use Mana potion/Flask/Biscuit"))
+                .AddItem(new MenuItem("usemppotions", "Use Hunters/Corrupting/Biscuit"))
                 .SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
+
 
             //Harass
             _config.AddSubMenu(new Menu("Harass", "Harass"));
@@ -473,10 +473,9 @@ namespace D_Corki
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range)) //&& _q.GetPrediction(t).Hitchance >= Qchangecombo())
-                    // _q.Cast(t, false, true);
-                    _q.SPredictionCast(t, Qchangecombo());
-            }
+                if (t.IsValidTarget(_q.Range)&& _q.GetPrediction(t).Hitchance >= Qchangecombo())
+                     _q.Cast(t, false, true);
+                   }
             if (useW)
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
@@ -486,16 +485,16 @@ namespace D_Corki
             if (useE && _e.IsReady())
             {
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_e.Range))// && _e.GetPrediction(t).Hitchance >= Echangecombo())
-                    //_e.Cast(t, false, true);
-                    _e.SPredictionCast(t, Echangecombo());
+                if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangecombo())
+                    _e.Cast(t, false, true);
+                   
             }
             if (useR && _r.IsReady())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_r.Range))// && _r.GetPrediction(t).Hitchance >= Rchangecombo())
-                    //_r.Cast(t, false, true);
-                    _r.SPredictionCast(t, Rchangecombo());
+                if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangecombo())
+                    _r.Cast(t, false, true);
+                  
             }
             UseItemes();
         }
@@ -549,23 +548,23 @@ namespace D_Corki
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range))// && _q.GetPrediction(t).Hitchance >= Qchangehar())
-                    //_q.Cast(t, false, true);
-                    _q.SPredictionCast(t, Qchangehar());
+                if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= Qchangehar())
+                    _q.Cast(t, false, true);
+                    
             }
             if (useE && _e.IsReady())
             {
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_e.Range))// && _e.GetPrediction(t).Hitchance >= Echangehar())
-                    // _e.Cast(t, false, true);
-                    _e.SPredictionCast(t, Echangehar());
+                if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangehar())
+                    _e.Cast(t, false, true);
+                  
             }
             if (useR && _r.IsReady() && rlimH < UltiStucks())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_r.Range)) //&& _r.GetPrediction(t).Hitchance >= Rchangehar())
-                    //_r.Cast(t, false, true);
-                    _r.SPredictionCast(t, Rchangehar());
+                if (t.IsValidTarget(_r.Range)&& _r.GetPrediction(t).Hitchance >= Rchangehar())
+                    _r.Cast(t, false, true);
+                  
             }
         }
 
@@ -581,23 +580,23 @@ namespace D_Corki
                     if (useQ && _q.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                        if (t.IsValidTarget(_q.Range))// && _q.GetPrediction(t).Hitchance >= Qchangecombo())
-                            // _q.Cast(t, false, true);
-                            _q.SPredictionCast(t, Qchangecombo());
+                        if (t.IsValidTarget(_q.Range)&& _q.GetPrediction(t).Hitchance >= Qchangecombo())
+                             _q.Cast(t, false, true);
+                          
                     }
                     if (useE && _e.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                        if (t.IsValidTarget(_e.Range))// && _e.GetPrediction(t).Hitchance >= Echangecombo())
-                            // _e.Cast(t, false, true);
-                            _e.SPredictionCast(t, Echangecombo());
+                        if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= Echangecombo())
+                            _e.Cast(t, false, true);
+                            
                     }
                     if (useR && _r.IsReady())
                     {
                         var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                        if (t.IsValidTarget(_r.Range))// && _r.GetPrediction(t).Hitchance >= Rchangecombo())
-                            _r.SPredictionCast(t, Rchangecombo());
-                        //_r.Cast(t, false, true);
+                        if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= Rchangecombo())
+                           
+                        _r.Cast(t, false, true);
                     }
                 }
             }
@@ -735,17 +734,15 @@ namespace D_Corki
             {
                 if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
                 {
-                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range))
-                        // && _q.GetPrediction(hero).Hitchance >= Qchangekil())
-                        //_q.Cast(hero, false, true);
-                        _q.SPredictionCast(hero, Qchangekil());
+                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range) && _q.GetPrediction(hero).Hitchance >= Qchangekil())
+                        _q.Cast(hero, false, true);
+                        
                 }
                 if (_e.IsReady() && _config.Item("UseEM").GetValue<bool>())
                 {
-                    if (_e.GetDamage(hero) > hero.Health && hero.IsValidTarget(_e.Range))
-                        // && _e.GetPrediction(hero).Hitchance >= Echangekil())
-                        // _e.Cast(hero, false, true);
-                        _e.SPredictionCast(hero, Echangekil());
+                    if (_e.GetDamage(hero) > hero.Health && hero.IsValidTarget(_e.Range)&& _e.GetPrediction(hero).Hitchance >= Echangekil())
+                         _e.Cast(hero, false, true);
+                        
                 }
                 if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>())
                 {
@@ -753,9 +750,9 @@ namespace D_Corki
                     var bigRocket = HasBigRocket();
                     if (hero.IsValidTarget(bigRocket ? _r2.Range : _r1.Range) &&
                         _r1.GetDamage(hero) * (bigRocket ? 1.5f : 1f) > hero.Health)
-                        // if (_r.GetPrediction(t).Hitchance >= Rchangekil())
-                        _r.SPredictionCast(t, Rchangekil());
-                    //  _r.Cast(t, false, true);
+                         if (_r.GetPrediction(t).Hitchance >= Rchangekil())
+                       
+                     _r.Cast(t, false, true);
                 }
             }
         }
@@ -807,55 +804,69 @@ namespace D_Corki
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveLane").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
-                                                                                             SmiteBlue.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmiteRed.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmitePurple.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmiteBlue.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmiteGrey.Any(
-                                                                                                 i => Items.HasItem(i))
+                (mobs.Count > 0 && _config.Item("Activejungle").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
+                                                                                               SmiteBlue.Any(
+                                                                                                   i => Items.HasItem(i)) ||
+                                                                                               SmiteRed.Any(
+                                                                                                   i => Items.HasItem(i)) ||
+                                                                                               SmitePurple.Any(
+                                                                                                   i => Items.HasItem(i)) ||
+                                                                                               SmiteBlue.Any(
+                                                                                                   i => Items.HasItem(i)) ||
+                                                                                               SmiteGrey.Any(
+                                                                                                   i => Items.HasItem(i))
                     )))
             {
                 if (iusepotionhp && iusehppotion &&
                     !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)))
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)
+                      || ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true)
+                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true)))
                 {
-                    if (Items.HasItem(2041) && Items.CanUseItem(2041))
-                    {
-                        Items.UseItem(2041);
-                    }
-                    else if (Items.HasItem(2010) && Items.CanUseItem(2010))
+
+                    if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
-                    else if (Items.HasItem(2003) && Items.CanUseItem(2003))
+                    if (Items.HasItem(2003) && Items.CanUseItem(2003))
                     {
                         Items.UseItem(2003);
                     }
+                    if (Items.HasItem(2031) && Items.CanUseItem(2031))
+                    {
+                        Items.UseItem(2031);
+                    }
+                    if (Items.HasItem(2032) && Items.CanUseItem(2032))
+                    {
+                        Items.UseItem(2032);
+                    }
+                    if (Items.HasItem(2033) && Items.CanUseItem(2033))
+                    {
+                        Items.UseItem(2033);
+                    }
                 }
-
-
                 if (iusepotionmp && iusemppotion &&
-                    !(ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)))
+                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true) ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true) ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true) ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true)))
                 {
                     if (Items.HasItem(2041) && Items.CanUseItem(2041))
                     {
                         Items.UseItem(2041);
                     }
-                    else if (Items.HasItem(2010) && Items.CanUseItem(2010))
+                    if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
-                    else if (Items.HasItem(2004) && Items.CanUseItem(2004))
+                    if (Items.HasItem(2032) && Items.CanUseItem(2032))
                     {
-                        Items.UseItem(2004);
+                        Items.UseItem(2032);
+                    }
+                    if (Items.HasItem(2033) && Items.CanUseItem(2033))
+                    {
+                        Items.UseItem(2033);
                     }
                 }
             }
