@@ -207,14 +207,14 @@ namespace D_Kogmaw
             _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
             _config.SubMenu("items")
                 .SubMenu("Potions")
-                .AddItem(new MenuItem("usehppotions", "Use Healt potion/Flask/Biscuit"))
+                .AddItem(new MenuItem("usehppotions", "Use Healt potion/Refillable/Hunters/Corrupting/Biscuit"))
                 .SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Potions")
                 .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
             _config.SubMenu("items")
                 .SubMenu("Potions")
-                .AddItem(new MenuItem("usemppotions", "Use Mana potion/Flask/Biscuit"))
+                .AddItem(new MenuItem("usemppotions", "Use Hunters/Corrupting/Biscuit"))
                 .SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Potions")
@@ -644,40 +644,54 @@ namespace D_Kogmaw
             {
                 if (iusepotionhp && iusehppotion &&
                     !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)))
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)
+                      || ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true)
+                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true)))
                 {
-                    if (Items.HasItem(2041) && Items.CanUseItem(2041))
-                    {
-                        Items.UseItem(2041);
-                    }
-                    else if (Items.HasItem(2010) && Items.CanUseItem(2010))
+
+                    if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
-                    else if (Items.HasItem(2003) && Items.CanUseItem(2003))
+                    if (Items.HasItem(2003) && Items.CanUseItem(2003))
                     {
                         Items.UseItem(2003);
                     }
+                    if (Items.HasItem(2031) && Items.CanUseItem(2031))
+                    {
+                        Items.UseItem(2031);
+                    }
+                    if (Items.HasItem(2032) && Items.CanUseItem(2032))
+                    {
+                        Items.UseItem(2032);
+                    }
+                    if (Items.HasItem(2033) && Items.CanUseItem(2033))
+                    {
+                        Items.UseItem(2033);
+                    }
                 }
-
-
                 if (iusepotionmp && iusemppotion &&
-                    !(ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)))
+                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true) ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true) ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true) ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true)))
                 {
                     if (Items.HasItem(2041) && Items.CanUseItem(2041))
                     {
                         Items.UseItem(2041);
                     }
-                    else if (Items.HasItem(2010) && Items.CanUseItem(2010))
+                    if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
-                    else if (Items.HasItem(2004) && Items.CanUseItem(2004))
+                    if (Items.HasItem(2032) && Items.CanUseItem(2032))
                     {
-                        Items.UseItem(2004);
+                        Items.UseItem(2032);
+                    }
+                    if (Items.HasItem(2033) && Items.CanUseItem(2033))
+                    {
+                        Items.UseItem(2033);
                     }
                 }
             }
@@ -739,15 +753,12 @@ namespace D_Kogmaw
                     _q.Cast(t);
             }
             if (useW && _w.IsReady())
-            { var eTarget = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
-               if( eTarget.Distance(_player.Position) < _e.Range)
-                {
-                    foreach (
-                        var hero in
-                            ObjectManager.Get<Obj_AI_Hero>()
-                                .Where(hero => hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(hero) + _w.Range)))
-                        _w.CastOnUnit(ObjectManager.Player);
-                }
+            {
+                foreach (
+                    var hero in
+                        ObjectManager.Get<Obj_AI_Hero>()
+                            .Where(hero => hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(hero) + _w.Range)))
+                    _w.CastOnUnit(ObjectManager.Player);
             }
             if (useE && _e.IsReady())
             {
