@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D-Ezreal", "D-Ezreal\D-Ezreal.csproj", "{52AA620D-10DE-4CA0-8830-4A14B800DBED}"
 EndProject
@@ -29,11 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_RekSai", "D_RekSai\D_RekS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orianna_by_trelli", "Oriana_by_trelli\Orianna_by_trelli.csproj", "{D8B1D84E-D8D9-439F-933D-393E2F2B136D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debug", "Debug\Debug.csproj", "{A0145921-506D-458C-BFD5-FE1C99E0169C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_Rengar", "D_Rengar\D_Rengar.csproj", "{E278539B-FB9E-427B-BD60-C8B6D50991DF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_Thresh", "D_Thresh\D_Thresh.csproj", "{656317E9-02E1-42D4-A9C4-6FFC88AEC56B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_Corki", "D_Corki\D_Corki.csproj", "{7EF3E141-E106-42E9-86A4-1B0608FCBFE6}"
 EndProject
@@ -97,18 +93,10 @@ Global
 		{D8B1D84E-D8D9-439F-933D-393E2F2B136D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8B1D84E-D8D9-439F-933D-393E2F2B136D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8B1D84E-D8D9-439F-933D-393E2F2B136D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0145921-506D-458C-BFD5-FE1C99E0169C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0145921-506D-458C-BFD5-FE1C99E0169C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0145921-506D-458C-BFD5-FE1C99E0169C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0145921-506D-458C-BFD5-FE1C99E0169C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E278539B-FB9E-427B-BD60-C8B6D50991DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{656317E9-02E1-42D4-A9C4-6FFC88AEC56B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{656317E9-02E1-42D4-A9C4-6FFC88AEC56B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{656317E9-02E1-42D4-A9C4-6FFC88AEC56B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{656317E9-02E1-42D4-A9C4-6FFC88AEC56B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7EF3E141-E106-42E9-86A4-1B0608FCBFE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7EF3E141-E106-42E9-86A4-1B0608FCBFE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EF3E141-E106-42E9-86A4-1B0608FCBFE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
