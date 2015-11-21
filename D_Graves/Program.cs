@@ -389,7 +389,7 @@ namespace D_Graves
                     //  Game.PrintChat("normal");
                     _w.Cast(gapcloser.Sender);
                 }
-            if (_e.IsReady() && gapcloser.Sender.IsValidTarget(1000) && _config.Item("Gap_E").GetValue<bool>())
+            if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 475 && _config.Item("Gap_E").GetValue<bool>())
             {
                 _e.Cast(gapcloser.Sender);
             }
