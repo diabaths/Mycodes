@@ -239,7 +239,7 @@ namespace D_Nidalee
                 .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
             Config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("ActiveHarass", "Harass key").SetValue(new KeyBind("X".ToCharArray()[0],
+                    new MenuItem("ActiveHarass", "Harass key").SetValue(new KeyBind("C".ToCharArray()[0],
                         KeyBindType.Press)));
 
 
