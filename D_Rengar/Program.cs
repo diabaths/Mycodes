@@ -440,26 +440,26 @@ namespace D_Rengar
 
         private static void Usepotion()
         {
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
+            var mobs = MinionManager.GetMinions(_player.ServerPosition, _e.Range,
                 MinionTypes.All,
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("Activejungle").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteRed.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmitePurple.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteGrey.Any(
-                                                                                                   i => Items.HasItem(i))
+                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
+                                                                                              SmiteBlue.Any(
+                                                                                                  i => Items.HasItem(i)) ||
+                                                                                              SmiteRed.Any(
+                                                                                                  i => Items.HasItem(i)) ||
+                                                                                              SmitePurple.Any(
+                                                                                                  i => Items.HasItem(i)) ||
+                                                                                              SmiteBlue.Any(
+                                                                                                  i => Items.HasItem(i)) ||
+                                                                                              SmiteGrey.Any(
+                                                                                                  i => Items.HasItem(i))
                     )))
             {
                 if (iusepotionhp && iusehppotion &&
@@ -493,6 +493,7 @@ namespace D_Rengar
                 }
             }
         }
+
         private static void Drawing_OnDraw(EventArgs args)
         {
             var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
@@ -519,7 +520,7 @@ namespace D_Rengar
             }
             if (_config.Item("Drawsmite").GetValue<bool>())
             {
-                if (Items.HasItem(1039)||SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
+                if (Items.HasItem(1041) ||SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
                 {
                     if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                     {

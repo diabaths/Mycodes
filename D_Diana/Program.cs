@@ -758,7 +758,7 @@ namespace D_Diana
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("Activejungle").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
+                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
                                                                                                SmiteBlue.Any(
                                                                                                    i => Items.HasItem(i)) ||
                                                                                                SmiteRed.Any(
@@ -1184,23 +1184,26 @@ namespace D_Diana
 
             if (_config.Item("Drawsmite").GetValue<bool>())
             {
-                if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
+                if (Items.HasItem(1041) || SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
-                        "Smite Jungle On");
+                    if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
+                    {
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.GreenYellow,
+                            "Smite Jungle On");
+                    }
+                    else
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.OrangeRed,
+                            "Smite Jungle Off");
                 }
-                else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
-                        "Smite Jungle Off");
                 if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }

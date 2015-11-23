@@ -72,7 +72,7 @@ namespace D_Nidalee
             Q = new Spell(SpellSlot.Q, 1500f);
             W = new Spell(SpellSlot.W, 900f);
             E = new Spell(SpellSlot.E, 600f);
-            WC = new Spell(SpellSlot.W, 750f);
+            WC = new Spell(SpellSlot.W, 375f);
             EC = new Spell(SpellSlot.E, 300f);
             R = new Spell(SpellSlot.R, 0);
 
@@ -781,7 +781,10 @@ namespace D_Nidalee
                 }
             }
         }
-
+        private static bool havemark(Obj_AI_Base target)
+        {
+            return target.HasBuff("nidaleepassivehunted");
+        }
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
@@ -997,7 +1000,7 @@ namespace D_Nidalee
             if (Player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && Config.Item("Activejungle").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
+                (mobs.Count > 0 && Config.Item("ActiveJungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
                                                                                                SmiteBlue.Any(
                                                                                                    i => Items.HasItem(i)) ||
                                                                                                SmiteRed.Any(
@@ -1306,23 +1309,26 @@ namespace D_Nidalee
             }
             if (Config.Item("Drawsmite").GetValue<bool>())
             {
-                if (Config.Item("Usesmite").GetValue<KeyBind>().Active)
+                if (Items.HasItem(1041) || SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.GreenYellow,
-                        "Smite Jungle On");
+                    if (Config.Item("Usesmite").GetValue<KeyBind>().Active)
+                    {
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.GreenYellow,
+                            "Smite Jungle On");
+                    }
+                    else
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.OrangeRed,
+                            "Smite Jungle Off");
                 }
-                else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.OrangeRed,
-                        "Smite Jungle Off");
                 if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
                 {
                     if (Config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }

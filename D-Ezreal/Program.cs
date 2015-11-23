@@ -614,7 +614,7 @@ namespace D_Ezreal
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("Activejungle").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
+                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
                                                                                                SmiteBlue.Any(
                                                                                                    i => Items.HasItem(i)) ||
                                                                                                SmiteRed.Any(
