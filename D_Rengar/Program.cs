@@ -18,11 +18,7 @@ namespace D_Rengar
         private static SpellSlot _smiteSlot;
         private static Menu _config;
         private static Spell _smite;
-        //Credits to Kurisu
-      /*  private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
-        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
-        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
-        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};*/
+      
         private static int _lastTick;
 
         private static void Main(string[] args)
@@ -460,11 +456,11 @@ namespace D_Rengar
                 (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active)&& _smite != null)
             {
                 if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true)
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true)))
+                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
@@ -846,20 +842,6 @@ namespace D_Rengar
             "summonersmite"
         };
 
-
-        //Credits to metaphorce
-       /* private static void SetSmiteSlot()
-        {
-            foreach (
-                var spell in
-                    ObjectManager.Player.Spellbook.Spells.Where(
-                        spell => String.Equals(spell.Name, Smitetype(), StringComparison.CurrentCultureIgnoreCase)))
-            {
-                _smiteSlot = spell.Slot;
-                _smite = new Spell(_smiteSlot, 500);
-                return;
-            }
-        }*/
 
         private static int GetSmiteDmg()
         {

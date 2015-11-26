@@ -34,12 +34,7 @@ namespace D_RekSai
 
         //private static bool burrowed = false;
 
-        //Credits to Kurisu
-        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
-        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
-        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
-        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
-
+       
 
         private static void Main(string[] args)
         {
@@ -79,7 +74,16 @@ namespace D_RekSai
 
 
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
-            SetSmiteSlot();
+            if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner1).Name))
+            {
+                _smite = new Spell(SpellSlot.Summoner1, 570f);
+                _smiteSlot = SpellSlot.Summoner1;
+            }
+            else if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner2).Name))
+            {
+                _smite = new Spell(SpellSlot.Summoner2, 570f);
+                _smiteSlot = SpellSlot.Summoner2;
+            }
 
             //D Rek'Sai
             _config = new Menu("D-RekSai", "D-RekSai", true);
@@ -728,15 +732,13 @@ namespace D_RekSai
 
         private static void Smiteontarget()
         {
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" ||
-                         _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
                 var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
                     ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+                    hero.IsValidTarget(570))
                 {
                     if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
                     {
@@ -747,9 +749,9 @@ namespace D_RekSai
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                     }
                 }
-                if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
                     ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+                    hero.IsValidTarget(570))
                 {
                     ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
@@ -980,25 +982,14 @@ namespace D_RekSai
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteRed.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmitePurple.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteGrey.Any(
-                                                                                                   i => Items.HasItem(i))
-                    )))
+                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite != null))
             {
                 if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true)
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true)))
+                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
@@ -1198,42 +1189,11 @@ namespace D_RekSai
             }
         }
 
-        //Credits to Kurisu
-        private static string Smitetype()
-        {
-            if (SmiteBlue.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmiteplayerganker";
-            }
-            if (SmiteRed.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmiteduel";
-            }
-            if (SmiteGrey.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmitequick";
-            }
-            if (SmitePurple.Any(i => Items.HasItem(i)))
-            {
-                return "itemsmiteaoe";
-            }
-            return "summonersmite";
-        }
-
-
-        //Credits to metaphorce
-        private static void SetSmiteSlot()
-        {
-            foreach (
-                var spell in
-                    ObjectManager.Player.Spellbook.Spells.Where(
-                        spell => String.Equals(spell.Name, Smitetype(), StringComparison.CurrentCultureIgnoreCase)))
-            {
-                _smiteSlot = spell.Slot;
-                _smite = new Spell(_smiteSlot, 700);
-                return;
-            }
-        }
+        public static readonly string[] Smitetype =
+         {
+            "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
+            "summonersmite"
+        };
 
         private static int GetSmiteDmg()
         {
@@ -1259,7 +1219,7 @@ namespace D_RekSai
             {
                 jungleMinions = new string[]
                 {
-                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red", "SRU_Krug", "SRU_Dragon",
+                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak","SRU_RiftHerald", "SRU_Red", "SRU_Krug", "SRU_Dragon",
                     "SRU_Baron"
                 };
             }
@@ -1437,28 +1397,28 @@ namespace D_RekSai
                         "Auto harass Disabled");
             }
 
-            if (_config.Item("Drawsmite").GetValue<bool>())
+            if (_config.Item("Drawsmite").GetValue<bool>() && _smite != null)
             {
-                if (Items.HasItem(1041) || SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
+
+                if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
-                    {
-                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.GreenYellow,
-                            "Smite Jungle On");
-                    }
-                    else
-                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.OrangeRed,
-                            "Smite Jungle Off");
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                        "Smite Jungle On");
                 }
-                if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
+                else
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                        "Smite Jungle Off");
+
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" ||
+                    _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }

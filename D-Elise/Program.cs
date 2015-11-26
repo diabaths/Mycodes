@@ -64,7 +64,7 @@ namespace D_Elise
         {
 
             _player = ObjectManager.Player;
-            if (ObjectManager.Player.BaseSkinName != ChampionName) return;
+            if (_player.ChampionName != ChampionName) return;
 
             _humanQ = new Spell(SpellSlot.Q, 625f);
             _humanW = new Spell(SpellSlot.W, 950f);
@@ -265,7 +265,7 @@ namespace D_Elise
 
             _config.AddToMainMenu();
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Interrupter.OnPossibleToInterrupt += Interrupter_OnPosibleToInterrupt;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -860,12 +860,12 @@ namespace D_Elise
             return _config.Item("usePackets").GetValue<bool>();
         }*/
 
-        private static void Interrupter_OnPosibleToInterrupt(Obj_AI_Base target, InterruptableSpell spell)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
         {
             if (!_config.Item("UseEInt").GetValue<bool>()) return;
-            if (target.IsValidTarget(_humanE.Range) && _humanE.GetPrediction(target).Hitchance >= HitChance.Low)
+            if (unit.IsValidTarget(_humanE.Range) && _humanE.GetPrediction(unit).Hitchance >= HitChance.Low)
             {
-                _humanE.Cast(target);
+                _humanE.Cast(unit);
             }
         }
 

@@ -36,7 +36,7 @@ namespace D_Corki
         private static void Game_OnGameLoad(EventArgs args)
         {
             _player = ObjectManager.Player;
-            if (ObjectManager.Player.BaseSkinName != ChampionName) return;
+            if (_player.ChampionName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 825f);
             _w = new Spell(SpellSlot.W, 800f);
@@ -849,10 +849,10 @@ namespace D_Corki
                     }
                 }
                 if (iusepotionmp && iusemppotion &&
-                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true)))
+                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask") ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlask")))
                 {
                     if (Items.HasItem(2041) && Items.CanUseItem(2041))
                     {
