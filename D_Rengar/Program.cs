@@ -15,14 +15,14 @@ namespace D_Rengar
         private static Orbwalking.Orbwalker _orbwalker;
         private static SpellSlot _igniteSlot;
         private static Items.Item _youmuu, _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
-        private static SpellSlot _smiteSlot = SpellSlot.Unknown;
+        private static SpellSlot _smiteSlot;
         private static Menu _config;
         private static Spell _smite;
         //Credits to Kurisu
-        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
+      /*  private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
         private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
         private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
-        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
+        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};*/
         private static int _lastTick;
 
         private static void Main(string[] args)
@@ -50,8 +50,17 @@ namespace D_Rengar
             _lotis = new Items.Item(3190, 590f);
             _youmuu = new Items.Item(3142, 10);
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
-            SetSmiteSlot();
-
+           // SetSmiteSlot();
+            if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner1).Name))
+            {
+                _smite = new Spell(SpellSlot.Summoner1, 570f);
+                _smiteSlot = SpellSlot.Summoner1;
+            }
+            else  if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner2).Name))
+            {
+                _smite = new Spell(SpellSlot.Summoner2, 570f);
+                _smiteSlot = SpellSlot.Summoner2;
+            }
             //D rengar
             _config = new Menu("D-Rengar", "D-Rengar", true);
 
@@ -327,6 +336,7 @@ namespace D_Rengar
             ChangeComboMode();
 
         }
+
         private static void OnAfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
@@ -410,15 +420,13 @@ namespace D_Rengar
 
         private static void Smiteontarget()
         {
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" ||
-                _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker")
-                foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
                 {
                     var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
                     var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                    if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
+                    if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
                         ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                        hero.IsValidTarget(_smite.Range))
+                        hero.IsValidTarget(570))
                     {
                         if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
                         {
@@ -429,9 +437,9 @@ namespace D_Rengar
                             ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                         }
                     }
-                    if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
+                    if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
                         ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                        hero.IsValidTarget(_smite.Range))
+                        hero.IsValidTarget(570))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                     }
@@ -449,18 +457,7 @@ namespace D_Rengar
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
-                                                                                              SmiteBlue.Any(
-                                                                                                  i => Items.HasItem(i)) ||
-                                                                                              SmiteRed.Any(
-                                                                                                  i => Items.HasItem(i)) ||
-                                                                                              SmitePurple.Any(
-                                                                                                  i => Items.HasItem(i)) ||
-                                                                                              SmiteBlue.Any(
-                                                                                                  i => Items.HasItem(i)) ||
-                                                                                              SmiteGrey.Any(
-                                                                                                  i => Items.HasItem(i))
-                    )))
+                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active)&& _smite != null)
             {
                 if (iusepotionhp && iusehppotion &&
                     !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||
@@ -518,20 +515,20 @@ namespace D_Rengar
                     Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
-            if (_config.Item("Drawsmite").GetValue<bool>())
+            if (_config.Item("Drawsmite").GetValue<bool>()&& _smite != null)
             {
-                if (Items.HasItem(1041) ||SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)) || SmitePurple.Any(i => Items.HasItem(i)) || SmiteGrey.Any(i => Items.HasItem(i)))
+
+                if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
-                    {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
-                            "Smite Jungle On");
-                    }
-                    else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
-                            "Smite Jungle Off");
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                        "Smite Jungle On");
                 }
-                if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
+                else
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                        "Smite Jungle Off");
+
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" ||
+                    _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
@@ -593,8 +590,8 @@ namespace D_Rengar
             var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
             var iTiamat = _config.Item("Tiamat").GetValue<bool>();
             var iHydra = _config.Item("Hydra").GetValue<bool>();
-
-            if (target.IsValidTarget(_smite.Range))
+            var usesmite = _config.Item("smitecombo").GetValue<bool>();
+            if (usesmite && target.IsValidTarget(570)&& (_smite != null)&& _player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
             {
                 Smiteontarget();
             }
@@ -843,30 +840,15 @@ namespace D_Rengar
             }
         }
 
-        private static string Smitetype()
+        public static readonly string[] Smitetype =
         {
-            if (SmiteBlue.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmiteplayerganker";
-            }
-            if (SmiteRed.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmiteduel";
-            }
-            if (SmiteGrey.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmitequick";
-            }
-            if (SmitePurple.Any(i => Items.HasItem(i)))
-            {
-                return "itemsmiteaoe";
-            }
-            return "summonersmite";
-        }
+            "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
+            "summonersmite"
+        };
 
 
         //Credits to metaphorce
-        private static void SetSmiteSlot()
+       /* private static void SetSmiteSlot()
         {
             foreach (
                 var spell in
@@ -874,10 +856,10 @@ namespace D_Rengar
                         spell => String.Equals(spell.Name, Smitetype(), StringComparison.CurrentCultureIgnoreCase)))
             {
                 _smiteSlot = spell.Slot;
-                _smite = new Spell(_smiteSlot, 700);
+                _smite = new Spell(_smiteSlot, 500);
                 return;
             }
-        }
+        }*/
 
         private static int GetSmiteDmg()
         {
@@ -903,7 +885,7 @@ namespace D_Rengar
             {
                 jungleMinions = new string[]
                 {
-                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red", "SRU_Krug", "SRU_Dragon",
+                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak","SRU_RiftHerald", "SRU_Red", "SRU_Krug", "SRU_Dragon",
                     "SRU_Baron"
                 };
             }
