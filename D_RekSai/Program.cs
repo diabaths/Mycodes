@@ -732,6 +732,7 @@ namespace D_RekSai
 
         private static void Smiteontarget()
         {
+            if (_smite != null) return;
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
