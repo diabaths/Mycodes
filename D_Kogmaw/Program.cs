@@ -26,12 +26,7 @@ namespace D_Kogmaw
         private static bool _initialSkin = true;
 
         private static SpellSlot _igniteSlot;
-
-        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
-        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
-        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
-        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
-
+        
         private static Items.Item _youmuu, _blade, _bilge, _hextech;
 
         private static readonly List<string> Skins = new List<string>();
@@ -45,7 +40,7 @@ namespace D_Kogmaw
         private static void Game_OnGameLoad(EventArgs args)
         {
             _player = ObjectManager.Player;
-            if (ObjectManager.Player.BaseSkinName != ChampionName) return;
+            if (ObjectManager.Player.ChampionName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 1100f);
             _w = new Spell(SpellSlot.W, float.MaxValue);
@@ -629,18 +624,7 @@ namespace D_Kogmaw
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("Activejungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteRed.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmitePurple.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteGrey.Any(
-                                                                                                   i => Items.HasItem(i))
-                    )))
+                (mobs.Count > 0 && _config.Item("Activejungle").GetValue<KeyBind>().Active))
             {
                 if (iusepotionhp && iusehppotion &&
                     !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||

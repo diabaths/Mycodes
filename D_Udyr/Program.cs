@@ -29,15 +29,10 @@ namespace D_Udyr
 
         private static Obj_AI_Hero _player;
 
-        private static SpellSlot _smiteSlot = SpellSlot.Unknown;
+        private static SpellSlot _smiteSlot;
 
         private static Spell _smite;
-        //Credits to Kurisu
-        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3724, 3723, 3933 };
-        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719, 3932 };
-        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714, 3931 };
-        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707, 3930 };
-
+       
         private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
 
         //Tiger Style                              1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18
@@ -76,8 +71,16 @@ namespace D_Udyr
             _rand = new Items.Item(3143, 490f);
             _lotis = new Items.Item(3190, 590f);
 
-
-            SetSmiteSlot();
+            if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner1).Name))
+            {
+                _smite = new Spell(SpellSlot.Summoner1, 570f);
+                _smiteSlot = SpellSlot.Summoner1;
+            }
+            else if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner2).Name))
+            {
+                _smite = new Spell(SpellSlot.Summoner2, 570f);
+                _smiteSlot = SpellSlot.Summoner2;
+            }
 
             //Udyr
             _config = new Menu("D-Udyr", "D-Udyr", true);
@@ -489,25 +492,14 @@ namespace D_Udyr
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && (Items.HasItem(1041) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteRed.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmitePurple.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteBlue.Any(
-                                                                                                   i => Items.HasItem(i)) ||
-                                                                                               SmiteGrey.Any(
-                                                                                                   i => Items.HasItem(i))
-                    )))
+                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite !=null))
             {
                 if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true)
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true)))
+                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
@@ -532,10 +524,10 @@ namespace D_Udyr
                     }
                 }
                 if (iusepotionmp && iusemppotion &&
-                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask", true)))
+                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask") ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlask")))
                 {
                     if (Items.HasItem(2041) && Items.CanUseItem(2041))
                     {
@@ -558,31 +550,30 @@ namespace D_Udyr
         }
         private static void Smiteontarget()
         {
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            if (_smite == null) return;
+            var hero = HeroManager.Enemies.FirstOrDefault(x => x.IsValidTarget(570));
+            var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+            var usesmite = _config.Item("smitecombo").GetValue<bool>();
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
+                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
             {
-                var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
-                var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                if (SmiteBlue.Any(i => Items.HasItem(i)) && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+                if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
                 {
-                    if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
-                    {
-                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                    }
-                    else if (smiteDmg >= hero.Health)
-                    {
-                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                    }
+                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
-                if (SmiteRed.Any(i => Items.HasItem(i)) && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(_smite.Range))
+                else if (smiteDmg >= hero.Health)
                 {
                     ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
             }
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
+                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                hero.IsValidTarget(570))
+            {
+                ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+            }
         }
+
         private static void Combo()
         {
             //Create target
@@ -593,7 +584,7 @@ namespace D_Udyr
             if (target != null && _player.Distance(target) <= _config.Item("TargetRange").GetValue<Slider>().Value)
             {
                 Smiteontarget();
-                if (_e.IsReady() && !target.HasBuff("udyrbearstuncheck", true))
+                if (_e.IsReady() && !target.HasBuff("udyrbearstuncheck"))
                 {
                     _e.Cast();
                     return;
@@ -602,19 +593,19 @@ namespace D_Udyr
                     ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Level)
                     if (_q.Cast()) return;
 
-                if (_r.IsReady() && target.HasBuff("udyrbearstuncheck", true))
+                if (_r.IsReady() && target.HasBuff("udyrbearstuncheck"))
                 {
                     Utility.DelayAction.Add(delay, () => _r.Cast());
                     return;
                 }
 
-                if (_q.IsReady() && target.HasBuff("udyrbearstuncheck", true))
+                if (_q.IsReady() && target.HasBuff("udyrbearstuncheck"))
                 {
                     Utility.DelayAction.Add(delay, () => _q.Cast());
                     return;
                 }
 
-                if (_w.IsReady() && target.HasBuff("udyrbearstuncheck", true))
+                if (_w.IsReady() && target.HasBuff("udyrbearstuncheck"))
                 {
                     Utility.DelayAction.Add(delay, () => _w.Cast());
                     return;
@@ -645,9 +636,9 @@ namespace D_Udyr
                     }
                     else if (enemy.HasBuff("udyrbearstuncheck"))
                     {
-                        Game.PrintChat(closestEnemy.BaseSkinName + " has buff already !!!");
+                        Game.PrintChat(closestEnemy.ChampionName + " has buff already !!!");
                         closestEnemy = enemy;
-                        Game.PrintChat(enemy.BaseSkinName + "is the new target");
+                        Game.PrintChat(enemy.ChampionName + "is the new target");
 
                     }
                     if (!enemy.HasBuff("udyrbearstuncheck"))
@@ -661,24 +652,28 @@ namespace D_Udyr
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
+            if (_smite != null)
             {
-                Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.GreenYellow,
-                    "Smite Jungle On");
-            }
-            else
-                Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.88f, System.Drawing.Color.OrangeRed,
-                    "Smite Jungle Off");
-            if (SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i)))
-            {
-                if (_config.Item("smitecombo").GetValue<bool>())
+                if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.GreenYellow,
-                        "Smite Target On");
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                        "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.90f, System.Drawing.Color.OrangeRed,
-                        "Smite Target Off");
+                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                        "Smite Jungle Off");
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" ||
+                    _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
+                {
+                    if (_config.Item("smitecombo").GetValue<bool>())
+                    {
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                            "Smite Target On");
+                    }
+                    else
+                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
+                            "Smite Target Off");
+                }
             }
             if (_config.Item("Forest").GetValue<KeyBind>().Active)
             {
@@ -689,41 +684,11 @@ namespace D_Udyr
                 Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
                     "Forest Is Off");
         }
-        //Credits to Kurisu
-        private static string Smitetype()
+        public static readonly string[] Smitetype =
         {
-            if (SmiteBlue.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmiteplayerganker";
-            }
-            if (SmiteRed.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmiteduel";
-            }
-            if (SmiteGrey.Any(i => Items.HasItem(i)))
-            {
-                return "s5_summonersmitequick";
-            }
-            if (SmitePurple.Any(i => Items.HasItem(i)))
-            {
-                return "itemsmiteaoe";
-            }
-            return "summonersmite";
-        }
-
-        //Credits to metaphorce
-        private static void SetSmiteSlot()
-        {
-            foreach (
-                var spell in
-                    ObjectManager.Player.Spellbook.Spells.Where(
-                        spell => String.Equals(spell.Name, Smitetype(), StringComparison.CurrentCultureIgnoreCase)))
-            {
-                _smiteSlot = spell.Slot;
-                _smite = new Spell(_smiteSlot, 700);
-                return;
-            }
-        }
+            "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
+            "summonersmite"
+        };
 
         private static int GetSmiteDmg()
         {
@@ -751,7 +716,7 @@ namespace D_Udyr
             {
                 jungleMinions = new string[]
                 {
-                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red", "SRU_Krug", "SRU_Dragon",
+                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak","SRU_RiftHerald", "SRU_Red", "SRU_Krug", "SRU_Dragon",
                     "SRU_Baron"
                 };
             }

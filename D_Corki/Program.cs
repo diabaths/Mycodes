@@ -23,11 +23,7 @@ namespace D_Corki
 
         private static Items.Item _youmuu, _blade, _bilge;
 
-        private static readonly int[] SmitePurple = {3713, 3726, 3725, 3724, 3723, 3933};
-        private static readonly int[] SmiteGrey = {3711, 3722, 3721, 3720, 3719, 3932};
-        private static readonly int[] SmiteRed = {3715, 3718, 3717, 3716, 3714, 3931};
-        private static readonly int[] SmiteBlue = {3706, 3710, 3709, 3708, 3707, 3930};
-
+       
         private static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
@@ -806,25 +802,14 @@ namespace D_Corki
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveLane").GetValue<KeyBind>().Active && (Items.HasItem(1039) ||
-                                                                                             SmiteBlue.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmiteRed.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmitePurple.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmiteBlue.Any(
-                                                                                                 i => Items.HasItem(i)) ||
-                                                                                             SmiteGrey.Any(
-                                                                                                 i => Items.HasItem(i))
-                    )))
+                (mobs.Count > 0 && _config.Item("ActiveLane").GetValue<KeyBind>().Active))
             {
                 if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion", true) ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion", true)
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask", true) ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle", true)
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask", true)))
+                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
+                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
+                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))

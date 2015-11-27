@@ -28,7 +28,7 @@ namespace D_RekSai
 
         private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
 
-        private static SpellSlot _smiteSlot = SpellSlot.Unknown;
+        private static SpellSlot _smiteSlot;
 
         private static Spell _smite;
 
@@ -44,7 +44,7 @@ namespace D_RekSai
         private static void Game_OnGameLoad(EventArgs args)
         {
             _player = ObjectManager.Player;
-            if (ObjectManager.Player.BaseSkinName != ChampionName) return;
+            if (ObjectManager.Player.ChampionName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 300);
             _bq = new Spell(SpellSlot.Q, 1450);

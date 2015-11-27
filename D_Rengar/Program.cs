@@ -388,8 +388,7 @@ namespace D_Rengar
             }
         }
 
-        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit,
-            Interrupter2.InterruptableTargetEventArgs args)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
         {
             if (_player.Mana < 5) return;
             if (_e.IsReady() && unit.IsValidTarget(_e.Range) &&
@@ -439,8 +438,7 @@ namespace D_Rengar
                 ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
             }
         }
-
-
+        
         private static void Usepotion()
         {
             var mobs = MinionManager.GetMinions(_player.ServerPosition, _e.Range,
@@ -840,8 +838,7 @@ namespace D_Rengar
             "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
             "summonersmite"
         };
-
-
+        
         private static int GetSmiteDmg()
         {
             int level = _player.Level;
