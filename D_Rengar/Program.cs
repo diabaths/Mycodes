@@ -46,7 +46,7 @@ namespace D_Rengar
             _lotis = new Items.Item(3190, 590f);
             _youmuu = new Items.Item(3142, 10);
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
-           // SetSmiteSlot();
+
             if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner1).Name))
             {
                 _smite = new Spell(SpellSlot.Summoner1, 570f);
@@ -417,31 +417,29 @@ namespace D_Rengar
         private static void Smiteontarget()
         {
             if (_smite == null) return;
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            var hero = HeroManager.Enemies.FirstOrDefault(x => x.IsValidTarget(570));
+            var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+            var usesmite = _config.Item("smitecombo").GetValue<bool>();
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
+                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
+            {
+                if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
                 {
-                    var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
-                    var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                    if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
-                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                        hero.IsValidTarget(570))
-                    {
-                        if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
-                        {
-                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                        }
-                        else if (smiteDmg >= hero.Health)
-                        {
-                            ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                        }
-                    }
-                    if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
-                        ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                        hero.IsValidTarget(570))
-                    {
-                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                    }
+                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
+                else if (smiteDmg >= hero.Health)
+                {
+                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                }
+            }
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
+                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
+                hero.IsValidTarget(570))
+            {
+                ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+            }
         }
+
 
         private static void Usepotion()
         {
