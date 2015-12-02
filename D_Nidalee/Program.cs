@@ -361,6 +361,8 @@ namespace D_Nidalee
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            WC.Range = target.HasBuff("nidaleepassivehunted") ? 730 : 375;
             if (Config.Item("UseAutoE").GetValue<bool>())
             {
                 AutoE();
@@ -754,11 +756,7 @@ namespace D_Nidalee
             }
         }
 
-        private static bool havemark(Obj_AI_Base target)
-        {
-            return target.HasBuff("nidaleepassivehunted");
-        }
-
+      
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
@@ -788,8 +786,8 @@ namespace D_Nidalee
             {
                 W.Cast(target);
             }
-            if (R.IsReady() && IsHuman && Config.Item("UseRCombo").GetValue<bool>() &&
-                Player.Distance(target) <= 625)
+            if ((R.IsReady() && IsHuman && Config.Item("UseRCombo").GetValue<bool>() &&
+                Player.Distance(target) <= 625)|| target.HasBuff("nidaleepassivehunted")&& Config.Item("UseRCombo").GetValue<bool>())
             {
                 if (IsHuman)
                 {
