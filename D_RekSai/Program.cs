@@ -854,10 +854,7 @@ namespace D_RekSai
                         var predE = _be.GetPrediction(te, true);
                         if (predE.Hitchance >= Echange())
                             _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -50));
-                        // else if (_player.IsFacing(te) && te.IsFacing(_player))
-                        //       _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -200));
-                        //_be.Cast(te.Position+100);
-                    }
+                       }
                 }
                 if (_config.Item("UseQCombo").GetValue<bool>())
                 {
