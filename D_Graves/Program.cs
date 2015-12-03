@@ -14,7 +14,7 @@ namespace D_Graves
     {
         private const string ChampionName = "Graves";
 
-        private static Orbwalking.Orbwalker _orbwalker;
+        private static Orbwalking.Orbwalker Orbwalker;
 
         private static Spell _q, _w, _e, _r;
 
@@ -57,24 +57,13 @@ namespace D_Graves
 
             //Orbwalker
             _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-            _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
+            Orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
 
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
-            _config.SubMenu("Combo").AddSubMenu(new Menu("Use E", "Use E"));
-            _config.SubMenu("Combo").SubMenu("Use E").AddItem(new MenuItem("UseEC", "Use E")).SetValue(false);
-            _config.SubMenu("Combo")
-                .SubMenu("Use E")
-                .AddItem(new MenuItem("diveintower", "Dive In tower with E"))
-                .SetValue(false);
-            _config.SubMenu("Combo")
-                .SubMenu("Use E")
-                .AddItem(new MenuItem("UseWHE", "Use E to Target if HP% >").SetValue(new Slider(65, 1, 100)));
-            _config.SubMenu("Combo")
-                .SubMenu("Use E")
-                .AddItem(new MenuItem("EnemyC", "Enemy in Range <").SetValue(new Slider(2, 1, 5)));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseEC", "Use E")).SetValue(false);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRC", "Use R")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use R if Hit X Enemys")).SetValue(true);
             _config.SubMenu("Combo")
@@ -361,7 +350,7 @@ namespace D_Graves
 
             _player = ObjectManager.Player;
 
-            _orbwalker.SetAttack(true);
+            Orbwalker.SetAttack(true);
             Usecleanse();
             KillSteal();
             Usepotion();
@@ -383,7 +372,7 @@ namespace D_Graves
                 }
             if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 475 && _config.Item("Gap_E").GetValue<bool>())
             {
-                _e.Cast(gapcloser.Sender);
+                _e.Cast(ObjectManager.Player.Position.Extend(gapcloser.Sender.Position, -_e.Range));
             }
         }
 
@@ -521,7 +510,6 @@ namespace D_Graves
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            var useE = _config.Item("UseEC").GetValue<bool>();
             var useR = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
             var customq = _config.Item("qrange").GetValue<Slider>().Value;
@@ -537,13 +525,7 @@ namespace D_Graves
                 if (t.IsValidTarget(_w.Range))
                     _w.CastIfHitchanceEquals(t, Wchange(), true);
             }
-            if (useE)
-            {
-                var t = TargetSelector.GetTarget(_q.Range + _e.Range, TargetSelector.DamageType.Physical);
-                if (t != null)
-                    Fuckinge(t);
-            }
-            if (_r.IsReady() && useR)
+           if (_r.IsReady() && useR)
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
                 if (t.IsInvulnerable) return;
@@ -570,56 +552,38 @@ namespace D_Graves
             UseItemes();
         }
 
-        private static void Fuckinge(Obj_AI_Hero hero)
-        {
-            if (hero == null) return;
-            var qmana = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost;
-            var emana = _player.Spellbook.GetSpell(SpellSlot.E).ManaCost;
-            var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
-            var diveTower = _config.Item("diveintower").GetValue<bool>();
-            if ((hero.UnderTurret() && !diveTower) || !_e.IsReady()) return;
-            var usewhE = (100*(_player.Health/_player.MaxHealth)) > _config.Item("UseWHE").GetValue<Slider>().Value;
-            if (usewhE && hero.IsValidTarget(_q.Range + 300) &&
-                hero.CountEnemiesInRange(_q.Range + _e.Range) <= _config.Item("EnemyC").GetValue<Slider>().Value &&
-                _player.Distance(hero) > Orbwalking.GetRealAutoAttackRange(_player))
-            {
-                if (hero.Health < (_player.GetAutoAttackDamage(hero, true)*2))
-                {
-                    _e.Cast(hero.Position);
-                }
-                else if (hero.Health < _q.GetDamage(hero) && _player.MaxMana > qmana + emana && _q.IsReady())
-                {
-                    _e.Cast(hero.Position);
-                }
-                else if (hero.Health < _q.GetDamage(hero) + _r.GetDamage(hero) && _q.IsReady() && _r.IsReady() &&
-                         _player.MaxMana > qmana + emana + rmana)
-                {
-                    _e.Cast(hero.Position);
-                }
-            }
-        }
 
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            var useQ = _config.Item("UseQC").GetValue<bool>();
-            var useW = _config.Item("UseWC").GetValue<bool>();
-            var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
-            var customq = _config.Item("qrange").GetValue<Slider>().Value;
-            if (combo && unit.IsMe && (target is Obj_AI_Hero))
-            {
-                if (useQ && _q.IsReady())
+
+            var mana = _player.ManaPercent > _config.Item("Harrasmana").GetValue<Slider>().Value;
+            if (unit.IsMe)
+                if (target.Type == GameObjectType.obj_AI_Hero)
                 {
-                    var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
-                    if (t.IsValidTarget(_q.Range - 70))
-                        _q.CastIfHitchanceEquals(t, Qchange(), true);
+                    if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo ||
+                        (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && mana))
+                    {
+                        var useQ = _config.Item("UseQC").GetValue<bool>() || _config.Item("UseQH").GetValue<bool>();
+                        var useW = _config.Item("UseWC").GetValue<bool>() || _config.Item("UseWH").GetValue<bool>();
+                        var customq = _config.Item("qrange").GetValue<Slider>().Value;
+                        if (useQ && _q.IsReady())
+                        {
+                            var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
+                            if (t.IsValidTarget(_q.Range - 70))
+                                _q.CastIfHitchanceEquals(t, Qchange(), true);
+                        }
+                        if (useW && _w.IsReady())
+                        {
+                            var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
+                            if (t.IsValidTarget(_w.Range))
+                                _w.CastIfHitchanceEquals(t, Wchange(), true);
+                        }
+                    }
+                    var useE = _config.Item("UseEC").GetValue<bool>();
+                    if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady())
+                        if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
+                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
                 }
-                if (useW && _w.IsReady())
-                {
-                    var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (t.IsValidTarget(_w.Range))
-                        _w.CastIfHitchanceEquals(t, Wchange(), true);
-                }
-            }
         }
 
         private static void Harass()
