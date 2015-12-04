@@ -542,7 +542,7 @@ namespace D_Graves
                     {
                         _r.CastIfHitchanceEquals(t, Rchange(), true);
                     }
-                    else if (_r.GetDamage(t) > t.Health)
+                    else if (_r.GetDamage(t) -50> t.Health)
                     {
                       _r.CastIfHitchanceEquals(t, Rchange(), true);
                     }
