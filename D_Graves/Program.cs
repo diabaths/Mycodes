@@ -2,7 +2,6 @@
 using System;
 using LeagueSharp;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using LeagueSharp.Common;
 
 #endregion
@@ -310,9 +309,10 @@ namespace D_Graves
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-
             Game.PrintChat(
-                "<font color='#f2f21d'>If You like my work and want to support, and keep it always up to date plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
+               "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
+            Game.PrintChat(
+                "<font color='#f2f21d'>Buy me cigars </font> <font color='#ff1900'>ssssssssssmith@hotmail.com</font> (10) S");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
