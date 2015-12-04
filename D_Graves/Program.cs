@@ -2,6 +2,7 @@
 using System;
 using LeagueSharp;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using LeagueSharp.Common;
 
 #endregion
@@ -21,7 +22,7 @@ namespace D_Graves
         private static Menu _config;
 
         private static Obj_AI_Hero _player;
-        
+
         private static Items.Item _youmuu, _blade, _bilge;
 
         private static void Main(string[] args)
@@ -32,6 +33,7 @@ namespace D_Graves
         private static void Game_OnGameLoad(EventArgs args)
         {
             _player = ObjectManager.Player;
+
             if (_player.ChampionName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 950F);
@@ -46,7 +48,7 @@ namespace D_Graves
             _youmuu = new Items.Item(3142, 10);
             _bilge = new Items.Item(3144, 450f);
             _blade = new Items.Item(3153, 450f);
-           
+
             //D Graves
             _config = new Menu("D-Graves", "D-Graves", true);
 
@@ -68,8 +70,10 @@ namespace D_Graves
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use R if Hit X Enemys")).SetValue(true);
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("MinTargets", "Use R if Hit Enemys >=").SetValue(new Slider(2, 1, 5)));
-           _config.SubMenu("Combo")
-                .AddItem(new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+            _config.SubMenu("Combo")
+                .AddItem(
+                    new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(new KeyBind("T".ToCharArray()[0],
+                        KeyBindType.Press)));
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -316,7 +320,7 @@ namespace D_Graves
             _q.Range = _config.Item("qrange").GetValue<Slider>().Value;
             if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
             {
-                var t = TargetSelector.GetTarget(_r.Range+300, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(_r.Range + 300, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
                     _r.Cast(t, true, true);
             }
@@ -370,7 +374,8 @@ namespace D_Graves
                     //  Game.PrintChat("normal");
                     _w.Cast(gapcloser.Sender);
                 }
-            if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 475 && _config.Item("Gap_E").GetValue<bool>())
+            if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 475 &&
+                _config.Item("Gap_E").GetValue<bool>())
             {
                 _e.Cast(ObjectManager.Player.Position.Extend(gapcloser.Sender.Position, -_e.Range));
             }
@@ -525,21 +530,21 @@ namespace D_Graves
                 if (t.IsValidTarget(_w.Range))
                     _w.CastIfHitchanceEquals(t, Wchange(), true);
             }
-           if (_r.IsReady() && useR)
+            if (_r.IsReady() && useR)
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
                 if (t.IsInvulnerable) return;
                 if (t.IsValidTarget(_r.Range))
                 {
                     if (_q.IsReady() && t.IsValidTarget(customq) &&
-                        (_q.GetDamage(t) > t.Health || _player.GetAutoAttackDamage(t, true)*2 > t.Health)) return;
+                        (_q.GetDamage(t) > t.Health || _player.GetAutoAttackDamage(t, true) > t.Health)) return;
                     if (ComboDamage(t) > t.Health)
                     {
                         _r.CastIfHitchanceEquals(t, Rchange(), true);
                     }
-                    if (_r.GetDamage(t) > t.Health)
+                    else if (_r.GetDamage(t) > t.Health)
                     {
-                        _r.CastIfHitchanceEquals(t, Rchange(), true);
+                      _r.CastIfHitchanceEquals(t, Rchange(), true);
                     }
                 }
                 if (autoR)
@@ -551,7 +556,6 @@ namespace D_Graves
             }
             UseItemes();
         }
-
 
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
@@ -579,12 +583,23 @@ namespace D_Graves
                                 _w.CastIfHitchanceEquals(t, Wchange(), true);
                         }
                     }
+
                     var useE = _config.Item("UseEC").GetValue<bool>();
+                    var ta = TargetSelector.GetTarget(700, TargetSelector.DamageType.Magical);
                     if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady())
                         if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
-                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                            if (!ta.UnderTurret())
+                                _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                            else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget() &&
+                                     _q.ManaCost + _e.ManaCost < _player.Mana)
+                                if (ta.Health < _q.GetDamage(ta) && ta.IsValidTarget())
+                                {
+                                    _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                                    _q.CastIfHitchanceEquals(ta, Qchange(), true);
+                                }
                 }
         }
+
 
         private static void Harass()
         {
@@ -619,7 +634,7 @@ namespace D_Graves
             var minionhitw = _config.Item("minminionsw").GetValue<Slider>().Value;
             var useQl = _config.Item("UseQL").GetValue<bool>();
             var useWl = _config.Item("UseWL").GetValue<bool>();
-           
+
 
             if (_q.IsReady() && useQl)
             {
@@ -632,7 +647,7 @@ namespace D_Graves
                 else
                 {
                     foreach (var minion in allMinionsQ)
-                        if (Orbwalking.InAutoAttackRange(minion)&&
+                        if (Orbwalking.InAutoAttackRange(minion) &&
                             minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
                         {
                             _q.Cast(minion);
@@ -743,10 +758,10 @@ namespace D_Graves
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
             var iusemppotion = _config.Item("usemppotions").GetValue<bool>();
             var iusepotionmp = _player.Mana <=
-                               (_player.MaxMana * (_config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
+                               (_player.MaxMana*(_config.Item("usepotionmp").GetValue<Slider>().Value)/100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
