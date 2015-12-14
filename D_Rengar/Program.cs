@@ -12,13 +12,14 @@ namespace D_Rengar
         private static Obj_AI_Hero _player;
         private static Spell _q, _w, _e, _r;
 
-        private static Orbwalking.Orbwalker _orbwalker;
+       
+
         private static SpellSlot _igniteSlot;
         private static Items.Item _youmuu, _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
         private static SpellSlot _smiteSlot;
         private static Menu _config;
         private static Spell _smite;
-      
+        private static Orbwalking.Orbwalker Orbwalker;
         private static int _lastTick;
 
         private static void Main(string[] args)
@@ -66,9 +67,9 @@ namespace D_Rengar
             _config.AddSubMenu(targetSelectorMenu);
 
             //Orbwalker
-            _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-            _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
-
+            var orbwalkerMenu = new Menu("Orbwalker", "Orbwalker");
+            Orbwalker = new D_Rengar.Orbwalking.Orbwalker(orbwalkerMenu);
+            _config.AddSubMenu(orbwalkerMenu);
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo")
@@ -326,7 +327,7 @@ namespace D_Rengar
             }
             _player = ObjectManager.Player;
 
-            _orbwalker.SetAttack(true);
+            Orbwalker.SetAttack(true);
 
             KillSteal();
             ChangeComboMode();
@@ -838,7 +839,8 @@ namespace D_Rengar
             "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
             "summonersmite"
         };
-        
+
+       
         private static int GetSmiteDmg()
         {
             int level = _player.Level;

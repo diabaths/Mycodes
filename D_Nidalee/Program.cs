@@ -364,7 +364,7 @@ namespace D_Nidalee
         private static void Game_OnGameUpdate(EventArgs args)
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-           if (target.IsValidTarget(Q.Range)) WC.Range = target.HasBuff("nidaleepassivehunted") ? 730 : 375;
+            if (target.IsValidTarget(Q.Range)) WC.Range = target.HasBuff("nidaleepassivehunted") ? 730 : 375;
             if (Config.Item("UseAutoE").GetValue<bool>())
             {
                 AutoE();
