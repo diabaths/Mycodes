@@ -293,7 +293,7 @@ namespace D_Rengar
         {
             if (_player.IsDead)
                 return;
-            if (_config.Item("AutoW").GetValue<bool>())
+            if (_config.Item("AutoW").GetValue<bool>()&& Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.Combo)
             {
                 AutoHeal();
             }
