@@ -349,8 +349,8 @@ namespace D_Nidalee
             Config.AddToMainMenu();
 
             Game.OnUpdate += Game_OnGameUpdate;
-            Obj_AI_Hero.OnCreate += OnCreateObj;
-            Obj_AI_Hero.OnDelete += OnDeleteObj;
+            GameObject.OnCreate += OnCreateObj;
+            GameObject.OnDelete += OnDeleteObj;
             //Game_OnGameEnd += Game_OnGameEnd;
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;

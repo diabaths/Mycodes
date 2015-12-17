@@ -1,24 +1,26 @@
 ﻿#region
 using System;
+using System.Collections.Generic;
 using LeagueSharp;
 using System.Linq;
 using LeagueSharp.Common;
+using SharpDX;
 
 #endregion
 
-// Server Potition Fixed
-
-namespace D_Graves
+namespace D_Lucian
 {
     internal class Program
     {
-        private const string ChampionName = "Graves";
+        private const string ChampionName = "Lucian";
 
         private static Orbwalking.Orbwalker Orbwalker;
 
-        private static Spell _q, _w, _e, _r;
+        private static Spell _q, _q1, _w, _w2, _e, _r;
 
         private static Menu _config;
+
+        public static bool Havepassive;
 
         private static Obj_AI_Hero _player;
 
@@ -35,21 +37,26 @@ namespace D_Graves
 
             if (_player.ChampionName != ChampionName) return;
 
-            _q = new Spell(SpellSlot.Q, 950F);
-            _w = new Spell(SpellSlot.W, 950f);
-            _e = new Spell(SpellSlot.E, 450f);
-            _r = new Spell(SpellSlot.R, 1500f);
+            _q = new Spell(SpellSlot.Q, 675);
+            _q1 = new Spell(SpellSlot.Q, 1200);
+            _w = new Spell(SpellSlot.W, 1200, TargetSelector.DamageType.Magical);
+            _w2 = new Spell(SpellSlot.W, 1200, TargetSelector.DamageType.Magical);
+            _e = new Spell(SpellSlot.E, 475f);
+            _r = new Spell(SpellSlot.R, 1400);
 
-            _q.SetSkillshot(0.25f, 60f, 2000f, false, SkillshotType.SkillshotLine);
-            _w.SetSkillshot(0.35f, 150f, 1650f, false, SkillshotType.SkillshotCircle);
-            _r.SetSkillshot(0.25f, 100f, 2100f, false, SkillshotType.SkillshotLine);
+
+            _q.SetTargetted(0.25f, 1400f);
+            _q1.SetSkillshot(0.5f, 50, float.MaxValue, false, SkillshotType.SkillshotLine);
+            _w.SetSkillshot(0.30f, 80f, 1600f, true, SkillshotType.SkillshotLine);
+            _w2.SetSkillshot(0.30f, 80f, 1600, false, SkillshotType.SkillshotCircle);
+            _r.SetSkillshot(0.2f, 110f, 2500, true, SkillshotType.SkillshotLine);
 
             _youmuu = new Items.Item(3142, 10);
             _bilge = new Items.Item(3144, 450f);
             _blade = new Items.Item(3153, 450f);
 
             //D Graves
-            _config = new Menu("D-Graves", "D-Graves", true);
+            _config = new Menu("D-Lucian", "D-Lucian", true);
 
             //TargetSelector
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
@@ -64,11 +71,7 @@ namespace D_Graves
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseEC", "Use E")).SetValue(false);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseRC", "Use R")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use R if Hit X Enemys")).SetValue(true);
-            _config.SubMenu("Combo")
-                .AddItem(new MenuItem("MinTargets", "Use R if Hit Enemys >=").SetValue(new Slider(2, 1, 5)));
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseEC", "Use E")).SetValue(true);
             _config.SubMenu("Combo")
                 .AddItem(
                     new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(new KeyBind("T".ToCharArray()[0],
@@ -79,7 +82,7 @@ namespace D_Graves
             //Harass
             _config.AddSubMenu(new Menu("Harass", "Harass"));
             _config.SubMenu("Harass").AddItem(new MenuItem("UseQH", "Use Q")).SetValue(true);
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseWH", "Use W")).SetValue(true);
+            _config.SubMenu("Harass").AddItem(new MenuItem("UseWH", "Use W")).SetValue(false);
             _config.SubMenu("Harass")
                 .AddItem(
                     new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
@@ -124,10 +127,10 @@ namespace D_Graves
             //Jungle clear
             _config.SubMenu("Farm").AddSubMenu(new Menu("JungleClear", "JungleClear"));
             _config.SubMenu("Farm").SubMenu("JungleClear").AddItem(new MenuItem("UseQJ", "Q Jungle")).SetValue(true);
-            _config.SubMenu("Farm").SubMenu("JungleClear").AddItem(new MenuItem("UseWJ", "W Jungle")).SetValue(false);
+            _config.SubMenu("Farm").SubMenu("JungleClear").AddItem(new MenuItem("UseWJ", "W Jungle")).SetValue(true);
             _config.SubMenu("Farm")
                 .SubMenu("JungleClear")
-                .AddItem(new MenuItem("Junglemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
+                .AddItem(new MenuItem("Junglemana", "Minimum Mana").SetValue(new Slider(35, 1, 100)));
             _config.SubMenu("Farm")
                 .SubMenu("JungleClear")
                 .AddItem(
@@ -243,86 +246,39 @@ namespace D_Graves
 
             //Misc
             _config.AddSubMenu(new Menu("Misc", "Misc"));
-            _config.SubMenu("Misc").AddItem(new MenuItem("qrange", "Q range").SetValue(new Slider(800, 450, 950)));
             _config.SubMenu("Misc").AddItem(new MenuItem("UseQM", "Use Q KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("UseWM", "Use W KillSteal")).SetValue(true);
-            _config.SubMenu("Misc").AddItem(new MenuItem("UseRM", "Use R KillSteal")).SetValue(true);
-            _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "GapClosers W")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_E", "GapClosers E")).SetValue(true);
 
-            //HitChance
-            _config.AddSubMenu(new Menu("HitChance", "HitChance"));
-            _config.SubMenu("HitChance").AddSubMenu(new Menu("Combo", "Combo"));
-            _config.SubMenu("HitChance")
-                .SubMenu("Combo")
-                .AddItem(
-                    new MenuItem("Qchange", "Q Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
-            _config.SubMenu("HitChance")
-                .SubMenu("Combo")
-                .AddItem(
-                    new MenuItem("Wchange", "W Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
-            _config.SubMenu("HitChance")
-                .SubMenu("Combo")
-                .AddItem(
-                    new MenuItem("Rchange", "R Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
-            _config.SubMenu("HitChance").AddSubMenu(new Menu("Harass", "Harass"));
-            _config.SubMenu("HitChance")
-                .SubMenu("Harass")
-                .AddItem(
-                    new MenuItem("Qchangeharass", "Q Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
-            _config.SubMenu("HitChance")
-                .SubMenu("Harass")
-                .AddItem(
-                    new MenuItem("Wchangeharass", "W Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
-            _config.SubMenu("HitChance").AddSubMenu(new Menu("KillSteal", "KillSteal"));
-            _config.SubMenu("HitChance")
-                .SubMenu("KillSteal")
-                .AddItem(
-                    new MenuItem("Qchangekill", "Q Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
-            _config.SubMenu("HitChance")
-                .SubMenu("KillSteal")
-                .AddItem(
-                    new MenuItem("Wchangekill", "W Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
-            _config.SubMenu("HitChance")
-                .SubMenu("KillSteal")
-                .AddItem(
-                    new MenuItem("Rchangekill", "R Hit").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawQ", "Draw Q")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawW", "Draw W")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Draw E")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawR", "Draw R")).SetValue(true);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawW", "Draw W")).SetValue(false);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Draw E")).SetValue(false);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawR", "Draw R")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw Auto Harass").SetValue(true));
 
             _config.AddToMainMenu();
-            Game.PrintChat("<font color='#881df2'>D-Graves by Diabaths</font> Loaded.");
+            Game.PrintChat("<font color='#881df2'>D-Lucian by Diabaths</font> Loaded.");
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+            Spellbook.OnCastSpell += OnCastSpell;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             Game.PrintChat(
-               "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
+                "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
             Game.PrintChat(
                 "<font color='#f2f21d'>Buy me cigars </font> <font color='#ff1900'>ssssssssssmith@hotmail.com</font> (10) S");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            _q.Range = _config.Item("qrange").GetValue<Slider>().Value;
             if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
             {
-                var t = TargetSelector.GetTarget(_r.Range + 300, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget())
-                    _r.Cast(t, true, true);
+                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget() && !_player.HasBuff("LucianR"))
+                    _r.Cast(t.Position);
             }
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
@@ -360,20 +316,124 @@ namespace D_Graves
             Usepotion();
         }
 
+        private static void OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
+        {
+           
+            if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
+            {
+                Havepassive = true;
+            }
+            switch (args.Slot)
+            {
+                case SpellSlot.Q:
+                case SpellSlot.W:
+                    Orbwalking.ResetAutoAttackTimer();
+                    break;
+            }
+        }
+      
+
+        private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsMe) return;
+            if (_player.HasBuff("lucianpassivebuff"))
+            {
+                Havepassive = true;
+            }
+            else Havepassive = false;
+            if (args.Slot == SpellSlot.E) Orbwalking.ResetAutoAttackTimer();
+            Orbwalking.ResetAutoAttackTimer();
+            var useE = _config.Item("UseEC").GetValue<bool>();
+            var ta = TargetSelector.GetTarget(_q.Range + 400, TargetSelector.DamageType.Magical);
+            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady() && !_player.HasBuff("LucianR"))
+                if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
+                {
+                    if (!ta.UnderTurret())
+                    {
+                        _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                    }
+                    else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget(_q.Range + _e.Range))
+                        if (_q.ManaCost + _e.ManaCost < _player.Mana && ta.Health < _q.GetDamage(ta))
+                        {
+                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                            CastQ();
+                        }
+                        else if (ta.Health < _player.GetAutoAttackDamage(ta, true)*2 && ta.IsValidTarget())
+                        {
+                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+
+                        }
+                }
+        }
+
+        public static void CastQ()
+        {
+            if (!_q.IsReady()) return;
+            var target = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
+                ? TargetSelector.SelectedTarget
+                : TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+
+            if (!target.IsValidTarget(_q.Range))
+                return;
+            {
+                _q.Cast(target);
+            }
+        }
+
+        public static void ExtendedQ()
+        {
+            if (!_q.IsReady()) return;
+            var target = TargetSelector.SelectedTarget != null &&
+                         TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
+                ? TargetSelector.SelectedTarget
+                : TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
+
+            if (!target.IsValidTarget(_q1.Range) || !_q.IsReady())
+                return;
+
+            var qpred = _q1.GetPrediction(target);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All,
+                MinionTeam.NotAlly, MinionOrderTypes.None);
+            var champions = HeroManager.Enemies.Where(m => m.Distance(ObjectManager.Player) <= _q.Range);
+            var monsters = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
+                MinionTypes.All,
+                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            {
+                foreach (var minion in from minion in minions
+                    let polygon = new Geometry.Polygon.Rectangle(
+                        (Vector3) ObjectManager.Player.ServerPosition,
+                        ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q1.Range), 65f)
+                    where polygon.IsInside(qpred.CastPosition)
+                    select minion)
+                {
+                    _q.Cast(minion);
+                }
+
+                foreach (var champ in from champ in champions
+                    let polygon = new Geometry.Polygon.Rectangle(
+                        (Vector3) ObjectManager.Player.ServerPosition,
+                        ObjectManager.Player.ServerPosition.Extend(champ.ServerPosition, _q1.Range), 65f)
+                    where polygon.IsInside(qpred.CastPosition)
+                    select champ)
+                {
+                    _q.Cast(champ);
+                }
+
+                foreach (var monster in from monster in monsters
+                    let polygon = new Geometry.Polygon.Rectangle(
+                        (Vector3) ObjectManager.Player.ServerPosition,
+                        ObjectManager.Player.ServerPosition.Extend(monster.ServerPosition, _q1.Range), 65f)
+                    where polygon.IsInside(qpred.CastPosition)
+                    select monster)
+                {
+                    _q.Cast(monster);
+                }
+            }
+        }
 
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (_w.IsReady() && gapcloser.Sender.IsValidTarget(_w.Range) && _config.Item("Gap_W").GetValue<bool>())
-                if (gapcloser.Sender.IsMelee())
-                {
-                    //  Game.PrintChat("melee");
-                    _w.Cast(_player);
-                }
-                else
-                {
-                    //  Game.PrintChat("normal");
-                    _w.Cast(gapcloser.Sender);
-                }
             if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 200 &&
                 _config.Item("Gap_E").GetValue<bool>())
             {
@@ -385,7 +445,8 @@ namespace D_Graves
         {
             if (_player.IsDead ||
                 (_config.Item("Cleansemode").GetValue<StringList>().SelectedIndex == 1 &&
-                 !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)) return;
+                 !_config.Item("ActiveCombo").GetValue<KeyBind>().Active))
+                return;
             if (Cleanse(_player) && _config.Item("useqss").GetValue<bool>())
             {
                 if (_player.HasBuff("zedulttargetmark"))
@@ -489,73 +550,33 @@ namespace D_Graves
             return cc;
         }
 
-        private static float ComboDamage(Obj_AI_Base enemy)
-        {
-            var damage = 0d;
-
-            if (Items.HasItem(3077) && Items.CanUseItem(3077))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Tiamat);
-            if (Items.HasItem(3074) && Items.CanUseItem(3074))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Hydra);
-            if (Items.HasItem(3153) && Items.CanUseItem(3153))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Botrk);
-            if (Items.HasItem(3144) && Items.CanUseItem(3144))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Bilgewater);
-            if (_q.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.Q)*1.3;
-            if (_w.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.W);
-            if (_r.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.R);
-            damage += _player.GetAutoAttackDamage(enemy, true)*2;
-            return (float) damage;
-        }
-
         private static void Combo()
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            var useR = _config.Item("UseRC").GetValue<bool>();
-            var autoR = _config.Item("UseRE").GetValue<bool>();
-            var customq = _config.Item("qrange").GetValue<Slider>().Value;
-            if (useQ && _q.IsReady())
+            if (useQ && _q.IsReady() && Havepassive == false)
             {
-                var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range))
-                    _q.CastIfHitchanceEquals(t, Qchange(), true);
+                var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget(_q.Range) && Havepassive == false)
+                    CastQ();
+                else if (t.IsValidTarget(_q1.Range) && Havepassive == false)
+                    ExtendedQ();
             }
-            if (useW && _w.IsReady())
+            if (useW && _w.IsReady() && Havepassive == false)
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_w.Range))
-                    _w.CastIfHitchanceEquals(t, Wchange(), true);
-            }
-            if (_r.IsReady() && useR)
-            {
-                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
-                if (t.IsInvulnerable) return;
-                if (t.IsValidTarget(_r.Range))
+                var predW = _w.GetPrediction(t);
+                if (t.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High && predW.CollisionObjects.Count == 0)
+                    _w.Cast(t, false, true);
+                else if (t.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
                 {
-                    if (_q.IsReady() && t.IsValidTarget(customq) &&
-                        (_q.GetDamage(t) > t.Health || _player.GetAutoAttackDamage(t, true) > t.Health)) return;
-                    if (ComboDamage(t) > t.Health)
-                    {
-                        _r.CastIfHitchanceEquals(t, Rchange(), true);
-                    }
-                    else if (_r.GetDamage(t) -50> t.Health)
-                    {
-                      _r.CastIfHitchanceEquals(t, Rchange(), true);
-                    }
-                }
-                if (autoR)
-                {
-                    var fuckr = _r.GetPrediction(t, true);
-                    if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value)
-                        _r.CastIfHitchanceEquals(t, Rchange(), true);
+                    _w2.Cast(t, false, true);
                 }
             }
+
             UseItemes();
         }
+
 
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
@@ -569,34 +590,27 @@ namespace D_Graves
                     {
                         var useQ = _config.Item("UseQC").GetValue<bool>() || _config.Item("UseQH").GetValue<bool>();
                         var useW = _config.Item("UseWC").GetValue<bool>() || _config.Item("UseWH").GetValue<bool>();
-                        var customq = _config.Item("qrange").GetValue<Slider>().Value;
                         if (useQ && _q.IsReady())
                         {
-                            var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
-                            if (t.IsValidTarget(_q.Range - 70))
-                                _q.CastIfHitchanceEquals(t, Qchange(), true);
+                            var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
+                            if (t.IsValidTarget(_q.Range) && Havepassive == false)
+                                CastQ();
+                            else if (t.IsValidTarget(_q1.Range) && Havepassive == false)
+                                ExtendedQ();
                         }
-                        if (useW && _w.IsReady())
+                        if (useW && _w.IsReady() && Havepassive == false)
                         {
                             var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                            if (t.IsValidTarget(_w.Range))
-                                _w.CastIfHitchanceEquals(t, Wchange(), true);
+                            var predW = _w.GetPrediction(t);
+                            if (t.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High &&
+                                predW.CollisionObjects.Count == 0)
+                                _w.Cast(t, false, true);
+                            else if (t.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
+                            {
+                                _w2.Cast(t, false, true);
+                            }
                         }
                     }
-
-                    var useE = _config.Item("UseEC").GetValue<bool>();
-                    var ta = TargetSelector.GetTarget(700, TargetSelector.DamageType.Magical);
-                    if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady())
-                        if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
-                            if (!ta.UnderTurret())
-                                _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                            else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget() &&
-                                     _q.ManaCost + _e.ManaCost < _player.Mana)
-                                if (ta.Health < _q.GetDamage(ta) && ta.IsValidTarget())
-                                {
-                                    _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                                    _q.CastIfHitchanceEquals(ta, Qchange(), true);
-                                }
                 }
         }
 
@@ -605,74 +619,75 @@ namespace D_Graves
         {
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
-            var customq = _config.Item("qrange").GetValue<Slider>().Value;
 
-            if (useQ && _q.IsReady())
+            if (useQ && _q.IsReady() && Havepassive == false)
             {
-                var t = TargetSelector.GetTarget(customq, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range - 70))
-                    _q.CastIfHitchanceEquals(t, Qchangeharass(), true);
+                var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget(_q.Range))
+                    CastQ();
+                else if (t.IsValidTarget(_q1.Range) && Havepassive == false)
+                    ExtendedQ();
             }
-            if (useW && _w.IsReady())
+            if (useW && _w.IsReady() && Havepassive == false)
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_w.Range))
-                    _w.CastIfHitchanceEquals(t, Wchangeharass(), true);
+                var predW = _w.GetPrediction(t);
+                if (t.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High && predW.CollisionObjects.Count == 0)
+                    _w.Cast(t, false, true);
+                else if (t.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
+                {
+                    _w2.Cast(t, false, true);
+                }
             }
         }
 
         private static void Laneclear()
         {
             if (!Orbwalking.CanMove(40)) return;
-
-            var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All);
-            var allMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range + _w.Width/2,
-                MinionTypes.All);
-            var rangedMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range + _w.Width + 50,
-                MinionTypes.Ranged);
+            var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
+            var minion = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range).FirstOrDefault();
+            if (minion == null || minion.Name.ToLower().Contains("ward"))
+            {
+                return;
+            }
             var minionhitq = _config.Item("minminions").GetValue<Slider>().Value;
             var minionhitw = _config.Item("minminionsw").GetValue<Slider>().Value;
             var useQl = _config.Item("UseQL").GetValue<bool>();
             var useWl = _config.Item("UseWL").GetValue<bool>();
+            var farmminions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All,
+                MinionTeam.NotAlly);
+            var minionsq = farmminions.FindAll(qminion => minion.IsValidTarget(_q.Range));
+            var minionq = minionsq.Find(minionQ => minionQ.IsValidTarget());
 
-
-            if (_q.IsReady() && useQl)
+            if (_q.IsReady() && useQl && Havepassive == false)
             {
-                var fl2 = _q.GetCircularFarmLocation(allMinionsQ, 200);
+                foreach (var minionssq in farmminions)
+                {
+                    var prediction = Prediction.GetPrediction(minionssq, _q.Delay, 10);
 
-                if (fl2.MinionsHit >= minionhitq)
-                {
-                    _q.Cast(fl2.Position);
-                }
-                else
-                {
-                    foreach (var minion in allMinionsQ)
-                        if (Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
+                    var collision = _q.GetCollision(_player.Position.To2D(),
+                        new List<Vector2> {prediction.UnitPosition.To2D()});
+                    foreach (var collisions in collision)
+                    {
+                        if (collision.Count() >= minionhitq)
+
                         {
-                            _q.Cast(minion);
+                            if (collision.Last().Distance(_player) - collision[0].Distance(_player) < 600 &&
+                                collision[0].Distance(_player) < 500)
+                                _q.Cast(collisions);
                         }
-                        else if (!Orbwalking.InAutoAttackRange(minion) &&
-                                 minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
-                        {
-                            _q.Cast(minion);
-                        }
+                    }
                 }
+                if (t.IsValidTarget(_q1.Range))
+                    ExtendedQ();
             }
 
-            if (_w.IsReady() && useWl)
+            if (_w.IsReady() && useWl && Havepassive == false)
             {
-                var fl1 = _w.GetCircularFarmLocation(rangedMinionsW, _w.Width);
-
-                if (fl1.MinionsHit >= minionhitw)
+                if (_w.GetLineFarmLocation(farmminions).MinionsHit >= minionhitw)
                 {
-                    _w.Cast(fl1.Position);
+                    _w.Cast(minionq);
                 }
-                else
-                    foreach (var minion in allMinionsW)
-                        if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W))
-                            _w.Cast(minion);
             }
         }
 
@@ -685,12 +700,14 @@ namespace D_Graves
             if (allMinions.Count < 3) return;
             foreach (var minion in allMinions)
             {
-                if (useQ && _q.IsReady() && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
+                if (useQ && _q.IsReady() && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q) &&
+                    Havepassive == false)
                 {
                     _q.Cast(minion);
                 }
 
-                if (_w.IsReady() && useW && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W))
+                if (_w.IsReady() && useW && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W) &&
+                    Havepassive == false)
                 {
                     _w.Cast(minion);
                 }
@@ -707,11 +724,11 @@ namespace D_Graves
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (useQ && _q.IsReady())
+                if (useQ && _q.IsReady() && Havepassive == false&& !mob.Name.Contains("Mini"))
                 {
                     _q.Cast(mob);
                 }
-                if (_w.IsReady() && useW)
+                if (_w.IsReady() && useW && Havepassive == false&& !mob.Name.Contains("Mini"))
                 {
                     _w.Cast(mob);
                 }
@@ -822,146 +839,6 @@ namespace D_Graves
             }
         }
 
-        private static HitChance Qchange()
-        {
-            switch (_config.Item("Qchange").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        private static HitChance Wchange()
-        {
-            switch (_config.Item("Wchange").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        private static HitChance Rchange()
-        {
-            switch (_config.Item("Rchange").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        private static HitChance Qchangeharass()
-        {
-            switch (_config.Item("Qchangeharass").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        private static HitChance Wchangeharass()
-        {
-            switch (_config.Item("Wchangeharass").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        private static HitChance Qchangekill()
-        {
-            switch (_config.Item("Qchangekill").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        private static HitChance Wchangekill()
-        {
-            switch (_config.Item("Wchangekill").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        private static HitChance Rchangekill()
-        {
-            switch (_config.Item("Rchangekill").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.High;
-            }
-        }
-
-        /* private static bool Packets()
-         {
-             return _config.Item("usePackets").GetValue<bool>();
-         }*/
 
         private static void KillSteal()
         {
@@ -969,27 +846,28 @@ namespace D_Graves
             {
                 if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
                 {
+                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range))
+                    {
+                        CastQ();
+                    }
                     if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range - 30))
                     {
-                        _q.CastIfHitchanceEquals(hero, Qchangekill(), true);
+                        ExtendedQ();
                     }
                 }
-                if (_w.IsReady() && _config.Item("UseWM").GetValue<bool>())
+                if (_w.IsReady() && _config.Item("UseWM").GetValue<bool>() && hero.IsValidTarget(_w.Range) &&
+                    _w.GetDamage(hero) > hero.Health)
                 {
-                    if (_w.GetDamage(hero) > hero.Health && hero.IsValidTarget(_w.Range))
+                    var predW = _w.GetPrediction(hero);
+                    if (hero.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High &&
+                        predW.CollisionObjects.Count == 0)
+                        _w.Cast(hero, false, true);
+                    else if (hero.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
                     {
-                        _w.CastIfHitchanceEquals(hero, Wchangekill(), true);
+                        _w2.Cast(hero, false, true);
                     }
                 }
-                if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>() && hero.IsValidTarget(_r.Range))
-                {
-                    if (_q.IsReady() && _q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range)) return;
-                    if (!hero.IsInvulnerable &&
-                        _r.GetDamage(hero) > hero.Health)
-                    {
-                        _r.CastIfHitchanceEquals(hero, Rchangekill(), true);
-                    }
-                }
+
             }
         }
 

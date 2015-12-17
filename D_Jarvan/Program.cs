@@ -283,10 +283,7 @@ namespace D_Jarvan
             _config.SubMenu("Misc").AddItem(new MenuItem("UseRM", "Use R KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "W GapClosers")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("UseEQInt", "EQ to Interrupt")).SetValue(true);
-            // _config.SubMenu("Misc").AddItem(new MenuItem("MinTargetsgap", "min enemy >=(GapClosers)").SetValue(new Slider(2, 1, 5)));
-            _config.SubMenu("Misc").AddItem(new MenuItem("skinjar", "Use Custom Skin").SetValue(false));
-            _config.SubMenu("Misc").AddItem(new MenuItem("skinjarvan", "Skin Changer").SetValue(new Slider(4, 1, 7)));
-            // _config.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Usepackes")).SetValue(true);
+           
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -303,17 +300,14 @@ namespace D_Jarvan
             Game.PrintChat("<font color='#881df2'>D-Jarvan by Diabaths</font> Loaded.");
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_AI_Hero.OnCreate += OnCreateObj;
-            Obj_AI_Hero.OnDelete += OnDeleteObj;
+            GameObject.OnCreate += OnCreateObj;
+            GameObject.OnDelete += OnDeleteObj;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
-            if (_config.Item("skinjar").GetValue<bool>())
-            {
-                GenModelPacket(_player.ChampionName, _config.Item("skinjarvan").GetValue<Slider>().Value);
-                _lastSkin = _config.Item("skinjarvan").GetValue<Slider>().Value;
-            }
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Game.PrintChat(
-                "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
+              "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
+            Game.PrintChat(
+                "<font color='#f2f21d'>Buy me cigars </font> <font color='#ff1900'>ssssssssssmith@hotmail.com</font> (10) S");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -322,11 +316,7 @@ namespace D_Jarvan
             {
                 Forest();
             }
-            if (_config.Item("skinjar").GetValue<bool>() && SkinChanged())
-            {
-                GenModelPacket(_player.ChampionName, _config.Item("skinjarvan").GetValue<Slider>().Value);
-                _lastSkin = _config.Item("skinjarvan").GetValue<Slider>().Value;
-            }
+           
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
@@ -385,7 +375,7 @@ namespace D_Jarvan
             }
         }
 
-        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
         {
             var manacheck = _player.Mana >
                             _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost +
@@ -402,18 +392,7 @@ namespace D_Jarvan
                 }
             }
         }
-
-        private static void GenModelPacket(string champ, int skinId)
-        {
-            Packet.S2C.UpdateModel.Encoded(new Packet.S2C.UpdateModel.Struct(_player.NetworkId, skinId, champ))
-                .Process();
-        }
-
-        private static bool SkinChanged()
-        {
-            return (_config.Item("skinjarvan").GetValue<Slider>().Value != _lastSkin);
-        }
-
+        
         private static float ComboDamage(Obj_AI_Base enemy)
         {
             var damage = 0d;
@@ -639,7 +618,7 @@ namespace D_Jarvan
 
                 if (t.IsValidTarget(flashDista) && !_q.IsReady())
                 {
-                    _player.Spellbook.CastSpell(_flashSlot, t.ServerPosition);
+                    if (t != null) _player.Spellbook.CastSpell(_flashSlot, t.ServerPosition);
                 }
             }
             if (_haveulti)
