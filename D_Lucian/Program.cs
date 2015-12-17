@@ -277,7 +277,7 @@ namespace D_Lucian
             if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget() && !_player.HasBuff("LucianR"))
+                if (t.IsValidTarget(_r.Range) && !_player.HasBuff("LucianR"))
                     _r.Cast(t.Position);
             }
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
