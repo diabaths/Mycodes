@@ -268,9 +268,8 @@ namespace D_Lucian
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Spellbook.OnCastSpell += OnCastSpell;
-            Obj_AI_Base.OnBuffRemove += BaseOnOnBuffRemove;
-            Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
+            CustomEvents.Unit.OnDash += Ondash;
             Game.PrintChat(
                 "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
             Game.PrintChat(
@@ -329,38 +328,57 @@ namespace D_Lucian
                     if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
                         ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
         }
-        protected static void BaseOnOnBuffRemove(Obj_AI_Base sender, Obj_AI_BaseBuffRemoveEventArgs args)
-        {
-            if (!sender.IsMe)
-                return;
-
-            if (args.Buff.DisplayName == "LucianPassiveBuff")
-                Havepassive = false;
-        }
+        
         private static void OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
             if (_player.HasBuff("LucianR"))
+            
+                args.Process = false;
             {
-                args.Process = false; 
-                
+                if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
+                {
+                    Havepassive = true;
+                    Utility.DelayAction.Add(300, () => Havepassive = false);
+                }
+
             }
-            if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E) Havepassive = true;
+        }
+
+        private static void Ondash(Obj_AI_Base sender, Dash.DashItem args)
+        {
+            if (sender.IsMe)
+            {
+                Havepassive = true;
+            }
         }
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
-            if(args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
-            Havepassive = true;
-           else if (args.SData.IsAutoAttack())
-                Havepassive = false;
-            if (args.Slot == SpellSlot.Q|| args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
+            if (args.SData.Name == "LucianW")
             {
+                Havepassive = true;
                 Orbwalking.ResetAutoAttackTimer();
+                Utility.DelayAction.Add((int)(_w.Delay * 1000) + 50, () => Havepassive = false);
             }
+            if (args.SData.Name == "LucianE")
+            {
+                Havepassive = true;
+                Orbwalking.ResetAutoAttackTimer();
+                Utility.DelayAction.Add(100, () => Havepassive = false);
+            }
+            if (args.SData.Name == "LucianQ")
+            {
+                Havepassive = true;
+                Orbwalking.ResetAutoAttackTimer();
+                Utility.DelayAction.Add((int)(_q1.Delay * 1000) + 50, () => Havepassive = false);
+            }
+            else
+                Havepassive = false;
             var useE = _config.Item("UseEC").GetValue<bool>();
             var ta = TargetSelector.GetTarget(_q.Range + 400, TargetSelector.DamageType.Magical);
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady() && !_player.HasBuff("LucianR"))
+            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady() &&
+                !_player.HasBuff("LucianR") && Havepassive == false)
                 if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
                 {
                     if (!ta.UnderTurret())
@@ -376,14 +394,13 @@ namespace D_Lucian
                         else if (ta.Health < _player.GetAutoAttackDamage(ta, true)*2 && ta.IsValidTarget())
                         {
                             _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-
                         }
                 }
         }
 
         public static void CastQ()
         {
-            if (!_q.IsReady()) return;
+            if (!_q.IsReady()|| Havepassive == true) return;
             var target = TargetSelector.SelectedTarget != null &&
                          TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
                 ? TargetSelector.SelectedTarget
@@ -398,7 +415,7 @@ namespace D_Lucian
 
         public static void ExtendedQ()
         {
-            if (!_q.IsReady()) return;
+            if (!_q.IsReady() || Havepassive == true) return;
             var target = TargetSelector.SelectedTarget != null &&
                          TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
                 ? TargetSelector.SelectedTarget
@@ -591,45 +608,8 @@ namespace D_Lucian
 
             UseItemes();
         }
-
-
-        private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
-        {
-
-            var mana = _player.ManaPercent > _config.Item("Harrasmana").GetValue<Slider>().Value;
-            if (unit.IsMe)
-                if (target.Type == GameObjectType.obj_AI_Hero)
-                {
-                    if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo ||
-                        (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && mana))
-                    {
-                        var useQ = _config.Item("UseQC").GetValue<bool>() || _config.Item("UseQH").GetValue<bool>();
-                        var useW = _config.Item("UseWC").GetValue<bool>() || _config.Item("UseWH").GetValue<bool>();
-                        if (useQ && _q.IsReady())
-                        {
-                            var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                            if (t.IsValidTarget(_q.Range) && Havepassive == false)
-                                CastQ();
-                            else if (t.IsValidTarget(_q1.Range) && Havepassive == false)
-                                ExtendedQ();
-                        }
-                        if (useW && _w.IsReady() && Havepassive == false)
-                        {
-                            var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                            var predW = _w.GetPrediction(t);
-                            if (t.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High &&
-                                predW.CollisionObjects.Count == 0)
-                                _w.Cast(t, false, true);
-                            else if (t.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
-                            {
-                                _w2.Cast(t, false, true);
-                            }
-                        }
-                    }
-                }
-        }
-
-
+        
+      
         private static void Harass()
         {
             var useQ = _config.Item("UseQH").GetValue<bool>();
