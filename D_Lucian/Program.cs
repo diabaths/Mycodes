@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using LeagueSharp;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using LeagueSharp.Common;
 using SharpDX;
 
@@ -21,6 +22,8 @@ namespace D_Lucian
         private static Menu _config;
 
         public static bool Havepassive;
+
+        private static bool _BuffRun;
 
         private static Obj_AI_Hero _player;
 
@@ -265,7 +268,9 @@ namespace D_Lucian
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Spellbook.OnCastSpell += OnCastSpell;
+            Obj_AI_Base.OnBuffRemove += BaseOnOnBuffRemove;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
+            Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
             Game.PrintChat(
                 "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
             Game.PrintChat(
@@ -316,33 +321,43 @@ namespace D_Lucian
             Usepotion();
         }
 
+   
+        private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
+        {
+            if (sender.IsMe)
+                if (args.Animation == "Spell1" || args.Animation == "Spell2")
+                    if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+        }
+        protected static void BaseOnOnBuffRemove(Obj_AI_Base sender, Obj_AI_BaseBuffRemoveEventArgs args)
+        {
+            if (!sender.IsMe)
+                return;
+
+            if (args.Buff.DisplayName == "LucianPassiveBuff")
+                Havepassive = false;
+        }
         private static void OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-           
-            if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
+            if (_player.HasBuff("LucianR"))
             {
-                Havepassive = true;
+                args.Process = false; 
+                
             }
-            switch (args.Slot)
-            {
-                case SpellSlot.Q:
-                case SpellSlot.W:
-                    Orbwalking.ResetAutoAttackTimer();
-                    break;
-            }
+            if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E) Havepassive = true;
         }
-      
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!sender.IsMe) return;
-            if (_player.HasBuff("lucianpassivebuff"))
+            if(args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
+            Havepassive = true;
+           else if (args.SData.IsAutoAttack())
+                Havepassive = false;
+            if (args.Slot == SpellSlot.Q|| args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
             {
-                Havepassive = true;
+                Orbwalking.ResetAutoAttackTimer();
             }
-            else Havepassive = false;
-            if (args.Slot == SpellSlot.E) Orbwalking.ResetAutoAttackTimer();
-            Orbwalking.ResetAutoAttackTimer();
             var useE = _config.Item("UseEC").GetValue<bool>();
             var ta = TargetSelector.GetTarget(_q.Range + 400, TargetSelector.DamageType.Magical);
             if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady() && !_player.HasBuff("LucianR"))
@@ -623,7 +638,7 @@ namespace D_Lucian
             if (useQ && _q.IsReady() && Havepassive == false)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range))
+                if (t.IsValidTarget(_q.Range)&& Havepassive == false)
                     CastQ();
                 else if (t.IsValidTarget(_q1.Range) && Havepassive == false)
                     ExtendedQ();
@@ -724,11 +739,11 @@ namespace D_Lucian
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (useQ && _q.IsReady() && Havepassive == false&& !mob.Name.Contains("Mini"))
+                if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range) && Havepassive == false&& !mob.Name.Contains("Mini"))
                 {
                     _q.Cast(mob);
                 }
-                if (_w.IsReady() && useW && Havepassive == false&& !mob.Name.Contains("Mini"))
+                if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && Havepassive == false&& !mob.Name.Contains("Mini"))
                 {
                     _w.Cast(mob);
                 }
