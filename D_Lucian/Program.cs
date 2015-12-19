@@ -21,9 +21,7 @@ namespace D_Lucian
 
         private static Menu _config;
 
-        public static bool Havepassive;
-
-        private static bool _BuffRun;
+        public static bool Qcast,Wcast,Ecast;
 
         private static Obj_AI_Hero _player;
 
@@ -268,8 +266,8 @@ namespace D_Lucian
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Spellbook.OnCastSpell += OnCastSpell;
+            Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
-            CustomEvents.Unit.OnDash += Ondash;
             Game.PrintChat(
                 "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
             Game.PrintChat(
@@ -320,7 +318,38 @@ namespace D_Lucian
             Usepotion();
         }
 
-   
+        private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
+        {
+            if (target.IsValidTarget(_q.Range + _e.Range))
+            {
+                var useE = _config.Item("UseEC").GetValue<bool>();
+                if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.Combo) return;
+                if(useE && _e.IsReady() &&
+                   !_player.HasBuff("LucianR") && !HavePassivee)
+                {
+                    if (target == null) return;
+                    if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
+                    {
+                        var ta = (Obj_AI_Base) target;
+                        if (!ta.UnderTurret())
+                        {
+                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                        }
+                        else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget(_q.Range + _e.Range))
+                            if (_q.ManaCost + _e.ManaCost < _player.Mana && ta.Health < _q.GetDamage(ta))
+                            {
+                                _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                                CastQ();
+                            }
+                            else if (ta.Health < _player.GetAutoAttackDamage(ta, true)*2 && ta.IsValidTarget())
+                            {
+                                _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                            }
+                    }
+                }
+            }
+        }
+
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
             if (sender.IsMe)
@@ -334,75 +363,38 @@ namespace D_Lucian
             if (_player.HasBuff("LucianR"))
             
                 args.Process = false;
-            {
-                if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
-                {
-                    Havepassive = true;
-                    Utility.DelayAction.Add(300, () => Havepassive = false);
-                }
-
-            }
+            
         }
+        private static bool HavePassivee => (Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff"));
 
-        private static void Ondash(Obj_AI_Base sender, Dash.DashItem args)
-        {
-            if (sender.IsMe)
-            {
-                Havepassive = true;
-            }
-        }
+        
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsMe) return;
-            if (args.SData.Name == "LucianW")
+            if (sender.IsMe)
             {
-                Havepassive = true;
-                Orbwalking.ResetAutoAttackTimer();
-                Utility.DelayAction.Add((int)(_w.Delay * 1000) + 50, () => Havepassive = false);
-            }
-            if (args.SData.Name == "LucianE")
-            {
-                Havepassive = true;
-                Orbwalking.ResetAutoAttackTimer();
-                Utility.DelayAction.Add(100, () => Havepassive = false);
-            }
-            if (args.SData.Name == "LucianQ")
-            {
-                Havepassive = true;
-                Orbwalking.ResetAutoAttackTimer();
-                Utility.DelayAction.Add((int)(_q1.Delay * 1000) + 50, () => Havepassive = false);
-            }
-            else
-                Havepassive = false;
-            var useE = _config.Item("UseEC").GetValue<bool>();
-            var ta = TargetSelector.GetTarget(_q.Range + 400, TargetSelector.DamageType.Magical);
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady() &&
-                !_player.HasBuff("LucianR") && Havepassive == false)
-                if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
+                if (args.SData.Name == "LucianW")
                 {
-                    if (!ta.UnderTurret())
-                    {
-                        _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                    }
-                    else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget(_q.Range + _e.Range))
-                        if (_q.ManaCost + _e.ManaCost < _player.Mana && ta.Health < _q.GetDamage(ta))
-                        {
-                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                            CastQ();
-                        }
-                        else if (ta.Health < _player.GetAutoAttackDamage(ta, true)*2 && ta.IsValidTarget())
-                        {
-                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                        }
+                    Wcast = true;
+                    Utility.DelayAction.Add(200, () => Wcast = false);
                 }
-        }
+                if (args.SData.Name == "LucianE")
+                {
+                    Ecast = true;
+                    Utility.DelayAction.Add(100, () => Ecast = false);
+                }
+                if (args.SData.Name == "LucianQ")
+                {
+                    Qcast = true;
+                    Utility.DelayAction.Add(200, () => Qcast = false);
+                }
+            }
+         }
 
         public static void CastQ()
         {
-            if (!_q.IsReady()|| Havepassive == true) return;
-            var target = TargetSelector.SelectedTarget != null &&
-                         TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
+            if (!_q.IsReady()) return;
+            var target = TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
                 ? TargetSelector.SelectedTarget
                 : TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
 
@@ -415,13 +407,12 @@ namespace D_Lucian
 
         public static void ExtendedQ()
         {
-            if (!_q.IsReady() || Havepassive == true) return;
-            var target = TargetSelector.SelectedTarget != null &&
-                         TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
+            if (!_q.IsReady()) return;
+            var target = TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
                 ? TargetSelector.SelectedTarget
                 : TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
 
-            if (!target.IsValidTarget(_q1.Range) || !_q.IsReady())
+            if (!target.IsValidTarget(_q1.Range))
                 return;
 
             var qpred = _q1.GetPrediction(target);
@@ -434,32 +425,34 @@ namespace D_Lucian
             {
                 foreach (var minion in from minion in minions
                     let polygon = new Geometry.Polygon.Rectangle(
-                        (Vector3) ObjectManager.Player.ServerPosition,
+                         ObjectManager.Player.ServerPosition,
                         ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q1.Range), 65f)
                     where polygon.IsInside(qpred.CastPosition)
                     select minion)
-                {
+                {if (minion.IsValidTarget(_q1.Range))
                     _q.Cast(minion);
                 }
 
                 foreach (var champ in from champ in champions
                     let polygon = new Geometry.Polygon.Rectangle(
-                        (Vector3) ObjectManager.Player.ServerPosition,
+                         ObjectManager.Player.ServerPosition,
                         ObjectManager.Player.ServerPosition.Extend(champ.ServerPosition, _q1.Range), 65f)
                     where polygon.IsInside(qpred.CastPosition)
                     select champ)
                 {
-                    _q.Cast(champ);
+                    if (champ.IsValidTarget(_q1.Range))
+                        _q.Cast(champ);
                 }
 
                 foreach (var monster in from monster in monsters
                     let polygon = new Geometry.Polygon.Rectangle(
-                        (Vector3) ObjectManager.Player.ServerPosition,
+                         ObjectManager.Player.ServerPosition,
                         ObjectManager.Player.ServerPosition.Extend(monster.ServerPosition, _q1.Range), 65f)
                     where polygon.IsInside(qpred.CastPosition)
                     select monster)
                 {
-                    _q.Cast(monster);
+                    if (monster.IsValidTarget(_q1.Range))
+                        _q.Cast(monster);
                 }
             }
         }
@@ -586,15 +579,15 @@ namespace D_Lucian
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            if (useQ && _q.IsReady() && Havepassive == false)
+            if (useQ && _q.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range) && Havepassive == false)
+                if (t.IsValidTarget(_q.Range) )
                     CastQ();
-                else if (t.IsValidTarget(_q1.Range) && Havepassive == false)
+                else if (t.IsValidTarget(_q1.Range))
                     ExtendedQ();
             }
-            if (useW && _w.IsReady() && Havepassive == false)
+            if (useW && _w.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -608,22 +601,22 @@ namespace D_Lucian
 
             UseItemes();
         }
-        
-      
+
+
         private static void Harass()
         {
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
 
-            if (useQ && _q.IsReady() && Havepassive == false)
+            if (useQ && _q.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range)&& Havepassive == false)
+                if (t.IsValidTarget(_q.Range))
                     CastQ();
-                else if (t.IsValidTarget(_q1.Range) && Havepassive == false)
+                else if (t.IsValidTarget(_q1.Range))
                     ExtendedQ();
             }
-            if (useW && _w.IsReady() && Havepassive == false)
+            if (useW && _w.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -654,7 +647,7 @@ namespace D_Lucian
             var minionsq = farmminions.FindAll(qminion => minion.IsValidTarget(_q.Range));
             var minionq = minionsq.Find(minionQ => minionQ.IsValidTarget());
 
-            if (_q.IsReady() && useQl && Havepassive == false)
+            if (_q.IsReady() && useQl && !HavePassivee)
             {
                 foreach (var minionssq in farmminions)
                 {
@@ -673,11 +666,11 @@ namespace D_Lucian
                         }
                     }
                 }
-                if (t.IsValidTarget(_q1.Range))
+                if (t.IsValidTarget(_q1.Range) && !HavePassivee)
                     ExtendedQ();
             }
 
-            if (_w.IsReady() && useWl && Havepassive == false)
+            if (_w.IsReady() && useWl && !HavePassivee)
             {
                 if (_w.GetLineFarmLocation(farmminions).MinionsHit >= minionhitw)
                 {
@@ -696,13 +689,13 @@ namespace D_Lucian
             foreach (var minion in allMinions)
             {
                 if (useQ && _q.IsReady() && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q) &&
-                    Havepassive == false)
+                    !HavePassivee)
                 {
                     _q.Cast(minion);
                 }
 
                 if (_w.IsReady() && useW && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W) &&
-                    Havepassive == false)
+                    !HavePassivee)
                 {
                     _w.Cast(minion);
                 }
@@ -719,11 +712,11 @@ namespace D_Lucian
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range) && Havepassive == false&& !mob.Name.Contains("Mini"))
+                if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range) && !HavePassivee && !mob.Name.Contains("Mini"))
                 {
                     _q.Cast(mob);
                 }
-                if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && Havepassive == false&& !mob.Name.Contains("Mini"))
+                if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && !HavePassivee && !mob.Name.Contains("Mini"))
                 {
                     _w.Cast(mob);
                 }
