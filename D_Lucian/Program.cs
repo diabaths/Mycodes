@@ -266,7 +266,6 @@ namespace D_Lucian
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Spellbook.OnCastSpell += OnCastSpell;
-            Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
             Game.PrintChat(
                 "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
@@ -318,38 +317,7 @@ namespace D_Lucian
             Usepotion();
         }
 
-        private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
-        {
-            if (target.IsValidTarget(_q.Range + _e.Range))
-            {
-                var useE = _config.Item("UseEC").GetValue<bool>();
-                if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.Combo) return;
-                if(useE && _e.IsReady() &&
-                   !_player.HasBuff("LucianR") && !HavePassivee)
-                {
-                    if (target == null) return;
-                    if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
-                    {
-                        var ta = (Obj_AI_Base) target;
-                        if (!ta.UnderTurret())
-                        {
-                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                        }
-                        else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget(_q.Range + _e.Range))
-                            if (_q.ManaCost + _e.ManaCost < _player.Mana && ta.Health < _q.GetDamage(ta))
-                            {
-                                _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                                CastQ();
-                            }
-                            else if (ta.Health < _player.GetAutoAttackDamage(ta, true)*2 && ta.IsValidTarget())
-                            {
-                                _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
-                            }
-                    }
-                }
-            }
-        }
-
+       
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
             if (sender.IsMe)
@@ -367,7 +335,7 @@ namespace D_Lucian
         }
         private static bool HavePassivee => (Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff"));
 
-        
+
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
@@ -389,7 +357,7 @@ namespace D_Lucian
                     Utility.DelayAction.Add(200, () => Qcast = false);
                 }
             }
-         }
+            }
 
         public static void CastQ()
         {
@@ -598,7 +566,32 @@ namespace D_Lucian
                     _w2.Cast(t, false, true);
                 }
             }
-
+            var useE = _config.Item("UseEC").GetValue<bool>();
+            if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.Combo) return;
+            if (useE && _e.IsReady() &&
+               !_player.HasBuff("LucianR") && !HavePassivee)
+            {
+                var ta = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
+                if (ta == null) return;
+                if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
+                {
+                    
+                    if (!ta.UnderTurret())
+                    {
+                        _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                    }
+                    else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget(_q.Range + _e.Range))
+                        if (_q.ManaCost + _e.ManaCost < _player.Mana && ta.Health < _q.GetDamage(ta))
+                        {
+                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                            CastQ();
+                        }
+                        else if (ta.Health < _player.GetAutoAttackDamage(ta, true) * 2 && ta.IsValidTarget())
+                        {
+                            _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
+                        }
+                }
+            }
             UseItemes();
         }
 
@@ -666,7 +659,8 @@ namespace D_Lucian
                         }
                     }
                 }
-                if (t.IsValidTarget(_q1.Range) && !HavePassivee)
+                
+               if (_q.IsReady() && t.IsValidTarget(_q1.Range) && !HavePassivee)
                     ExtendedQ();
             }
 
