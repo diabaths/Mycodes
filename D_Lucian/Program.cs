@@ -317,7 +317,11 @@ namespace D_Lucian
             Usepotion();
         }
 
-       
+        /* public static bool IsWall(Vector2 vector)
+        {
+            return NavMesh.GetCollisionFlags(vector.X, vector.Y).HasFlag(CollisionFlags.Wall);
+        }*/
+
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
             if (sender.IsMe)
@@ -328,12 +332,22 @@ namespace D_Lucian
         
         private static void OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
+            if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
+            {
+                Qcast = true;
+                Wcast = true;
+                Ecast = true;
+                Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
+                Utility.DelayAction.Add(200, () => Qcast = false);
+                Utility.DelayAction.Add(200, () => Wcast = false);
+                Utility.DelayAction.Add(200, () => Ecast = false);
+            }
             if (_player.HasBuff("LucianR"))
             
                 args.Process = false;
             
         }
-        private static bool HavePassivee => (Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff"));
+        private static bool HavePassivee => Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff");
 
 
 
@@ -380,7 +394,7 @@ namespace D_Lucian
                 ? TargetSelector.SelectedTarget
                 : TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
 
-            if (!target.IsValidTarget(_q1.Range))
+            if (target==null)
                 return;
 
             var qpred = _q1.GetPrediction(target);
@@ -547,13 +561,13 @@ namespace D_Lucian
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            if (useQ && _q.IsReady() && !HavePassivee)
+            if (useQ  && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range) )
-                    CastQ();
-                else if (t.IsValidTarget(_q1.Range))
+                if (t.IsValidTarget(_q1.Range)&& _q.IsReady())
                     ExtendedQ();
+                else if (t.IsValidTarget(_q.Range)&& _q.IsReady())
+                    CastQ();
             }
             if (useW && _w.IsReady() && !HavePassivee)
             {
@@ -604,10 +618,10 @@ namespace D_Lucian
             if (useQ && _q.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range))
-                    CastQ();
-                else if (t.IsValidTarget(_q1.Range))
+                if (t.IsValidTarget(_q1.Range))
                     ExtendedQ();
+                else if (t.IsValidTarget(_q.Range))
+                    CastQ();
             }
             if (useW && _w.IsReady() && !HavePassivee)
             {
@@ -828,13 +842,13 @@ namespace D_Lucian
             {
                 if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
                 {
-                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range))
-                    {
-                        CastQ();
-                    }
                     if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range - 30))
                     {
                         ExtendedQ();
+                    }
+                    if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range))
+                    {
+                        CastQ();
                     }
                 }
                 if (_w.IsReady() && _config.Item("UseWM").GetValue<bool>() && hero.IsValidTarget(_w.Range) &&
@@ -849,7 +863,6 @@ namespace D_Lucian
                         _w2.Cast(hero, false, true);
                     }
                 }
-
             }
         }
 
