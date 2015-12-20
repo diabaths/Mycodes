@@ -67,9 +67,9 @@ namespace D_Rengar
             _config.AddSubMenu(targetSelectorMenu);
 
             //Orbwalker
-            var orbwalkerMenu = new Menu("Orbwalker", "Orbwalker");
-            Orbwalker = new D_Rengar.Orbwalking.Orbwalker(orbwalkerMenu);
-            _config.AddSubMenu(orbwalkerMenu);
+            _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
+            Orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
+
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo")
