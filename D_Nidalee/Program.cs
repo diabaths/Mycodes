@@ -30,13 +30,13 @@ namespace D_Nidalee
 
         private static bool IsCougar;
 
-        private static readonly float[] HumanQcd = { 6, 6, 6, 6, 6 };
+        private static readonly float[] HumanQcd = {6, 6, 6, 6, 6};
 
-        private static readonly float[] HumanWcd = { 12, 12, 12, 12, 12 };
+        private static readonly float[] HumanWcd = {12, 12, 12, 12, 12};
 
-        private static readonly float[] HumanEcd = { 13, 12, 11, 10, 9 };
+        private static readonly float[] HumanEcd = {13, 12, 11, 10, 9};
 
-        private static readonly float[] CougarQcd, CougarWcd, CougarEcd = { 5, 5, 5, 5, 5 };
+        private static readonly float[] CougarQcd, CougarWcd, CougarEcd = {5, 5, 5, 5, 5};
 
         private static float _humQcd = 0, _humWcd = 0, _humEcd = 0;
 
@@ -134,7 +134,7 @@ namespace D_Nidalee
             Config.SubMenu("Combo")
                 .AddItem(
                     new MenuItem("QHitCombo", "Q HitChange").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
 
             Config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
@@ -234,7 +234,7 @@ namespace D_Nidalee
             Config.SubMenu("Harass")
                 .AddItem(
                     new MenuItem("QHitharass", "Q HitChange").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
             Config.SubMenu("Harass")
                 .AddItem(
                     new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
@@ -328,7 +328,7 @@ namespace D_Nidalee
             Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
             Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
             dmgAfterComboItem.ValueChanged +=
-                delegate (object sender, OnValueChangeEventArgs eventArgs)
+                delegate(object sender, OnValueChangeEventArgs eventArgs)
                 {
                     Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>();
                 };
@@ -384,7 +384,7 @@ namespace D_Nidalee
 
             CheckSpells();
             if (Config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100 * (Player.Mana / Player.MaxMana)) > Config.Item("lastmana").GetValue<Slider>().Value)
+                (100*(Player.Mana/Player.MaxMana)) > Config.Item("lastmana").GetValue<Slider>().Value)
             {
                 LastHit();
             }
@@ -394,7 +394,7 @@ namespace D_Nidalee
             }
             if ((Config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  Config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100 * (Player.Mana / Player.MaxMana)) > Config.Item("Harrasmana").GetValue<Slider>().Value)
+                (100*(Player.Mana/Player.MaxMana)) > Config.Item("Harrasmana").GetValue<Slider>().Value)
             {
                 Harass();
             }
@@ -417,156 +417,19 @@ namespace D_Nidalee
             Usepotion();
         }
 
-        public static Vector2? GetFirstWallPoint(Vector3 from, Vector3 to, float step = 25)
-        {
-            return GetFirstWallPoint(from.To2D(), to.To2D(), step);
-        }
-
-        public static Vector2? GetFirstWallPoint(Vector2 from, Vector2 to, float step = 25)
-        {
-            var direction = (to - from).Normalized();
-
-            for (float d = 0; d < from.Distance(to); d = d + step)
-            {
-                var testPoint = from + d * direction;
-                var flags = NavMesh.GetCollisionFlags(testPoint.X, testPoint.Y);
-                if (flags.HasFlag(CollisionFlags.Wall) || flags.HasFlag(CollisionFlags.Building))
-                {
-                    return from + (d - step) * direction;
-                }
-            }
-
-            return null;
-        }
 
         private static void Escapeterino()
         {
-            // Walljumper credits to Hellsing
-
-            if (!IsCougar && R.IsReady() && WC.IsReady())
-                R.Cast();
-
-            // We need to define a new move position since jumping over walls
-            // requires you to be close to the specified wall. Therefore we set the move
-            // point to be that specific piont. People will need to get used to it,
-            // but this is how it works.
-            var wallCheck = GetFirstWallPoint(Player.Position, Game.CursorPos);
-
-            // Be more precise
-            if (wallCheck != null)
-                wallCheck = GetFirstWallPoint((Vector3)wallCheck, Game.CursorPos, 5);
-
-            // Define more position point
-            var movePosition = wallCheck != null ? (Vector3)wallCheck : Game.CursorPos;
-
-            // Update fleeTargetPosition
-            var tempGrid = NavMesh.WorldToGrid(movePosition.X, movePosition.Y);
-            var fleeTargetPosition = NavMesh.GridToWorld((short)tempGrid.X, (short)tempGrid.Y);
-
-            // Also check if we want to AA aswell
-            Obj_AI_Base target = null;
-
-            // Reset walljump indicators
-            var wallJumpPossible = false;
-
-            // Only calculate stuff when our Q is up and there is a wall inbetween
-            if (IsCougar && WC.IsReady() && wallCheck != null)
+            Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            if (IsHuman && R.IsReady())
             {
-                // Get our wall position to calculate from
-                var wallPosition = movePosition;
-
-                // Check 300 units to the cursor position in a 160 degree cone for a valid non-wall spot
-                Vector2 direction = (Game.CursorPos.To2D() - wallPosition.To2D()).Normalized();
-                float maxAngle = 80;
-                float step = maxAngle / 20;
-                float currentAngle = 0;
-                float currentStep = 0;
-                bool jumpTriggered = false;
-                while (true)
+                if (WC.IsReady())
                 {
-                    // Validate the counter, break if no valid spot was found in previous loops
-                    if (currentStep > maxAngle && currentAngle < 0)
-                        break;
-
-                    // Check next angle
-                    if ((currentAngle == 0 || currentAngle < 0) && currentStep != 0)
-                    {
-                        currentAngle = (currentStep) * (float)Math.PI / 180;
-                        currentStep += step;
-                    }
-
-                    else if (currentAngle > 0)
-                        currentAngle = -currentAngle;
-
-                    Vector3 checkPoint;
-
-                    // One time only check for direct line of sight without rotating
-                    if (currentStep == 0)
-                    {
-                        currentStep = step;
-                        checkPoint = wallPosition + WC.Range * direction.To3D();
-                    }
-                    // Rotated check
-                    else
-                        checkPoint = wallPosition + WC.Range * direction.Rotated(currentAngle).To3D();
-
-                    // Check if the point is not a wall
-                    if (!checkPoint.IsWall())
-                    {
-                        // Check if there is a wall between the checkPoint and wallPosition
-                        wallCheck = GetFirstWallPoint(checkPoint, wallPosition);
-                        if (wallCheck != null)
-                        {
-                            // There is a wall inbetween, get the closes point to the wall, as precise as possible
-                            Vector3 wallPositionOpposite =
-                                (Vector3)GetFirstWallPoint((Vector3)wallCheck, wallPosition, 5);
-
-                            // Check if it's worth to jump considering the path length
-                            if (Player.GetPath(wallPositionOpposite).ToList().To2D().PathLength() -
-                                Player.Distance(wallPositionOpposite) > 200)
-                            {
-                                // Check the distance to the opposite side of the wall
-                                if (Player.Distance(wallPositionOpposite, true) <
-                                    Math.Pow(WC.Range - Player.BoundingRadius / 2, 2))
-                                {
-                                    // Make the jump happen
-                                    WC.Cast(wallPositionOpposite);
-
-                                    // Update jumpTriggered value to not orbwalk now since we want to jump
-                                    jumpTriggered = true;
-
-                                    break;
-                                }
-                                // If we are not able to jump due to the distance, draw the spot to
-                                // make the user notice the possibliy
-                                else
-                                {
-                                    // Update indicator values
-                                    wallJumpPossible = true;
-                                }
-                            }
-
-                            else
-                            {
-                                // yolo
-                                Render.Circle.DrawCircle(Game.CursorPos, 35, Color.Red, 2);
-                            }
-                        }
-                    }
-                }
-
-                // Check if the loop triggered the jump, if not just orbwalk
-                if (!jumpTriggered)
-                    Orbwalking.Orbwalk(target, Game.CursorPos, 90f, 0f, false, false);
-            }
-
-            // Either no wall or W on cooldown, just move towards to wall then
-            else
-            {
-                Orbwalking.Orbwalk(target, Game.CursorPos, 90f, 0f, false, false);
-                if (IsCougar && WC.IsReady())
                     WC.Cast(Game.CursorPos);
+                }
             }
+            else if (IsCougar && WC.IsReady())
+                WC.Cast(Game.CursorPos);
         }
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
