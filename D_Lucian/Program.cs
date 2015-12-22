@@ -376,9 +376,7 @@ namespace D_Lucian
         public static void CastQ()
         {
             if (!_q.IsReady()) return;
-            var target = TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
-                ? TargetSelector.SelectedTarget
-                : TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+            var target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
 
             if (!target.IsValidTarget(_q.Range))
                 return;
@@ -390,11 +388,9 @@ namespace D_Lucian
         public static void ExtendedQ()
         {
             if (!_q.IsReady()) return;
-            var target = TargetSelector.SelectedTarget.Distance(ObjectManager.Player) < 2000
-                ? TargetSelector.SelectedTarget
-                : TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
+            var target = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
 
-            if (target==null)
+            if (!target.IsValidTarget(_q1.Range))
                 return;
 
             var qpred = _q1.GetPrediction(target);

@@ -974,6 +974,8 @@ namespace D_Rengar
 
         private static void JungleClear()
         {
+            
+
             var mobs = MinionManager.GetMinions(_player.ServerPosition, _e.Range,
                 MinionTypes.All,
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
@@ -985,13 +987,14 @@ namespace D_Rengar
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-               if (_player.Mana <= 4)
+                if (_player.Mana <= 4)
                 {
                     if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range))
                     {
                         _q.Cast();
                     }
-                    if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range-100) && !_player.HasBuff("rengarpassivebuff"))
+                    if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range - 100) &&
+                        !_player.HasBuff("rengarpassivebuff"))
                     {
                         _w.Cast();
                     }
@@ -1017,7 +1020,8 @@ namespace D_Rengar
                         _q.Cast();
                     }
                     if (mob.IsValidTarget(_w.Range) && _w.IsReady() &&
-                        _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 1 && useW && !_player.HasBuff("rengarpassivebuff"))
+                        _config.Item("JunglePrio").GetValue<StringList>().SelectedIndex == 1 && useW &&
+                        !_player.HasBuff("rengarpassivebuff"))
                     {
                         _w.Cast();
                     }
@@ -1040,7 +1044,7 @@ namespace D_Rengar
             }
         }
 
-        private static void LastHit()
+        private static            void LastHit()
         {
             var allMinions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _e.Range, MinionTypes.All);
             var useQ = _config.Item("UseQLH").GetValue<bool>();
