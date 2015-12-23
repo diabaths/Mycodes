@@ -330,7 +330,10 @@ namespace D_Zyra
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_E", "GapClosers E")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("usefrostq", "Frost Queen to GapClosers")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("support", "Support Mode")).SetValue(false);
+            _config.SubMenu("Misc").AddItem(new MenuItem("", "E Hit Change"));
+            _config.SubMenu("Misc").AddItem(new MenuItem("Echange", "E Hit Change").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" })));
 
+    
             //Damage after combo:
             MenuItem dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Draw damage after combo").SetValue(true);
             Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
@@ -406,6 +409,22 @@ namespace D_Zyra
             Usecleanse();
 
         }
+        private static HitChance Echange()
+        {
+            switch (_config.Item("Echange").GetValue<StringList>().SelectedIndex)
+            {
+                case 0:
+                    return HitChance.Low;
+                case 1:
+                    return HitChance.Medium;
+                case 2:
+                    return HitChance.High;
+                case 3:
+                    return HitChance.VeryHigh;
+                default:
+                    return HitChance.High;
+            }
+        }
 
         // princer007  Code
         private static int Getallies(float range)
@@ -471,7 +490,7 @@ namespace D_Zyra
             {
                 if (_e.IsReady() && gapcloser.Sender.IsValidTarget(_e.Range) && _w.IsReady())
                 {
-                    _e.CastIfHitchanceEquals(gapcloser.Sender, HitChance.High);
+                    _e.CastIfHitchanceEquals(gapcloser.Sender, Echange());
                     Utility.DelayAction.Add(50, () => _w.Cast(new Vector3(pos.X - 2, pos.Y - 2, pos.Z)));
                     Utility.DelayAction.Add(150, () => _w.Cast(new Vector3(pos.X + 2, pos.Y + 2, pos.Z)));
                 }
@@ -494,7 +513,7 @@ namespace D_Zyra
             if (!_config.Item("Inter_E").GetValue<bool>()) return;
             if (_e.IsReady() && unit.IsValidTarget(_e.Range) && _w.IsReady())
             {
-                _e.CastIfHitchanceEquals(unit, HitChance.High);
+                _e.CastIfHitchanceEquals(unit, Echange());
                 Utility.DelayAction.Add(50, () => _w.Cast(new Vector3(pos.X - 2, pos.Y - 2, pos.Z)));
                 Utility.DelayAction.Add(150, () => _w.Cast(new Vector3(pos.X + 2, pos.Y + 2, pos.Z)));
             }
@@ -747,7 +766,7 @@ namespace D_Zyra
             var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
             if (!target.IsValidTarget(_e.Range))
                 return;
-            _e.CastIfHitchanceEquals(target, HitChance.High);
+            _e.CastIfHitchanceEquals(target, Echange());
             if (_w.IsReady() &&
                 _config.Item("useWE_Passive").GetValue<bool>())
             {
@@ -764,7 +783,7 @@ namespace D_Zyra
             var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
             if (!target.IsValidTarget(_e.Range))
                 return;
-            _e.CastIfHitchanceEquals(target, HitChance.High);
+            _e.CastIfHitchanceEquals(target, Echange());
             if (_w.IsReady() &&
                 _config.Item("useWE_Passiveh").GetValue<bool>())
             {
