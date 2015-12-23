@@ -21,7 +21,7 @@ namespace D_Lucian
 
         private static Menu _config;
 
-        public static bool Qcast,Wcast,Ecast;
+        public static bool Qcast, Wcast, Ecast;
 
         private static Obj_AI_Hero _player;
 
@@ -109,6 +109,7 @@ namespace D_Lucian
                     new MenuItem("ActiveLast", "LastHit!").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
             //Lane Clear
             _config.SubMenu("Farm").AddSubMenu(new Menu("LaneClear", "LaneClear"));
+            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQLP", "Q To Harass")).SetValue(true);
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQL", "Q LaneClear")).SetValue(true);
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
@@ -226,7 +227,7 @@ namespace D_Lucian
                 .SubMenu("Deffensive")
                 .SubMenu("Cleanse")
                 .AddItem(new MenuItem("Cleansemode", "Use Cleanse"))
-                .SetValue(new StringList(new string[2] {"Always", "In Combo"}));
+                .SetValue(new StringList(new string[2] { "Always", "In Combo" }));
 
             //potions
             _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
@@ -288,23 +289,23 @@ namespace D_Lucian
             if (!_config.Item("ActiveCombo").GetValue<KeyBind>().Active &&
                 (_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value)
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value)
             {
                 Harass();
 
             }
             if (_config.Item("ActiveLane").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
             {
                 Laneclear();
             }
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
             if (_config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Lastmana").GetValue<Slider>().Value)
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lastmana").GetValue<Slider>().Value)
             {
                 LastHit();
             }
@@ -321,7 +322,7 @@ namespace D_Lucian
         {
             return NavMesh.GetCollisionFlags(vector.X, vector.Y).HasFlag(CollisionFlags.Wall);
         }*/
-
+      
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
             if (sender.IsMe)
@@ -329,7 +330,7 @@ namespace D_Lucian
                     if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
                         ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
         }
-        
+
         private static void OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
             if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
@@ -343,9 +344,9 @@ namespace D_Lucian
                 Utility.DelayAction.Add(200, () => Ecast = false);
             }
             if (_player.HasBuff("LucianR"))
-            
+
                 args.Process = false;
-            
+
         }
         private static bool HavePassivee => Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff");
 
@@ -371,7 +372,7 @@ namespace D_Lucian
                     Utility.DelayAction.Add(200, () => Qcast = false);
                 }
             }
-            }
+        }
 
         public static void CastQ()
         {
@@ -402,32 +403,33 @@ namespace D_Lucian
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             {
                 foreach (var minion in from minion in minions
-                    let polygon = new Geometry.Polygon.Rectangle(
-                         ObjectManager.Player.ServerPosition,
-                        ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q1.Range), 65f)
-                    where polygon.IsInside(qpred.CastPosition)
-                    select minion)
-                {if (minion.IsValidTarget(_q1.Range))
-                    _q.Cast(minion);
+                                       let polygon = new Geometry.Polygon.Rectangle(
+                                            ObjectManager.Player.ServerPosition,
+                                           ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q1.Range), 65f)
+                                       where polygon.IsInside(qpred.CastPosition)
+                                       select minion)
+                {
+                    if (minion.IsValidTarget(_q1.Range))
+                        _q.Cast(minion);
                 }
 
                 foreach (var champ in from champ in champions
-                    let polygon = new Geometry.Polygon.Rectangle(
-                         ObjectManager.Player.ServerPosition,
-                        ObjectManager.Player.ServerPosition.Extend(champ.ServerPosition, _q1.Range), 65f)
-                    where polygon.IsInside(qpred.CastPosition)
-                    select champ)
+                                      let polygon = new Geometry.Polygon.Rectangle(
+                                           ObjectManager.Player.ServerPosition,
+                                          ObjectManager.Player.ServerPosition.Extend(champ.ServerPosition, _q1.Range), 65f)
+                                      where polygon.IsInside(qpred.CastPosition)
+                                      select champ)
                 {
                     if (champ.IsValidTarget(_q1.Range))
                         _q.Cast(champ);
                 }
 
                 foreach (var monster in from monster in monsters
-                    let polygon = new Geometry.Polygon.Rectangle(
-                         ObjectManager.Player.ServerPosition,
-                        ObjectManager.Player.ServerPosition.Extend(monster.ServerPosition, _q1.Range), 65f)
-                    where polygon.IsInside(qpred.CastPosition)
-                    select monster)
+                                        let polygon = new Geometry.Polygon.Rectangle(
+                                             ObjectManager.Player.ServerPosition,
+                                            ObjectManager.Player.ServerPosition.Extend(monster.ServerPosition, _q1.Range), 65f)
+                                        where polygon.IsInside(qpred.CastPosition)
+                                        select monster)
                 {
                     if (monster.IsValidTarget(_q1.Range))
                         _q.Cast(monster);
@@ -557,12 +559,12 @@ namespace D_Lucian
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            if (useQ  && !HavePassivee)
+            if (useQ && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q1.Range)&& _q.IsReady())
+                if (t.IsValidTarget(_q1.Range) && _q.IsReady())
                     ExtendedQ();
-                else if (t.IsValidTarget(_q.Range)&& _q.IsReady())
+                else if (t.IsValidTarget(_q.Range) && _q.IsReady())
                     CastQ();
             }
             if (useW && _w.IsReady() && !HavePassivee)
@@ -585,7 +587,7 @@ namespace D_Lucian
                 if (ta == null) return;
                 if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
                 {
-                    
+
                     if (!ta.UnderTurret())
                     {
                         _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
@@ -645,6 +647,7 @@ namespace D_Lucian
             var minionhitw = _config.Item("minminionsw").GetValue<Slider>().Value;
             var useQl = _config.Item("UseQL").GetValue<bool>();
             var useWl = _config.Item("UseWL").GetValue<bool>();
+            var useQlP = _config.Item("UseQLP").GetValue<bool>();
             var farmminions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All,
                 MinionTeam.NotAlly);
             var minionsq = farmminions.FindAll(qminion => minion.IsValidTarget(_q.Range));
@@ -657,7 +660,7 @@ namespace D_Lucian
                     var prediction = Prediction.GetPrediction(minionssq, _q.Delay, 10);
 
                     var collision = _q.GetCollision(_player.Position.To2D(),
-                        new List<Vector2> {prediction.UnitPosition.To2D()});
+                        new List<Vector2> { prediction.UnitPosition.To2D() });
                     foreach (var collisions in collision)
                     {
                         if (collision.Count() >= minionhitq)
@@ -669,10 +672,11 @@ namespace D_Lucian
                         }
                     }
                 }
-                
-               if (_q.IsReady() && t.IsValidTarget(_q1.Range) && !HavePassivee)
-                    ExtendedQ();
             }
+            if (_q.IsReady() && useQlP && !HavePassivee)
+                if (_q.IsReady() && t.IsValidTarget(_q1.Range) && !HavePassivee)
+                    ExtendedQ();
+
 
             if (_w.IsReady() && useWl && !HavePassivee)
             {
@@ -692,13 +696,13 @@ namespace D_Lucian
             if (allMinions.Count < 3) return;
             foreach (var minion in allMinions)
             {
-                if (useQ && _q.IsReady() && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q) &&
+                if (useQ && _q.IsReady() && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q) &&
                     !HavePassivee)
                 {
                     _q.Cast(minion);
                 }
 
-                if (_w.IsReady() && useW && minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W) &&
+                if (_w.IsReady() && useW && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.W) &&
                     !HavePassivee)
                 {
                     _w.Cast(minion);
@@ -733,14 +737,14 @@ namespace D_Lucian
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
                 var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
+                                    (hero.MaxHealth * (_config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
                 var iBilgemyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
+                                 (_player.MaxHealth * (_config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
                 var iBlade = _config.Item("Blade").GetValue<bool>();
                 var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
+                                    (hero.MaxHealth * (_config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
                 var iBlademyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Blademyhp").GetValue<Slider>().Value)/100);
+                                 (_player.MaxHealth * (_config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
                 var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
 
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
@@ -767,10 +771,10 @@ namespace D_Lucian
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
+                               (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
             var iusemppotion = _config.Item("usemppotions").GetValue<bool>();
             var iusepotionmp = _player.Mana <=
-                               (_player.MaxMana*(_config.Item("usepotionmp").GetValue<Slider>().Value)/100);
+                               (_player.MaxMana * (_config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
@@ -870,16 +874,16 @@ namespace D_Lucian
             {
                 if (harass)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
                         "Auto harass Enabled");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
             if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, _q.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
             }
             if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
             {
