@@ -261,14 +261,14 @@ namespace D_Elise
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawQ", "Human Q")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawW", "Human W")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Human E")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("SpiderDrawQ", "Spider Q")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("SpiderDrawE", "Spider E")).SetValue(true);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawQ", "Human Q")).SetValue(false);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawW", "Human W")).SetValue(false);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Human E")).SetValue(false);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("SpiderDrawQ", "Spider Q")).SetValue(false);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("SpiderDrawE", "Spider E")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawsmite", "Draw Smite")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(new MenuItem("drawmode", "Draw Smite Mode")).SetValue(true);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawCooldown", "Draw Cooldown")).SetValue(true);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawCooldown", "Draw Cooldown")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
 
 
