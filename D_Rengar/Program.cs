@@ -282,7 +282,7 @@ namespace D_Rengar
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Orbwalking.AfterAttack += OnAfterAttack;
-            Orbwalking.BeforeAttack += OnBeforeAttack;
+           // Orbwalking.BeforeAttack += OnBeforeAttack;
             Game.PrintChat(
               "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
             Game.PrintChat(
@@ -354,11 +354,10 @@ namespace D_Rengar
             if (args.Target is Obj_AI_Hero)
             {
                 if (combo && Q && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target) && mode &&
-                    args.Target.IsValidTarget(_q.Range)&& !_player.HasBuff("rengarpassivebuff"))
+                    args.Target.IsValidTarget(_q.Range))
                 {
                     _q.Cast();
                 }
-                else if(args.Target.InBush)
             }
         }
 
@@ -547,7 +546,6 @@ namespace D_Rengar
             if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, _e.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
-
             }
         }
 
@@ -616,7 +614,7 @@ namespace D_Rengar
                 if (useQ)
                 {
                     var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                    if (tq.IsValidTarget(_q.Range) && _q.IsReady()&& !_player.HasBuff("rengarpassivebuff"))
+                    if (tq.IsValidTarget(_q.Range) && _q.IsReady())
                         _q.Cast();
                 }
                 if (useW)
@@ -655,7 +653,7 @@ namespace D_Rengar
                       Orbwalking.InAutoAttackRange(tq))))
                 {
 
-                    if (tq.IsValidTarget(_q.Range) && _q.IsReady()&& !_player.HasBuff("rengarpassivebuff"))
+                    if (tq.IsValidTarget(_q.Range) && _q.IsReady())
                         _q.Cast();
                 }
                 if (useW &&
@@ -718,7 +716,7 @@ namespace D_Rengar
                 if (useQ)
                 {
                     var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                    if (tq.IsValidTarget(_q.Range) && _q.IsReady()&& !_player.HasBuff("rengarpassivebuff"))
+                    if (tq.IsValidTarget(_q.Range) && _q.IsReady())
                         _q.Cast();
                 }
                 if (useW)
@@ -743,7 +741,7 @@ namespace D_Rengar
                     _config.Item("HarrPrio").GetValue<StringList>().SelectedIndex == 0)
                 {
                     var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                    if (tq.IsValidTarget(_q.Range) && _q.IsReady()&& !_player.HasBuff("rengarpassivebuff"))
+                    if (tq.IsValidTarget(_q.Range) && _q.IsReady())
                         _q.Cast();
                 }
                 if (useW &&
