@@ -37,7 +37,7 @@ namespace D_Ezreal
 
         private static void Ping(Vector2 position)
         {
-            if (Environment.TickCount - _lastPingT < 30*1000) return;
+            if (Environment.TickCount - _lastPingT < 30 * 1000) return;
             _lastPingT = Environment.TickCount;
             _pingLocation = position;
             SimplePing();
@@ -251,7 +251,7 @@ namespace D_Ezreal
                 .SubMenu("Deffensive")
                 .SubMenu("Cleanse")
                 .AddItem(new MenuItem("Cleansemode", "Use Cleanse"))
-                .SetValue(new StringList(new string[2] {"Always", "In Combo"}));
+                .SetValue(new StringList(new string[2] { "Always", "In Combo" }));
             _config.SubMenu("items")
                 .SubMenu("Deffensive")
                 .AddItem(new MenuItem("Archangel", "Seraph's Embrace"))
@@ -296,14 +296,14 @@ namespace D_Ezreal
             Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
             Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
             dmgAfterComboItem.ValueChanged +=
-                delegate(object sender, OnValueChangeEventArgs eventArgs)
+                delegate (object sender, OnValueChangeEventArgs eventArgs)
                 {
                     Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>();
                 };
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
-            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawQ", "Draw Q")).SetValue(false);
+            _config.SubMenu("Drawings").AddItem(new MenuItem("DrawQ", "Draw Q")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawW", "Draw W")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Draw E")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawR", "Draw R")).SetValue(false);
@@ -321,7 +321,7 @@ namespace D_Ezreal
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            
+
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -335,7 +335,7 @@ namespace D_Ezreal
                                 hero =>
                                     ObjectManager.Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
                                     hero.IsValidTarget(30000) &&
-                                    _player.GetSpellDamage(hero, SpellSlot.R)*0.9 > hero.Health)
+                                    _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health)
                     )
                 {
 
@@ -344,7 +344,7 @@ namespace D_Ezreal
             }
 
             if (_config.Item("ActiveLane").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
             {
                 Laneclear();
             }
@@ -355,7 +355,7 @@ namespace D_Ezreal
                             _player.Spellbook.GetSpell(SpellSlot.E).ManaCost;
             if (target.IsValidTarget(_q.Range) && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
-                if (_player.Mana >= manacheck  &&
+                if (_player.Mana >= manacheck &&
                     qpred.CollisionObjects.Count == 0 && _q.IsReady() &&
                     _config.Item("useQimmo").GetValue<bool>())
                 {
@@ -380,7 +380,7 @@ namespace D_Ezreal
             _player = ObjectManager.Player;
             _orbwalker.SetAttack(true);
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
@@ -390,14 +390,14 @@ namespace D_Ezreal
             }
             if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value &&
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value &&
                 !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Harass();
             }
 
             if (_config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value)
+                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value)
             {
                 LastHit();
             }
@@ -410,17 +410,26 @@ namespace D_Ezreal
 
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (_e.IsReady() && _config.Item("Gap_E").GetValue<bool>() && gapcloser.Sender.IsValidTarget(1000))
+            if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 250 &&
+              _config.Item("Gap_E").GetValue<bool>())
             {
-              _e.Cast(gapcloser.Sender);
+                _e.Cast(ObjectManager.Player.Position.Extend(gapcloser.Sender.Position, -_e.Range));
             }
         }
-        
+
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
+            var useQH = _config.Item("UseQH").GetValue<bool>();
+            var useWH = _config.Item("UseWH").GetValue<bool>();
+            var useqlast =  _config.Item("UseQLH").GetValue<bool>();
+            var useqlane = _config.Item("UseQL").GetValue<bool>() || _config.Item("UseQJ").GetValue<bool>();
+            var lastmana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value;
+            var lanemana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value || (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value;
+            var harassmana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value;
             var combo = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
+            var harass = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed || _config.Item("harasstoggle").GetValue<KeyBind>().Active;
             var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
             var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
             if (combo && unit.IsMe && (target is Obj_AI_Hero))
@@ -443,8 +452,28 @@ namespace D_Ezreal
                     }
                 }
             }
+            if (harass && unit.IsMe && (target is Obj_AI_Hero)&& harassmana)
+            {
+                if (useQH && _q.IsReady())
+                {
+                    var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+                    var qpred = _q.GetPrediction(t);
+                    if (t.IsValidTarget(_q.Range) && qpred.CollisionObjects.Count == 0)
+                    {
+                        _q.CastIfHitchanceEquals(t, HitChance.High, true);
+                    }
+                }
+                if (useWH && _w.IsReady())
+                {
+                    var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
+                    if (t.IsValidTarget(_w.Range))
+                    {
+                        _w.CastIfHitchanceEquals(t, HitChance.High, true);
+                    }
+                }
+            }
             //Creditc FlapperDoodle
-            if (lastHit || laneClear)
+            if (lastHit && lastmana && useqlast || laneClear && lanemana && useqlane)
             {
                 foreach (
                     var minionDie in
@@ -987,7 +1016,7 @@ namespace D_Ezreal
             }
             if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, _q.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
             }
             if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
             {
