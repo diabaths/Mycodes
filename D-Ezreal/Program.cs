@@ -413,7 +413,7 @@ namespace D_Ezreal
             if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 250 &&
               _config.Item("Gap_E").GetValue<bool>())
             {
-                _e.Cast(ObjectManager.Player.Position.Extend(gapcloser.Sender.Position, -_e.Range));
+                _e.Cast(_player.Position.Extend(Game.CursorPos, _e.Range), true);
             }
         }
 
