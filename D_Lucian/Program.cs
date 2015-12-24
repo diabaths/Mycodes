@@ -588,7 +588,7 @@ namespace D_Lucian
                 if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
                 {
 
-                    if (!ta.UnderTurret())
+                    if (!ta.UnderTurret()&& ta.IsValidTarget(_q.Range))
                     {
                         _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
                     }
