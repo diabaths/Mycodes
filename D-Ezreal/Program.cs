@@ -764,11 +764,11 @@ namespace D_Ezreal
                 var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
                 if (usew && _w.IsReady() && whDmg - 20 > hero.Health && !hero.IsInvulnerable)
                 {
-                    if (hero.IsValidTarget(_w.Range) && _player.Mana > wmana + emana )
+                    if (hero.IsValidTarget(_w.Range) && _player.Mana > wmana + emana)
                     {
                         _w.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
-                    else if (usee && !hero.IsValidTarget(_w.Range)&&hero.IsValidTarget(_w.Range+_e.Range) && _player.Mana > wmana + emana &&
+                    else if (usee && !hero.IsValidTarget(_w.Range) && hero.IsValidTarget(_w.Range + _e.Range) && _player.Mana > wmana + emana &&
                              _e.IsReady()
                         )
                     {
@@ -779,7 +779,7 @@ namespace D_Ezreal
                 if (useq && _q.IsReady() && qhDmg - 20 > hero.Health && !hero.IsInvulnerable)
                 {
                     if (_player.Mana > qmana && hero.IsValidTarget(_q.Range) &&
-                        
+
                         _q.GetPrediction(hero).CollisionObjects.Count == 0)
                     {
                         _q.CastIfHitchanceEquals(hero, HitChance.High, true);
@@ -791,31 +791,43 @@ namespace D_Ezreal
                         _q.Cast(hero, true);
                     }
                 }
-                if (user && _player.Mana > rmana && _r.IsReady() && !hero.IsInvulnerable)
+                if (user && !hero.IsInvulnerable)
                 {
-                    if (hero.IsValidTarget(_r.Range)  &&
-                        rhDmg - 20 > hero.Health)
-                        _r.CastIfHitchanceEquals(hero, HitChance.High, true);
+                    if (_q.IsReady() && _w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q) + _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_q.Range))
+                        return;
+                    if (_q.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q) && hero.IsValidTarget(_q.Range))
+                        return;
+                    if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_w.Range))
+                        return;
+                    if (_player.Mana > rmana && _r.IsReady())
+                        if (hero.IsValidTarget(_r.Range) &&
+                            rhDmg - 20 > hero.Health)
+                            _r.CastIfHitchanceEquals(hero, HitChance.High, true);
                 }
             }
         }
-
-
+        
         private static void UseRcombo()
         {
             if (!_r.IsReady()) return;
             var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
             var rsolo = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
-           foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
-           {
-               var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
-               if (hero == null) return;
-               if (hero.IsInvulnerable) return;
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
+            {
+                var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
+                if (hero == null) return;
+                if (hero.IsInvulnerable) return;
                 if (!hero.IsInvulnerable && _player.Distance(hero) >= minrange)
                 {
                     if (rsolo)
                     {
+                        if (_q.IsReady() && _w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q) + _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_q.Range))
+                            return;
+                        if (_q.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q) && hero.IsValidTarget(_q.Range))
+                            return;
+                        if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_w.Range))
+                            return;
                         if (rDmg > hero.Health)
                             _r.CastIfHitchanceEquals(hero, HitChance.High, true);
 
@@ -828,7 +840,7 @@ namespace D_Ezreal
                 if (autoR)
                 {
                     var fuckr = _r.GetPrediction(hero, true);
-                    if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value )
+                    if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value)
                     {
                         _r.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
