@@ -382,7 +382,7 @@ namespace D_Zyra
             }
             if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
             {
-                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_r.Range))
                     _r.Cast(t.Position);
             }
