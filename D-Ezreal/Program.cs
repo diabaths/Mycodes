@@ -8,6 +8,8 @@ using Color = System.Drawing.Color;
 
 namespace D_Ezreal
 {
+    using static ObjectManager;
+
     internal class Program
     {
         private const string ChampionName = "Ezreal";
@@ -48,14 +50,13 @@ namespace D_Ezreal
 
         private static void SimplePing()
         {
-            Packet.S2C.Ping.Encoded(new Packet.S2C.Ping.Struct(_pingLocation.X, _pingLocation.Y, 0, 0,
-                Packet.PingType.Fallback)).Process();
+            Game.ShowPing(PingCategory.Fallback, _pingLocation, true);
         }
 
         private static void Game_OnGameLoad(EventArgs args)
         {
             _player = ObjectManager.Player;
-            if (ObjectManager.Player.BaseSkinName != ChampionName) return;
+            if (ObjectManager.Player.ChampionName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 1150);
             _w = new Spell(SpellSlot.W, 1000);
@@ -330,10 +331,10 @@ namespace D_Ezreal
             {
                 foreach (
                     var enemy in
-                        ObjectManager.Get<Obj_AI_Hero>()
+                        Get<Obj_AI_Hero>()
                             .Where(
                                 hero =>
-                                    ObjectManager.Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
+                                    Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
                                     hero.IsValidTarget(30000) &&
                                     _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health)
                     )
@@ -377,7 +378,7 @@ namespace D_Ezreal
                     _q.CastIfHitchanceEquals(target, HitChance.High, true);
                 }
             }
-            _player = ObjectManager.Player;
+            _player = Player;
             _orbwalker.SetAttack(true);
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
                 (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
@@ -413,7 +414,7 @@ namespace D_Ezreal
             if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 250 &&
               _config.Item("Gap_E").GetValue<bool>())
             {
-                _e.Cast(ObjectManager.Player.Position.Extend(gapcloser.Sender.Position, -_e.Range));
+                _e.Cast(Player.Position.Extend(gapcloser.Sender.Position, -_e.Range));
             }
         }
 
@@ -613,11 +614,11 @@ namespace D_Ezreal
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
             if (Items.HasItem(3146) && Items.CanUseItem(3146))
                 dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hexgun);
-            if (ObjectManager.Player.GetSpellSlot("SummonerIgnite") != SpellSlot.Unknown)
+            if (Player.GetSpellSlot("SummonerIgnite") != SpellSlot.Unknown)
             {
                 dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
             }
-            if (ObjectManager.Player.HasBuff("LichBane"))
+            if (Player.HasBuff("LichBane"))
             {
                 dmg += _player.BaseAttackDamage*0.75 + _player.FlatMagicDamageMod*0.5;
             }
@@ -636,17 +637,17 @@ namespace D_Ezreal
             var iusemppotion = _config.Item("usemppotions").GetValue<bool>();
             var iusepotionmp = _player.Mana <=
                                (_player.MaxMana * (_config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
-            if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
+            if (_player.InFountain() || Player.HasBuff("Recall")) return;
 
             if (Utility.CountEnemiesInRange(800) > 0 ||
                 (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active))
             {
                 if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
+                    !(Player.HasBuff("RegenerationPotion") ||
+                      Player.HasBuff("ItemMiniRegenPotion")
+                      || Player.HasBuff("ItemCrystalFlask") ||
+                      Player.HasBuff("ItemCrystalFlaskJungle")
+                      || Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
@@ -671,10 +672,10 @@ namespace D_Ezreal
                     }
                 }
                 if (iusepotionmp && iusemppotion &&
-                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask") ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask")))
+                    !(Player.HasBuff("ItemDarkCrystalFlask") ||
+                      Player.HasBuff("ItemMiniRegenPotion") ||
+                      Player.HasBuff("ItemCrystalFlaskJungle") ||
+                      Player.HasBuff("ItemCrystalFlask")))
                 {
                     if (Items.HasItem(2041) && Items.CanUseItem(2041))
                     {
@@ -698,7 +699,7 @@ namespace D_Ezreal
 
         private static void UseItemes()
         {
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
                 var iBilgeEnemyhp = hero.Health <=
@@ -749,7 +750,7 @@ namespace D_Ezreal
 
         private static void KillSteal()
         {
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var useq = _config.Item("useQK").GetValue<bool>();
                 var usew = _config.Item("useWK").GetValue<bool>();
@@ -813,7 +814,7 @@ namespace D_Ezreal
             var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
             var rsolo = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
+            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
             {
                 var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
                 if (hero == null) return;
@@ -992,7 +993,7 @@ namespace D_Ezreal
             {
                 foreach (
                     var enemyVisible in
-                        ObjectManager.Get<Obj_AI_Hero>().Where(enemyVisible => enemyVisible.IsValidTarget()))
+                        Get<Obj_AI_Hero>().Where(enemyVisible => enemyVisible.IsValidTarget()))
                 {
                     if (ComboDamage(enemyVisible) > enemyVisible.Health)
                     {
@@ -1028,20 +1029,20 @@ namespace D_Ezreal
             }
             if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, _q.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
+                Render.Circle.DrawCircle(Player.Position, _q.Range, _q.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
             }
             if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
+                Render.Circle.DrawCircle(Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
             }
             if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
+                Render.Circle.DrawCircle(Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
             }
 
             if (_config.Item("DrawR").GetValue<bool>() && _r.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
+                Render.Circle.DrawCircle(Player.Position, _r.Range, System.Drawing.Color.GreenYellow);
             }
         }
     }

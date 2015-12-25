@@ -50,10 +50,10 @@ namespace D_Zyra
 
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
 
-            _dfg = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ||
-                   Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
-                ? new Items.Item(3188, 750)
-                : new Items.Item(3128, 750);
+            _dfg = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline
+                   || Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
+                       ? new Items.Item(3188, 750)
+                       : new Items.Item(3128, 750);
             _hextech = new Items.Item(3146, 700);
             _youmuu = new Items.Item(3142, 10);
             _bilge = new Items.Item(3144, 450f);
@@ -98,12 +98,11 @@ namespace D_Zyra
             _config.SubMenu("Combo").AddItem(new MenuItem("use_ulti", "Use R If Killable")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use AutoR")).SetValue(true);
             _config.SubMenu("Combo")
-                .AddItem(
-                    new MenuItem("MinTargets", "AutoR if Min Targets >=").SetValue(new Slider(2, 1, 5)));
+                .AddItem(new MenuItem("MinTargets", "AutoR if Min Targets >=").SetValue(new Slider(2, 1, 5)));
             _config.SubMenu("Combo")
-                 .AddItem(
-                     new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(new KeyBind("T".ToCharArray()[0],
-                         KeyBindType.Press)));
+                .AddItem(
+                    new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(
+                        new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -240,7 +239,7 @@ namespace D_Zyra
                 .SubMenu("Deffensive")
                 .SubMenu("Cleanse")
                 .AddItem(new MenuItem("Cleansemode", ""))
-                .SetValue(new StringList(new string[2] {"Cleanse Always", "Cleanse in Combo"}));
+                .SetValue(new StringList(new string[2] { "Cleanse Always", "Cleanse in Combo" }));
 
             //potions
             _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
@@ -269,11 +268,12 @@ namespace D_Zyra
                 .AddItem(new MenuItem("harassmana", "Minimum Mana% >").SetValue(new Slider(35, 1, 100)));
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
+                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(
+                        new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("ActiveHarass", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
+                    new MenuItem("ActiveHarass", "Harass!").SetValue(
+                        new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
 
             //Farm
             _config.AddSubMenu(new Menu("Farm", "Farm"));
@@ -293,8 +293,8 @@ namespace D_Zyra
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(
-                    new MenuItem("Activelane", "LaneClear!").SetValue(new KeyBind("V".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("Activelane", "LaneClear!").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Farm").AddSubMenu(new Menu("Jungle", "Jungle"));
             _config.SubMenu("Farm").SubMenu("Jungle").AddItem(new MenuItem("useQJ", "Use Q").SetValue(true));
             _config.SubMenu("Farm")
@@ -310,14 +310,15 @@ namespace D_Zyra
             _config.SubMenu("Farm")
                 .SubMenu("Jungle")
                 .AddItem(
-                    new MenuItem("ActiveJungle", "Jungle!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
+                    new MenuItem("ActiveJungle", "Jungle!").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
             //Smite ActiveJungle
             _config.AddSubMenu(new Menu("Smite", "Smite"));
             _config.SubMenu("Smite")
                 .AddItem(
-                    new MenuItem("Usesmite", "Use Smite(toggle)").SetValue(new KeyBind("H".ToCharArray()[0],
-                        KeyBindType.Toggle)));
+                    new MenuItem("Usesmite", "Use Smite(toggle)").SetValue(
+                        new KeyBind("H".ToCharArray()[0], KeyBindType.Toggle)));
             _config.SubMenu("Smite").AddItem(new MenuItem("Useblue", "Smite Blue Early ")).SetValue(true);
             _config.SubMenu("Smite")
                 .AddItem(new MenuItem("manaJ", "Smite Blue Early if MP% <").SetValue(new Slider(35, 1, 100)));
@@ -327,6 +328,7 @@ namespace D_Zyra
 
             //Misc
             _config.AddSubMenu(new Menu("Misc", "Misc"));
+
             //_config.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Usepackes")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useQkill", "Q to Killsteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useEkill", "E to Killsteal")).SetValue(true);
@@ -335,15 +337,17 @@ namespace D_Zyra
             _config.SubMenu("Misc").AddItem(new MenuItem("usefrostq", "Frost Queen to GapClosers")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("support", "Support Mode")).SetValue(false);
             _config.SubMenu("Misc").AddItem(new MenuItem("", "E Hit Change"));
-            _config.SubMenu("Misc").AddItem(new MenuItem("Echange", "E Hit Change").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" })));
+            _config.SubMenu("Misc")
+                .AddItem(
+                    new MenuItem("Echange", "E Hit Change").SetValue(
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
 
-    
+
             //Damage after combo:
             MenuItem dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Draw damage after combo").SetValue(true);
             Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
             Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
-            dmgAfterComboItem.ValueChanged +=
-                delegate(object sender, OnValueChangeEventArgs eventArgs)
+            dmgAfterComboItem.ValueChanged += delegate(object sender, OnValueChangeEventArgs eventArgs)
                 {
                     Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>();
                 };
@@ -362,7 +366,7 @@ namespace D_Zyra
 
             Game.PrintChat("<font color='#881df2'>D-Zyra by Diabaths </font> Loaded.");
             Game.PrintChat(
-               "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
+                "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
             Game.PrintChat(
                 "<font color='#f2f21d'>Buy me cigars </font> <font color='#ff1900'>ssssssssssmith@hotmail.com</font> (10) S");
             Drawing.OnDraw += Drawing_OnDraw;
@@ -383,28 +387,27 @@ namespace D_Zyra
             if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_r.Range))
-                    _r.Cast(t.Position);
+                if (t.IsValidTarget(_r.Range)) _r.Cast(t.Position);
             }
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
             }
-            if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
-                 _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("harassmana").GetValue<Slider>().Value &&
-                !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
+            if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active
+                 || _config.Item("harasstoggle").GetValue<KeyBind>().Active)
+                && (100 * (_player.Mana / _player.MaxMana)) > _config.Item("harassmana").GetValue<Slider>().Value
+                && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Harass();
 
             }
-            if (_config.Item("Activelane").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("lanemana").GetValue<Slider>().Value)
+            if (_config.Item("Activelane").GetValue<KeyBind>().Active
+                && (100 * (_player.Mana / _player.MaxMana)) > _config.Item("lanemana").GetValue<Slider>().Value)
             {
                 Laneclear();
             }
-            if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                (100*(_player.Mana/_player.MaxMana)) > _config.Item("junglemana").GetValue<Slider>().Value)
+            if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active
+                && (100 * (_player.Mana / _player.MaxMana)) > _config.Item("junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
@@ -420,6 +423,7 @@ namespace D_Zyra
             Usecleanse();
 
         }
+
         private static HitChance Echange()
         {
             switch (_config.Item("Echange").GetValue<StringList>().SelectedIndex)
@@ -441,15 +445,14 @@ namespace D_Zyra
         private static int Getallies(float range)
         {
             int allies = 0;
-            foreach (Obj_AI_Hero hero in ObjectManager.Get<Obj_AI_Hero>())
-                if (hero.IsAlly && !hero.IsMe && _player.Distance(hero) <= range) allies++;
+            foreach (Obj_AI_Hero hero in ObjectManager.Get<Obj_AI_Hero>()) if (hero.IsAlly && !hero.IsMe && _player.Distance(hero) <= range) allies++;
             return allies;
         }
 
         private static void Orbwalking_BeforeAttack(LeagueSharp.Common.Orbwalking.BeforeAttackEventArgs args)
         {
-            if (Getallies(1000) > 0 && ((Obj_AI_Base) _orbwalker.GetTarget()).IsMinion && /*args.Unit.IsMinion &&*/
-                _config.Item("support").GetValue<bool>()) args.Process = false;
+            if (Getallies(1000) > 0 && ((Obj_AI_Base)_orbwalker.GetTarget()).IsMinion
+                && /*args.Unit.IsMinion &&*/ _config.Item("support").GetValue<bool>()) args.Process = false;
         }
 
         private static float ComboDamage(Obj_AI_Hero hero)
@@ -460,8 +463,8 @@ namespace D_Zyra
             {
                 if (_w.IsReady())
                 {
-                    dmg += _player.GetSpellDamage(hero, SpellSlot.Q) + (23 + 6.5*ObjectManager.Player.Level) +
-                           (1.2*_player.FlatMagicDamageMod);
+                    dmg += _player.GetSpellDamage(hero, SpellSlot.Q) + (23 + 6.5 * ObjectManager.Player.Level)
+                           + (1.2 * _player.FlatMagicDamageMod);
                 }
                 else dmg += _player.GetSpellDamage(hero, SpellSlot.Q);
             }
@@ -470,28 +473,25 @@ namespace D_Zyra
             {
                 if (_w.IsReady())
                 {
-                    dmg += _player.GetSpellDamage(hero, SpellSlot.E) + (23 + 6.5*ObjectManager.Player.Level) +
-                           (1.2*_player.FlatMagicDamageMod);
+                    dmg += _player.GetSpellDamage(hero, SpellSlot.E) + (23 + 6.5 * ObjectManager.Player.Level)
+                           + (1.2 * _player.FlatMagicDamageMod);
                 }
                 else dmg += _player.GetSpellDamage(hero, SpellSlot.E);
             }
-            if (_r.IsReady())
-                dmg += _player.GetSpellDamage(hero, SpellSlot.R);
-            if (Items.HasItem(3153) && Items.CanUseItem(3153))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
-            if (Items.HasItem(3146) && Items.CanUseItem(3146))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hexgun);
+            if (_r.IsReady()) dmg += _player.GetSpellDamage(hero, SpellSlot.R);
+            if (Items.HasItem(3153) && Items.CanUseItem(3153)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
+            if (Items.HasItem(3146) && Items.CanUseItem(3146)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hexgun);
 
             if (ObjectManager.Player.HasBuff("LichBane"))
             {
-                dmg += _player.BaseAttackDamage*0.75 + _player.FlatMagicDamageMod*0.5;
+                dmg += _player.BaseAttackDamage * 0.75 + _player.FlatMagicDamageMod * 0.5;
             }
             if (ObjectManager.Player.GetSpellSlot("SummonerIgnite") != SpellSlot.Unknown)
             {
                 dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
             }
             dmg += _player.GetAutoAttackDamage(hero, true);
-            return (float) dmg;
+            return (float)dmg;
         }
 
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
@@ -510,14 +510,15 @@ namespace D_Zyra
                     _e.CastIfHitchanceEquals(gapcloser.Sender, HitChance.High);
                 }
             }
-            if (Items.HasItem(3092) && Items.CanUseItem(3092) && _config.Item("usefrostq").GetValue<bool>() &&
-                gapcloser.Sender.IsValidTarget(800))
+            if (Items.HasItem(3092) && Items.CanUseItem(3092) && _config.Item("usefrostq").GetValue<bool>()
+                && gapcloser.Sender.IsValidTarget(800))
             {
                 _frostqueen.Cast(gapcloser.Sender);
             }
         }
 
-        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit,
+        private static void Interrupter2_OnInterruptableTarget(
+            Obj_AI_Hero unit,
             Interrupter2.InterruptableTargetEventArgs args)
         {
             var pos = _e.GetPrediction(unit).CastPosition;
@@ -540,8 +541,8 @@ namespace D_Zyra
             var hero = HeroManager.Enemies.FirstOrDefault(x => x.IsValidTarget(570));
             var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
             var usesmite = _config.Item("smitecombo").GetValue<bool>();
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
-                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite
+                && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
             {
                 if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
                 {
@@ -552,9 +553,8 @@ namespace D_Zyra
                     ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
             }
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
-                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                hero.IsValidTarget(570))
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite
+                && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready && hero.IsValidTarget(570))
             {
                 ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
             }
@@ -564,47 +564,38 @@ namespace D_Zyra
         {
             var useignite = _config.Item("useignite").GetValue<bool>();
             var target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-            if (_config.Item("UseRE").GetValue<bool>() || _config.Item("use_ulti").GetValue<bool>())
-                CastREnemy();
+            if (_config.Item("UseRE").GetValue<bool>() || _config.Item("use_ulti").GetValue<bool>()) CastREnemy();
             UseItemes();
             Smiteontarget();
 
-            if (useignite && _igniteSlot != SpellSlot.Unknown && target.IsValidTarget(600) &&
-                _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+            if (useignite && _igniteSlot != SpellSlot.Unknown && target.IsValidTarget(600)
+                && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
-                if (target.Health <= 1.2*ComboDamage(target))
+                if (target.Health <= 1.2 * ComboDamage(target))
                 {
                     _player.Spellbook.CastSpell(_igniteSlot, target);
                 }
             }
-            if (_config.Item("useQC").GetValue<bool>())
-                CastQEnemy();
-            if (_config.Item("useEC").GetValue<bool>())
-                CastEEnemy();
+            if (_config.Item("useQC").GetValue<bool>()) CastQEnemy();
+            if (_config.Item("useEC").GetValue<bool>()) CastEEnemy();
         }
 
         private static void Harass()
         {
-            if (_config.Item("useQH").GetValue<bool>())
-                CastQEnemyharass();
-            if (_config.Item("useEH").GetValue<bool>())
-                CastEEnemyharass();
+            if (_config.Item("useQH").GetValue<bool>()) CastQEnemyharass();
+            if (_config.Item("useEH").GetValue<bool>()) CastEEnemyharass();
         }
 
         private static void Laneclear()
         {
-            if (_config.Item("useQL").GetValue<bool>())
-                CastQMinion();
-            if (_config.Item("useEL").GetValue<bool>())
-                CastEMinion();
+            if (_config.Item("useQL").GetValue<bool>()) CastQMinion();
+            if (_config.Item("useEL").GetValue<bool>()) CastEMinion();
         }
 
         private static void JungleClear()
         {
-            if (_config.Item("useQJ").GetValue<bool>())
-                CastQjungleMinion();
-            if (_config.Item("useEJ").GetValue<bool>())
-                CastEjungleMinion();
+            if (_config.Item("useQJ").GetValue<bool>()) CastQjungleMinion();
+            if (_config.Item("useEJ").GetValue<bool>()) CastEjungleMinion();
         }
 
         /* private static bool Packets()
@@ -614,25 +605,27 @@ namespace D_Zyra
 
         private static bool ZyraisZombie()
         {
-            return ObjectManager.Player.Spellbook.GetSpell(SpellSlot.Q).Name ==
-                   ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Name ||
-                   ObjectManager.Player.Spellbook.GetSpell(SpellSlot.W).Name ==
-                   ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Name;
+            return ObjectManager.Player.Spellbook.GetSpell(SpellSlot.Q).Name
+                   == ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Name
+                   || ObjectManager.Player.Spellbook.GetSpell(SpellSlot.W).Name
+                   == ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Name;
         }
 
         private static void CastEjungleMinion()
         {
-            if (!_e.IsReady())
-                return;
-            var minions = MinionManager.GetMinions(_player.ServerPosition, _e.Range,
+            if (!_e.IsReady()) return;
+            var minions = MinionManager.GetMinions(
+                _player.ServerPosition,
+                _e.Range,
                 MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-            if (minions.Count == 0)
-                return;
+                MinionTeam.Neutral,
+                MinionOrderTypes.MaxHealth);
+            if (minions.Count == 0) return;
             var castPostion =
                 MinionManager.GetBestLineFarmLocation(
                     minions.Select(minion => minion.ServerPosition.To2D()).ToList(),
-                    _e.Width, _e.Range);
+                    _e.Width,
+                    _e.Range);
             _e.Cast(castPostion.Position);
             if (_config.Item("useWE_Passivej").GetValue<bool>() && _w.IsReady())
             {
@@ -644,15 +637,14 @@ namespace D_Zyra
 
         private static void CastEMinion()
         {
-            if (!_e.IsReady())
-                return;
+            if (!_e.IsReady()) return;
             var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _e.Range, MinionTypes.All);
-            if (minions.Count == 0)
-                return;
+            if (minions.Count == 0) return;
             var castPostion =
                 MinionManager.GetBestLineFarmLocation(
                     minions.Select(minion => minion.ServerPosition.To2D()).ToList(),
-                    _e.Width, _e.Range);
+                    _e.Width,
+                    _e.Range);
             _e.Cast(castPostion.Position);
             if (_config.Item("useWE_Passivel").GetValue<bool>() && _w.IsReady())
             {
@@ -665,16 +657,19 @@ namespace D_Zyra
 
         private static void CastQjungleMinion()
         {
-            if (!_q.IsReady())
-                return;
-            var minions = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
+            if (!_q.IsReady()) return;
+            var minions = MinionManager.GetMinions(
+                _player.ServerPosition,
+                _q.Range,
                 MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-            if (minions.Count == 0)
-                return;
+                MinionTeam.Neutral,
+                MinionOrderTypes.MaxHealth);
+            if (minions.Count == 0) return;
             var castPostion =
                 MinionManager.GetBestCircularFarmLocation(
-                    minions.Select(minion => minion.ServerPosition.To2D()).ToList(), _q.Width, _q.Range);
+                    minions.Select(minion => minion.ServerPosition.To2D()).ToList(),
+                    _q.Width,
+                    _q.Range);
             _q.Cast(castPostion.Position);
             if (_config.Item("useW_Passivej").GetValue<bool>() && _w.IsReady())
             {
@@ -686,15 +681,17 @@ namespace D_Zyra
 
         private static void CastQMinion()
         {
-            if (!_q.IsReady())
-                return;
-            var minions = MinionManager.GetMinions(ObjectManager.Player.Position, _q.Range + (_q.Width/2),
+            if (!_q.IsReady()) return;
+            var minions = MinionManager.GetMinions(
+                ObjectManager.Player.Position,
+                _q.Range + (_q.Width / 2),
                 MinionTypes.All);
-            if (minions.Count == 0)
-                return;
+            if (minions.Count == 0) return;
             var castPostion =
                 MinionManager.GetBestCircularFarmLocation(
-                    minions.Select(minion => minion.ServerPosition.To2D()).ToList(), _q.Width, _q.Range);
+                    minions.Select(minion => minion.ServerPosition.To2D()).ToList(),
+                    _q.Width,
+                    _q.Range);
             _q.Cast(castPostion.Position);
             if (_config.Item("useW_Passivel").GetValue<bool>() && _w.IsReady())
             {
@@ -710,13 +707,13 @@ namespace D_Zyra
             var rpred = _r.GetPrediction(target, true);
             if (!target.IsValidTarget(_r.Range) || !_r.IsReady()) return;
 
-            if (ComboDamage(target)*1.3 > target.Health && _config.Item("use_ulti").GetValue<bool>() &&
-                _r.GetPrediction(target).Hitchance >= HitChance.High)
+            if (ComboDamage(target) * 1.3 > target.Health && _config.Item("use_ulti").GetValue<bool>()
+                && _r.GetPrediction(target).Hitchance >= HitChance.High)
             {
                 _r.Cast(rpred.CastPosition);
             }
-            if (ObjectManager.Get<Obj_AI_Hero>().Count(hero => hero.IsValidTarget(_r.Range)) >=
-                _config.Item("MinTargets").GetValue<Slider>().Value
+            if (ObjectManager.Get<Obj_AI_Hero>().Count(hero => hero.IsValidTarget(_r.Range))
+                >= _config.Item("MinTargets").GetValue<Slider>().Value
                 && _r.GetPrediction(target).Hitchance >= HitChance.High)
             {
                 _r.Cast(target);
@@ -725,26 +722,14 @@ namespace D_Zyra
 
         private static int GetNumberHitByR(Obj_AI_Hero target)
         {
-            int Enemys = 0;
-            foreach (Obj_AI_Hero enemys in ObjectManager.Get<Obj_AI_Hero>())
-            {
-                var pred = _r.GetPrediction(enemys, true);
-                if (pred.Hitchance >= HitChance.High && !enemys.IsMe && enemys.IsEnemy &&
-                    Vector3.Distance(_player.Position, pred.UnitPosition) <= _r.Range)
-                {
-                    Enemys = Enemys + 1;
-                }
-            }
-            return Enemys;
+            return (from enemys in ObjectManager.Get<Obj_AI_Hero>() let pred = _r.GetPrediction(enemys, true) where pred.Hitchance >= HitChance.High && !enemys.IsMe && enemys.IsEnemy && Vector3.Distance(_player.Position, pred.UnitPosition) <= _r.Range select enemys).Count();
         }
 
         private static void CastQEnemy()
         {
-            if (!_q.IsReady())
-                return;
-            var target = TargetSelector.GetTarget(_q.Range + (_q.Width/2), TargetSelector.DamageType.Magical);
-            if (!target.IsValidTarget(_q.Range))
-                return;
+            if (!_q.IsReady()) return;
+            var target = TargetSelector.GetTarget(_q.Range + (_q.Width / 2), TargetSelector.DamageType.Magical);
+            if (!target.IsValidTarget(_q.Range)) return;
             _q.CastIfHitchanceEquals(target, HitChance.High);
             if (_w.IsReady() && _config.Item("useW_Passive").GetValue<bool>())
             {
@@ -756,11 +741,9 @@ namespace D_Zyra
 
         private static void CastQEnemyharass()
         {
-            if (!_q.IsReady())
-                return;
-            var target = TargetSelector.GetTarget(_q.Range + (_q.Width/2), TargetSelector.DamageType.Magical);
-            if (!target.IsValidTarget(_q.Range))
-                return;
+            if (!_q.IsReady()) return;
+            var target = TargetSelector.GetTarget(_q.Range + (_q.Width / 2), TargetSelector.DamageType.Magical);
+            if (!target.IsValidTarget(_q.Range)) return;
             _q.CastIfHitchanceEquals(target, HitChance.High);
             if (_w.IsReady() && _config.Item("useW_Passiveh").GetValue<bool>())
             {
@@ -772,14 +755,11 @@ namespace D_Zyra
 
         private static void CastEEnemy()
         {
-            if (!_e.IsReady())
-                return;
+            if (!_e.IsReady()) return;
             var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-            if (!target.IsValidTarget(_e.Range))
-                return;
+            if (!target.IsValidTarget(_e.Range)) return;
             _e.CastIfHitchanceEquals(target, Echange());
-            if (_w.IsReady() &&
-                _config.Item("useWE_Passive").GetValue<bool>())
+            if (_w.IsReady() && _config.Item("useWE_Passive").GetValue<bool>())
             {
                 var pos = _e.GetPrediction(target).CastPosition;
                 Utility.DelayAction.Add(50, () => _w.Cast(new Vector3(pos.X - 5, pos.Y - 5, pos.Z)));
@@ -789,14 +769,11 @@ namespace D_Zyra
 
         private static void CastEEnemyharass()
         {
-            if (!_e.IsReady())
-                return;
+            if (!_e.IsReady()) return;
             var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-            if (!target.IsValidTarget(_e.Range))
-                return;
+            if (!target.IsValidTarget(_e.Range)) return;
             _e.CastIfHitchanceEquals(target, Echange());
-            if (_w.IsReady() &&
-                _config.Item("useWE_Passiveh").GetValue<bool>())
+            if (_w.IsReady() && _config.Item("useWE_Passiveh").GetValue<bool>())
             {
                 var pos = _e.GetPrediction(target).CastPosition;
                 Utility.DelayAction.Add(50, () => _w.Cast(new Vector3(pos.X - 5, pos.Y - 5, pos.Z)));
@@ -806,11 +783,9 @@ namespace D_Zyra
 
         private static void CastPassive()
         {
-            if (!_passive.IsReady())
-                return;
+            if (!_passive.IsReady()) return;
             var target = TargetSelector.GetTarget(_passive.Range, TargetSelector.DamageType.Magical);
-            if (!target.IsValidTarget(_e.Range))
-                return;
+            if (!target.IsValidTarget(_e.Range)) return;
             _passive.CastIfHitchanceEquals(target, HitChance.High);
         }
 
@@ -863,21 +838,22 @@ namespace D_Zyra
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
-                var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
-                var iBilgemyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
+                var iBilgeEnemyhp = hero.Health
+                                    <= (hero.MaxHealth * (_config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
+                var iBilgemyhp = _player.Health
+                                 <= (_player.MaxHealth * (_config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
                 var iBlade = _config.Item("Blade").GetValue<bool>();
-                var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
-                var iBlademyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Blademyhp").GetValue<Slider>().Value)/100);
+                var iBladeEnemyhp = hero.Health
+                                    <= (hero.MaxHealth * (_config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
+                var iBlademyhp = _player.Health
+                                 <= (_player.MaxHealth * (_config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
                 var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
                 var iHextech = _config.Item("Hextech").GetValue<bool>();
-                var iHextechEnemyhp = hero.Health <=
-                                      (hero.MaxHealth*(_config.Item("HextechEnemyhp").GetValue<Slider>().Value)/100);
-                var iHextechmyhp = _player.Health <=
-                                   (_player.MaxHealth*(_config.Item("Hextechmyhp").GetValue<Slider>().Value)/100);
+                var iHextechEnemyhp = hero.Health
+                                      <= (hero.MaxHealth * (_config.Item("HextechEnemyhp").GetValue<Slider>().Value)
+                                          / 100);
+                var iHextechmyhp = _player.Health
+                                   <= (_player.MaxHealth * (_config.Item("Hextechmyhp").GetValue<Slider>().Value) / 100);
                 var iOmen = _config.Item("Omen").GetValue<bool>();
                 var iOmenenemys = hero.CountEnemiesInRange(450) >= _config.Item("Omenenemys").GetValue<Slider>().Value;
                 var ifrost = _config.Item("frostQ").GetValue<bool>();
@@ -916,9 +892,8 @@ namespace D_Zyra
             {
                 foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly || hero.IsMe))
                 {
-                    if (hero.Health <= (hero.MaxHealth*(_config.Item("lotisminhp").GetValue<Slider>().Value)/100) &&
-                        hero.Distance(_player.ServerPosition) <= _lotis.Range && _lotis.IsReady())
-                        _lotis.Cast();
+                    if (hero.Health <= (hero.MaxHealth * (_config.Item("lotisminhp").GetValue<Slider>().Value) / 100)
+                        && hero.Distance(_player.ServerPosition) <= _lotis.Range && _lotis.IsReady()) _lotis.Cast();
                 }
             }
 
@@ -926,26 +901,29 @@ namespace D_Zyra
 
         private static void Usepotion()
         {
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
+            var mobs = MinionManager.GetMinions(
+                _player.ServerPosition,
+                _q.Range,
                 MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                MinionTeam.Neutral,
+                MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
-            var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
+            var iusepotionhp = _player.Health
+                               <= (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
             var iusemppotion = _config.Item("usemppotions").GetValue<bool>();
-            var iusepotionmp = _player.Mana <=
-                               (_player.MaxMana*(_config.Item("usepotionmp").GetValue<Slider>().Value)/100);
+            var iusepotionmp = _player.Mana
+                               <= (_player.MaxMana * (_config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
-            if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite != null))
+            if (Utility.CountEnemiesInRange(800) > 0
+                || (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite != null))
             {
-                if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
+                if (iusepotionhp && iusehppotion
+                    && !(ObjectManager.Player.HasBuff("RegenerationPotion")
+                         || ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlask")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                         || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
@@ -969,11 +947,11 @@ namespace D_Zyra
                         Items.UseItem(2033);
                     }
                 }
-                if (iusepotionmp && iusemppotion &&
-                    !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask") ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlask")))
+                if (iusepotionmp && iusemppotion
+                    && !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")
+                         || ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlask")))
                 {
                     if (Items.HasItem(2041) && Items.CanUseItem(2041))
                     {
@@ -996,17 +974,17 @@ namespace D_Zyra
         }
 
         public static readonly string[] Smitetype =
-        {
-            "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
-            "summonersmite"
-        };
+            {
+                "s5_summonersmiteplayerganker", "s5_summonersmiteduel",
+                "s5_summonersmitequick", "itemsmiteaoe", "summonersmite"
+            };
 
         private static int GetSmiteDmg()
         {
             int level = _player.Level;
-            int index = _player.Level/5;
-            float[] dmgs = {370 + 20*level, 330 + 30*level, 240 + 40*level, 100 + 50*level};
-            return (int) dmgs[index];
+            int index = _player.Level / 5;
+            float[] dmgs = { 370 + 20 * level, 330 + 30 * level, 240 + 40 * level, 100 + 50 * level };
+            return (int)dmgs[index];
         }
 
         //New map Monsters Name By SKO
@@ -1016,21 +994,20 @@ namespace D_Zyra
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var useblue = _config.Item("Useblue").GetValue<bool>();
             var usered = _config.Item("Usered").GetValue<bool>();
-            var health = (100*(_player.Health/_player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
-            var mana = (100*(_player.Mana/_player.MaxMana)) < _config.Item("manaJ").GetValue<Slider>().Value;
+            var health = (100 * (_player.Health / _player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
+            var mana = (100 * (_player.Mana / _player.MaxMana)) < _config.Item("manaJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {
-                jungleMinions = new string[] {"TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf"};
+                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
             }
             else
             {
                 jungleMinions = new string[]
-                {
-                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_RiftHerald", "SRU_Red", "SRU_Krug",
-                    "SRU_Dragon",
-                    "SRU_Baron"
-                };
+                                    {
+                                        "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_RiftHerald",
+                                        "SRU_Red", "SRU_Krug", "SRU_Dragon", "SRU_Baron"
+                                    };
             }
             var minions = MinionManager.GetMinions(_player.Position, 1000, MinionTypes.All, MinionTeam.Neutral);
             if (minions.Count() > 0)
@@ -1039,26 +1016,25 @@ namespace D_Zyra
 
                 foreach (Obj_AI_Base minion in minions)
                 {
-                    if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline &&
-                        minion.Health <= smiteDmg &&
-                        jungleMinions.Any(name => minion.Name.Substring(0, minion.Name.Length - 5).Equals(name)))
+                    if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline && minion.Health <= smiteDmg
+                        && jungleMinions.Any(name => minion.Name.Substring(0, minion.Name.Length - 5).Equals(name)))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
-                    if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name)) &&
-                        !jungleMinions.Any(name => minion.Name.Contains("Mini")))
+                    if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name))
+                        && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
-                    else if (jungle && useblue && mana && minion.Health >= smiteDmg &&
-                             jungleMinions.Any(name => minion.Name.StartsWith("SRU_Blue")) &&
-                             !jungleMinions.Any(name => minion.Name.Contains("Mini")))
+                    else if (jungle && useblue && mana && minion.Health >= smiteDmg
+                             && jungleMinions.Any(name => minion.Name.StartsWith("SRU_Blue"))
+                             && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
-                    else if (jungle && usered && health && minion.Health >= smiteDmg &&
-                             jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red")) &&
-                             !jungleMinions.Any(name => minion.Name.Contains("Mini")))
+                    else if (jungle && usered && health && minion.Health >= smiteDmg
+                             && jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red"))
+                             && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
@@ -1068,19 +1044,16 @@ namespace D_Zyra
 
         private static void Usecleanse()
         {
-            if (_player.IsDead ||
-                (_config.Item("Cleansemode").GetValue<StringList>().SelectedIndex == 1 &&
-                 !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)) return;
+            if (_player.IsDead
+                || (_config.Item("Cleansemode").GetValue<StringList>().SelectedIndex == 1
+                    && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)) return;
             if (Cleanse(_player) && _config.Item("useqss").GetValue<bool>())
             {
                 if (_player.HasBuff("zedulttargetmark"))
                 {
-                    if (Items.HasItem(3140) && Items.CanUseItem(3140))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3140));
-                    else if (Items.HasItem(3139) && Items.CanUseItem(3139))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3139));
-                    else if (Items.HasItem(3137) && Items.CanUseItem(3137))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3137));
+                    if (Items.HasItem(3140) && Items.CanUseItem(3140)) Utility.DelayAction.Add(500, () => Items.UseItem(3140));
+                    else if (Items.HasItem(3139) && Items.CanUseItem(3139)) Utility.DelayAction.Add(500, () => Items.UseItem(3139));
+                    else if (Items.HasItem(3137) && Items.CanUseItem(3137)) Utility.DelayAction.Add(500, () => Items.UseItem(3137));
                 }
                 else
                 {
@@ -1092,17 +1065,15 @@ namespace D_Zyra
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => (hero.IsAlly || hero.IsMe)))
             {
                 var usemikael = _config.Item("usemikael").GetValue<bool>();
-                var mikaeluse = hero.Health <=
-                                (hero.MaxHealth*(_config.Item("mikaelusehp").GetValue<Slider>().Value)/100);
-                if (((Cleanse(hero) && usemikael) || mikaeluse) && _config.Item("mikaeluse" + hero.ChampionName) != null &&
-                    _config.Item("mikaeluse" + hero.ChampionName).GetValue<bool>() == true)
+                var mikaeluse = hero.Health
+                                <= (hero.MaxHealth * _config.Item("mikaelusehp").GetValue<Slider>().Value) / 100;
+                if (((Cleanse(hero) && usemikael) || mikaeluse) && _config.Item("mikaeluse" + hero.ChampionName) != null
+                    && _config.Item("mikaeluse" + hero.ChampionName).GetValue<bool>() == true)
                 {
                     if (_mikael.IsReady() && hero.Distance(_player.ServerPosition) <= _mikael.Range)
                     {
-                        if (_player.HasBuff("zedulttargetmark"))
-                            Utility.DelayAction.Add(500, () => _mikael.Cast(hero));
-                        else
-                            _mikael.Cast(hero);
+                        if (_player.HasBuff("zedulttargetmark")) Utility.DelayAction.Add(500, () => _mikael.Cast(hero));
+                        else _mikael.Cast(hero);
                     }
                 }
             }
@@ -1193,64 +1164,86 @@ namespace D_Zyra
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
+            var harass = _config.Item("harasstoggle").GetValue<KeyBind>().Active;
             if (_config.Item("Drawharass").GetValue<bool>())
             {
                 if (harass)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.92f,
+                        System.Drawing.Color.GreenYellow,
                         "Auto harass Enabled");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.92f,
+                        System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
             if (_config.Item("Drawsmite").GetValue<bool>() && _smite != null)
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.GreenYellow,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
 
-                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" ||
-                    _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker"
+                    || _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }
             if (_config.Item("damagetest").GetValue<bool>())
             {
-                foreach (
-                    var enemyVisible in
-                        ObjectManager.Get<Obj_AI_Hero>().Where(enemyVisible => enemyVisible.IsValidTarget()))
+                foreach (var enemyVisible in
+                    ObjectManager.Get<Obj_AI_Hero>().Where(enemyVisible => enemyVisible.IsValidTarget()))
                 {
                     if (ComboDamage(enemyVisible) > enemyVisible.Health)
                     {
-                        Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Red,
+                        Drawing.DrawText(
+                            Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
+                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40,
+                            Color.Red,
                             "Combo=Rekt");
                     }
-                    else if (ComboDamage(enemyVisible) + _player.GetAutoAttackDamage(enemyVisible, true)*2 >
-                             enemyVisible.Health)
+                    else if (ComboDamage(enemyVisible) + _player.GetAutoAttackDamage(enemyVisible, true) * 2 > enemyVisible.Health)
                     {
-                        Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Orange,
+                        Drawing.DrawText(
+                            Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
+                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40,
+                            Color.Orange,
                             "Combo+AA=Rekt");
                     }
                     else
-                        Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Green,
+                        Drawing.DrawText(
+                            Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
+                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40,
+                            Color.Green,
                             "Unkillable");
                 }
             }
