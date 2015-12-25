@@ -101,6 +101,10 @@ namespace D_Zyra
                 .AddItem(
                     new MenuItem("MinTargets", "AutoR if Min Targets >=").SetValue(new Slider(2, 1, 5)));
             _config.SubMenu("Combo")
+                 .AddItem(
+                     new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(new KeyBind("T".ToCharArray()[0],
+                         KeyBindType.Press)));
+            _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
             _config.AddSubMenu(new Menu("items", "items"));
@@ -375,6 +379,12 @@ namespace D_Zyra
             {
                 CastPassive();
                 return;
+            }
+            if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
+            {
+                var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget(_r.Range))
+                    _r.Cast(t.Position);
             }
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
