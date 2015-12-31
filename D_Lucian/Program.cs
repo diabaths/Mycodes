@@ -348,10 +348,9 @@ namespace D_Lucian
                 args.Process = false;
 
         }
+        
         private static bool HavePassivee => Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff");
-
-
-
+        
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender.IsMe)
