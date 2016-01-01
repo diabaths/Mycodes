@@ -358,8 +358,10 @@ namespace D_Rengar
 
         private static void OnBeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-            var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
-            var Q = _config.Item("UseQC").GetValue<bool>();
+            var combo = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
+            var harass = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed;
+            var QC = _config.Item("UseQC").GetValue<bool>();
+            var QH = _config.Item("UseQH").GetValue<bool>();
             var mode = _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0
                        || _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2;
             if (!(args.Target is Obj_AI_Hero))
@@ -372,16 +374,35 @@ namespace D_Rengar
                 return;
             }
 
-            if (combo && Q && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target)
-                && args.Target.IsValidTarget(_q.Range))
+            if (_player.Mana <= 4)
             {
-                _q.Cast();
+                if (combo && QC && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target)
+                    && args.Target.IsValidTarget(_q.Range))
+                {
+                    _q.Cast();
+                }
+
+                if (harass && QH && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target)
+                    && args.Target.IsValidTarget(_q.Range))
+                {
+                    _q.Cast();
+                }
             }
 
-            if (combo && Q && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target) && mode
-                && args.Target.IsValidTarget(_q.Range) && _player.Mana == 5)
+            if (_player.Mana == 5)
             {
-                _q.Cast();
+                if (combo && QC && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target) && mode
+                    && args.Target.IsValidTarget(_q.Range))
+                {
+                    _q.Cast();
+                }
+
+
+                if (harass && QH && _q.IsReady() && Orbwalking.InAutoAttackRange(args.Target) && mode
+                    && args.Target.IsValidTarget(_q.Range))
+                {
+                    _q.Cast();
+                }
             }
         }
 
