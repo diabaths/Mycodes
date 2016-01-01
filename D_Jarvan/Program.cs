@@ -32,8 +32,6 @@ namespace D_Jarvan
 
         private static SpellSlot _flashSlot;
 
-        private static Vector3 _epos = default(Vector3);
-
         private static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
@@ -388,17 +386,12 @@ namespace D_Jarvan
             var manacheck = _player.Mana
                             > _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost
                             + _player.Spellbook.GetSpell(SpellSlot.E).ManaCost;
-            if (unit.IsValidTarget(_q.Range) && _config.Item("UseEQInt").GetValue<bool>() && manacheck)
+            if (unit.IsValidTarget(_e.Range) && _config.Item("UseEQInt").GetValue<bool>() && manacheck)
             {
-                if (_e.IsReady() && _q.IsReady())
-                {
-                    _e.Cast(unit);
-                }
-
-                if (_q.IsReady() && _epos != default(Vector3) && unit.IsValidTarget(200, true, _epos))
-                {
-                    _q.Cast(_epos);
-                }
+                var vector = unit.ServerPosition - ObjectManager.Player.Position;
+                var Behind = _e.GetPrediction(unit).CastPosition + Vector3.Normalize(vector) * 100;
+                _e.Cast(Behind);
+                _q.Cast(Behind);
             }
         }
 
@@ -452,6 +445,8 @@ namespace D_Jarvan
             var useE = _config.Item("UseEC").GetValue<bool>();
             var useR = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
+            var cooldown = _player.GetSpell(SpellSlot.E).CooldownExpires;
+            var CD = (int)(cooldown -(Game.Time - 1));
             var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
             Smiteontarget();
             if (t.IsValidTarget(600) && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown
@@ -470,15 +465,10 @@ namespace D_Jarvan
 
             if (useE && _e.IsReady() && t.IsValidTarget(_e.Range) && _q.IsReady())
             {
-                var predE = _e.GetPrediction(t);
-                if (predE.Hitchance >= _e.MinHitChance
-                    && _e.Cast(
-                        predE.UnitPosition.Extend(_player.ServerPosition, -_e.Width / (t.IsFacing(_player) ? 2 : 1))))
-                    if (useQ && t.IsValidTarget(_e.Range) && _q.IsReady() && _epos != default(Vector3)
-                        && t.IsValidTarget(200, true, _epos))
-                    {
-                        _q.Cast(predE.UnitPosition);
-                    }
+                var vector = t.ServerPosition - ObjectManager.Player.Position;
+                var Behind = _e.GetPrediction(t).CastPosition + Vector3.Normalize(vector) * 100;
+                _e.Cast(Behind);
+                _q.Cast(Behind);
             }
 
             if (useW && _w.IsReady())
@@ -486,7 +476,7 @@ namespace D_Jarvan
                 if (t.IsValidTarget(_w.Range)) Utility.DelayAction.Add(1000, () => _w.Cast());
             }
 
-            if (useQ && _q.IsReady() && !_e.IsReady())
+            if (useQ && _q.IsReady() && !_e.IsReady() && CD>=3)
             {
                 if (t.IsValidTarget(_q.Range) && _r.GetPrediction(t).Hitchance >= HitChance.High) _q.Cast(t);
             }
@@ -526,14 +516,17 @@ namespace D_Jarvan
             Smiteontarget();
             if (_e.IsReady() && _q.IsReady() && manacheck && t.IsValidTarget(_q.Range))
             {
-                _e.Cast(t.ServerPosition);
-                _q.Cast(t.ServerPosition);
+                if (t != null)
+                {
+                    _e.Cast(t.ServerPosition);
+                    _q.Cast(t.ServerPosition);
+                }
             }
 
             if (t.IsValidTarget(600) && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown
                 && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
-                if (ComboDamage(t) > t.Health)
+                if (t != null && ComboDamage(t) > t.Health)
                 {
                     _player.Spellbook.CastSpell(_igniteSlot, t);
                 }
@@ -566,11 +559,12 @@ namespace D_Jarvan
             var useEqhp = (100 * (_player.Health / _player.MaxHealth))
                           > _config.Item("UseEQHHP").GetValue<Slider>().Value;
             var useItemsH = _config.Item("UseItemsharass").GetValue<bool>();
-            if (useEqhp && useEq && _q.IsReady() && _e.IsReady())
+            if (useEqhp && useEq && _q.IsReady() && _e.IsReady() && target.IsValidTarget(_e.Range))
             {
-                var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget(_q.Range)) _e.Cast(t);
-                _q.Cast(t);
+                var vector = target.ServerPosition - ObjectManager.Player.Position;
+                var Behind = _e.GetPrediction(target).CastPosition + Vector3.Normalize(vector) * 100;
+                _e.Cast(Behind);
+                _q.Cast(Behind);
             }
 
             if (useQ && _q.IsReady())
@@ -615,13 +609,15 @@ namespace D_Jarvan
             Smiteontarget();
             if (_flashSlot != SpellSlot.Unknown && _player.Spellbook.CanUseSpell(_flashSlot) == SpellState.Ready)
             {
-                if (_e.IsReady() && _q.IsReady() && manacheck && !t.IsValidTarget(_q.Range))
+                if (_e.IsReady() && _q.IsReady() && manacheck && !t.IsValidTarget(_e.Range))
                 {
-                    _e.Cast(Game.CursorPos);
-                }
-                if (_epos != default(Vector3) && _q.IsInRange(_epos))
-                {
-                    _q.Cast(_epos);
+                    if (t != null)
+                    {
+                        var vector = t.ServerPosition - ObjectManager.Player.Position;
+                        var Behind = _e.GetPrediction(t).CastPosition + Vector3.Normalize(vector) * 100;
+                        _e.Cast(Behind);
+                        _q.Cast(Behind);
+                    }
                 }
 
                 if (t.IsValidTarget(flashDista) && !_q.IsReady())
@@ -763,18 +759,19 @@ namespace D_Jarvan
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (useEq)
+                if (useEq && !mob.Name.Contains("Mini"))
                 {
                     if (_e.IsReady() && useE && _player.Distance(mob) < _q.Range)
                     {
                         _e.Cast(mob);
                     }
+
                     if (useQ && _q.IsReady() && _player.Distance(mob) < _q.Range)
                     {
                         _q.Cast(mob);
                     }
                 }
-                else
+                else if (!mob.Name.Contains("Mini"))
                 {
                     if (useQ && _q.IsReady() && _player.Distance(mob) < _q.Range)
                     {
@@ -1081,11 +1078,7 @@ namespace D_Jarvan
         {
             if (!(sender is Obj_GeneralParticleEmitter)) return;
             var obj = (Obj_GeneralParticleEmitter)sender;
-            if (sender.Name == "JarvanDemacianStandard_buf_green.troy")
-            {
-                _epos = sender.Position;
-            }
-
+           
             if (obj.IsMe && obj.Name == "JarvanCataclysm_tar")
             {
                 _haveulti = true;
@@ -1095,11 +1088,7 @@ namespace D_Jarvan
         private static void OnDeleteObj(GameObject sender, EventArgs args)
         {
             if (!(sender is Obj_GeneralParticleEmitter)) return;
-            if (sender.Name == "JarvanDemacianStandard_buf_green.troy")
-            {
-                _epos = default(Vector3);
-            }
-
+            
             var obj = (Obj_GeneralParticleEmitter)sender;
             if (obj.IsMe && obj.Name == "JarvanCataclysm_tar")
             {
