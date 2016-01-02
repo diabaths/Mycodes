@@ -18,7 +18,7 @@ namespace D_Jarvan
 
         private static SpellSlot _igniteSlot;
 
-        private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
+        private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis, _youmuu;
 
         private static Menu _config;
 
@@ -64,6 +64,7 @@ namespace D_Jarvan
                 _smiteSlot = SpellSlot.Summoner2;
             }
 
+            _youmuu = new Items.Item(3142, 10);
             _bilge = new Items.Item(3144, 450f);
             _blade = new Items.Item(3153, 450f);
             _hydra = new Items.Item(3074, 250f);
@@ -113,6 +114,7 @@ namespace D_Jarvan
             _config.SubMenu("items").AddSubMenu(new Menu("Offensive", "Offensive"));
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Tiamat", "Use Tiamat")).SetValue(true);
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hydra", "Use Hydra")).SetValue(true);
+            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Youmuu", "Use Youmuu's")).SetValue(true);
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilge", "Use Bilge")).SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Offensive")
@@ -888,6 +890,7 @@ namespace D_Jarvan
                 var iOmen = _config.Item("Omen").GetValue<bool>();
                 var iOmenenemys = hero.CountEnemiesInRange(450) >= _config.Item("Omenenemys").GetValue<Slider>().Value;
                 var iTiamat = _config.Item("Tiamat").GetValue<bool>();
+                var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
                 var iHydra = _config.Item("Hydra").GetValue<bool>();
                 var iRighteous = _config.Item("Righteous").GetValue<bool>();
                 var iRighteousenemys =
@@ -918,6 +921,11 @@ namespace D_Jarvan
                 if (iOmenenemys && iOmen && _rand.IsReady() && hero.IsValidTarget(450))
                 {
                     _rand.Cast();
+                }
+
+                if (hero.IsValidTarget(450) && iYoumuu && _youmuu.IsReady())
+                {
+                    _youmuu.Cast();
                 }
 
                 if (iRighteousenemys && iRighteous && Items.HasItem(3800) && Items.CanUseItem(3800)
