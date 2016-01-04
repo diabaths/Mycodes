@@ -558,7 +558,7 @@ namespace D_Lucian
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            if (useQ && !HavePassivee && !_player.IsDashing())
+            if (useQ && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget(_q1.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
@@ -566,7 +566,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee && !_player.IsDashing())
+            if (useW && _w.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -612,7 +612,7 @@ namespace D_Lucian
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
 
-            if (useQ && _q.IsReady() && !HavePassivee && !_player.IsDashing())
+            if (useQ && _q.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget(_q1.Range) && !t.HasBuffOfType(BuffType.Invulnerability))
@@ -620,7 +620,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee && !_player.IsDashing())
+            if (useW && _w.IsReady() && !HavePassivee)
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);

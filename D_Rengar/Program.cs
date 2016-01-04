@@ -91,7 +91,7 @@ namespace D_Rengar
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseEC", "Use E")).SetValue(true);
             _config.SubMenu("Combo")
-                .AddItem(new MenuItem("UseEEC", "Use Empower E when Q(range) < target(range) "))
+                .AddItem(new MenuItem("UseEEC", "Use Empower E when Q(range) < target(range)"))
                 .SetValue(true);
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
