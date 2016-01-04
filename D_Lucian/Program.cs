@@ -473,7 +473,7 @@ namespace D_Lucian
 
         private static bool Cleanse(Obj_AI_Hero hero)
         {
-            bool cc = false;
+            var cc = false;
             if (_config.Item("blind").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Blind))
@@ -558,15 +558,15 @@ namespace D_Lucian
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            if (useQ && !HavePassivee)
+            if (useQ && !HavePassivee && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q1.Range) && _q.IsReady())
+                if (t.IsValidTarget(_q1.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
                     ExtendedQ();
-                else if (t.IsValidTarget(_q.Range) && _q.IsReady())
+                else if (t.IsValidTarget(_q.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee)
+            if (useW && _w.IsReady() && !HavePassivee && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -612,15 +612,15 @@ namespace D_Lucian
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
 
-            if (useQ && _q.IsReady() && !HavePassivee)
+            if (useQ && _q.IsReady() && !HavePassivee && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q1.Range))
+                if (t.IsValidTarget(_q1.Range) && !t.HasBuffOfType(BuffType.Invulnerability))
                     ExtendedQ();
-                else if (t.IsValidTarget(_q.Range))
+                else if (t.IsValidTarget(_q.Range) && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee)
+            if (useW && _w.IsReady() && !HavePassivee && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
