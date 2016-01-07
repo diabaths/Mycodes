@@ -724,7 +724,6 @@ namespace D_Rengar
                 if (iTiamat && _tiamat.IsReady() && th.IsValidTarget(_tiamat.Range))
                 {
                     _tiamat.Cast();
-
                 }
 
                 if (iHydra && _hydra.IsReady() && th.IsValidTarget(_hydra.Range))

@@ -765,9 +765,7 @@ namespace D_Lucian
 
         private static void Usepotion()
         {
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
-                MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,MinionTypes.All,MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
                                (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
@@ -791,23 +789,28 @@ namespace D_Lucian
                     {
                         Items.UseItem(2010);
                     }
+
                     if (Items.HasItem(2003) && Items.CanUseItem(2003))
                     {
                         Items.UseItem(2003);
                     }
+
                     if (Items.HasItem(2031) && Items.CanUseItem(2031))
                     {
                         Items.UseItem(2031);
                     }
+
                     if (Items.HasItem(2032) && Items.CanUseItem(2032))
                     {
                         Items.UseItem(2032);
                     }
+
                     if (Items.HasItem(2033) && Items.CanUseItem(2033))
                     {
                         Items.UseItem(2033);
                     }
                 }
+
                 if (iusepotionmp && iusemppotion &&
                     !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask") ||
                       ObjectManager.Player.HasBuff("ItemMiniRegenPotion") ||
@@ -818,14 +821,17 @@ namespace D_Lucian
                     {
                         Items.UseItem(2041);
                     }
+
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
+
                     if (Items.HasItem(2032) && Items.CanUseItem(2032))
                     {
                         Items.UseItem(2032);
                     }
+
                     if (Items.HasItem(2033) && Items.CanUseItem(2033))
                     {
                         Items.UseItem(2033);
@@ -880,14 +886,17 @@ namespace D_Lucian
                     Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
+
             if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, _q.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
             }
+
             if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
             }
+
             if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);

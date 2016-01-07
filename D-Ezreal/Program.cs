@@ -484,9 +484,9 @@ namespace D_Ezreal
                                 minion =>
                                     target.NetworkId != minion.NetworkId && minion.IsEnemy &&
                                     HealthPrediction.GetHealthPrediction(minion,
-                                        (int) ((_player.AttackDelay*1000)*2.65f + Game.Ping/2), 0) <= 0 &&
+                                        (int) ((_player.AttackDelay*600)*2.65f + Game.Ping/1.5), 0) <= 0 &&
                                     _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
-                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High)
+                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
                         _q.Cast(minionDie, true);
             }
         }
@@ -858,24 +858,33 @@ namespace D_Ezreal
             var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
             if (lastHit && _player.ManaPercent > _config.Item("lastmana").GetValue<Slider>().Value)
             {
-                var minion =
-                    MinionManager.GetMinions(_q.Range, MinionTypes.All, MinionTeam.Enemy)
-                        .FirstOrDefault(
-                            min =>
-                                min.IsValidTarget(_q.Range) &&
-                                _player.GetSpellDamage(min, SpellSlot.Q) >= min.Health);
-                if (minion != null)
-                    _q.CastIfHitchanceEquals(minion, HitChance.High, true);
+                foreach (var minionDie in
+                   MinionManager.GetMinions(_q.Range)
+                       .Where(
+                           minion =>
+                           minion.IsEnemy
+                           && HealthPrediction.GetHealthPrediction(
+                               minion,
+                               (int)((_player.AttackDelay * 600) * 2.65f + Game.Ping/1.5),
+                               0) <= 0 && _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
+                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High
+                        && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
+                        _q.Cast(minionDie, true); 
             }
             if (laneClear && _player.ManaPercent > _config.Item("Lanemana").GetValue<Slider>().Value)
             {
-                var minion =
-                    MinionManager.GetMinions(_q.Range, MinionTypes.All, MinionTeam.Enemy,
-                        MinionOrderTypes.MaxHealth)
-                        .OrderBy(min => min.Distance(_player))
-                        .FirstOrDefault(min => min.IsValidTarget(_q.Range));
-                if (minion != null)
-                    _q.CastIfHitchanceEquals(minion, HitChance.High, true);
+                foreach (var minionDie in
+                    MinionManager.GetMinions(_q.Range)
+                        .Where(
+                            minion =>
+                            minion.IsEnemy
+                            && HealthPrediction.GetHealthPrediction(
+                                minion,
+                                (int)((_player.AttackDelay * 600) * 2.65f + Game.Ping /1.5),
+                                0) <= 0 && _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
+                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High
+                        && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
+                        _q.Cast(minionDie, true); 
             }
         }
 

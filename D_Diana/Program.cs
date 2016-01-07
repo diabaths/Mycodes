@@ -996,6 +996,7 @@ namespace D_Diana
                         if (!Orbwalking.InAutoAttackRange(minion)
                             && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _q.Cast(minion);
             }
+
             if (_w.IsReady() && useW && allMinionsW.Count > 2)
             {
                 _w.Cast();
