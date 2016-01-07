@@ -124,6 +124,7 @@ namespace D_Ezreal
             _config.AddSubMenu(new Menu("Farm", "Farm"));
             _config.SubMenu("Farm").AddSubMenu(new Menu("LaneClear", "LaneClear"));
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQL", "Q LaneClear")).SetValue(true);
+            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQLH", "Q To Harass")).SetValue(true);
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(new MenuItem("Lanemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
@@ -337,7 +338,7 @@ namespace D_Ezreal
                                 hero =>
                                     Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
                                     hero.IsValidTarget(30000) &&
-                                    _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health)
+                                    _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health && Player.Distance(hero)>1000)
                     )
                 {
 
@@ -482,9 +483,9 @@ namespace D_Ezreal
                         MinionManager.GetMinions(_q.Range)
                             .Where(
                                 minion =>
-                                    target.NetworkId != minion.NetworkId && minion.IsEnemy &&
+                                    target.NetworkId != minion.NetworkId && minion.IsEnemy /*&&
                                     HealthPrediction.GetHealthPrediction(minion,
-                                        (int) ((_player.AttackDelay*600)*2.65f + Game.Ping/1.5), 0) <= 0 &&
+                                        (int) ((_player.AttackDelay*600)*2.65f + Game.Ping/1.5), 0) <= 0*/ &&
                                     _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
                     if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
                         _q.Cast(minionDie, true);
@@ -575,7 +576,12 @@ namespace D_Ezreal
 
         private static void Laneclear()
         {
+            var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
             if (_config.Item("UseQL").GetValue<bool>()) Farm_skills(_q, true);
+            if (tq.IsValidTarget(_q.Range - 50) && _q.GetPrediction(tq).CollisionObjects.Count == 0 && _config.Item("UseQLH").GetValue<bool>())
+            {
+                _q.CastIfHitchanceEquals(tq, HitChance.High, true);
+            }
         }
 
         private static void LastHit()
@@ -863,10 +869,10 @@ namespace D_Ezreal
                        .Where(
                            minion =>
                            minion.IsEnemy
-                           && HealthPrediction.GetHealthPrediction(
+                           /*&& HealthPrediction.GetHealthPrediction(
                                minion,
                                (int)((_player.AttackDelay * 600) * 2.65f + Game.Ping/1.5),
-                               0) <= 0 && _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
+                               0) <= 0 */&& _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
                     if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High
                         && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
                         _q.Cast(minionDie, true); 
@@ -878,10 +884,10 @@ namespace D_Ezreal
                         .Where(
                             minion =>
                             minion.IsEnemy
-                            && HealthPrediction.GetHealthPrediction(
+                            /*&& HealthPrediction.GetHealthPrediction(
                                 minion,
                                 (int)((_player.AttackDelay * 600) * 2.65f + Game.Ping /1.5),
-                                0) <= 0 && _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
+                                0) <= 0 */&& _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
                     if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High
                         && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
                         _q.Cast(minionDie, true); 
@@ -915,7 +921,7 @@ namespace D_Ezreal
 
         private static bool Cleanse(Obj_AI_Hero hero)
         {
-            bool cc = false;
+            var cc = false;
             if (_config.Item("blind").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Blind))
