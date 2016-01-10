@@ -740,7 +740,7 @@ namespace D_Rengar
                 }
 
                 if (useEE && !_player.HasBuff("RengarR")
-                    && (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 1
+                    && (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2
                         || _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0))
                 {
                     var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
