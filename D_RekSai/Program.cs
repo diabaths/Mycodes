@@ -34,8 +34,6 @@ namespace D_RekSai
 
         //private static bool burrowed = false;
 
-       
-
         private static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
@@ -193,7 +191,7 @@ namespace D_RekSai
                 .SubMenu("Deffensive")
                 .SubMenu("Cleanse")
                 .AddItem(new MenuItem("Cleansemode", "Use Cleanse"))
-                .SetValue(new StringList(new string[2] {"Always", "In Combo"}));
+                .SetValue(new StringList(new string[2] { "Always", "In Combo" }));
             //_config.SubMenu("items").SubMenu("Deffensive").AddItem(new MenuItem("zhonyas", "Use Zhonyas")).SetValue(true); 
             _config.SubMenu("items")
                 .SubMenu("Deffensive")
@@ -227,12 +225,12 @@ namespace D_RekSai
 
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("ActiveHarass", "Harass key").SetValue(new KeyBind("C".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("ActiveHarass", "Harass key").SetValue(
+                        new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("harasstoggle", "Harass(toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
+                    new MenuItem("harasstoggle", "Harass(toggle)").SetValue(
+                        new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
 
 
             _config.AddSubMenu(new Menu("Farm", "Farm"));
@@ -244,7 +242,8 @@ namespace D_RekSai
             _config.SubMenu("Farm")
                 .SubMenu("Lane")
                 .AddItem(
-                    new MenuItem("ActiveLane", "Farm key").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
+                    new MenuItem("ActiveLane", "Farm key").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
 
             //jungle
@@ -259,16 +258,16 @@ namespace D_RekSai
             _config.SubMenu("Farm")
                 .SubMenu("Jungle")
                 .AddItem(
-                    new MenuItem("ActiveJungle", "Jungle key").SetValue(new KeyBind("V".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("ActiveJungle", "Jungle key").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
 
             //Smite 
             _config.AddSubMenu(new Menu("Smite", "Smite"));
             _config.SubMenu("Smite")
                 .AddItem(
-                    new MenuItem("Usesmite", "Use Smite(toggle)").SetValue(new KeyBind("H".ToCharArray()[0],
-                        KeyBindType.Toggle)));
+                    new MenuItem("Usesmite", "Use Smite(toggle)").SetValue(
+                        new KeyBind("H".ToCharArray()[0], KeyBindType.Toggle)));
             _config.SubMenu("Smite").AddItem(new MenuItem("Usered", "Smite Red Early ")).SetValue(true);
             _config.SubMenu("Smite")
                 .AddItem(new MenuItem("healthJ", "Smite Red Early if HP% <").SetValue(new Slider(35, 1, 100)));
@@ -300,8 +299,7 @@ namespace D_RekSai
             MenuItem dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Draw damage after combo").SetValue(true);
             Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
             Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
-            dmgAfterComboItem.ValueChanged +=
-                delegate(object sender, OnValueChangeEventArgs eventArgs)
+            dmgAfterComboItem.ValueChanged += delegate(object sender, OnValueChangeEventArgs eventArgs)
                 {
                     Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>();
                 };
@@ -313,24 +311,24 @@ namespace D_RekSai
                 .SubMenu("Combo")
                 .AddItem(
                     new MenuItem("BQchange", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
             _config.SubMenu("HitChance")
                 .SubMenu("Combo")
                 .AddItem(
                     new MenuItem("Echange", "burrowed E HitChance").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
             _config.SubMenu("HitChance").AddSubMenu(new Menu("Harass", "Harass"));
             _config.SubMenu("HitChance")
                 .SubMenu("Harass")
                 .AddItem(
                     new MenuItem("BQchangeharass", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
             _config.SubMenu("HitChance").AddSubMenu(new Menu("KillSteal", "KillSteal"));
             _config.SubMenu("HitChance")
                 .SubMenu("KillSteal")
                 .AddItem(
                     new MenuItem("Qchangekill", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -354,7 +352,6 @@ namespace D_RekSai
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             //Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -373,9 +370,9 @@ namespace D_RekSai
             {
                 Combo();
             }
-            if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
-                 _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
+            if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active
+                 || _config.Item("harasstoggle").GetValue<KeyBind>().Active)
+                && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Harass();
             }
@@ -393,14 +390,14 @@ namespace D_RekSai
                 KillSteal();
             }
             Usecleanse();
-            if (_config.Item("AutoW").GetValue<bool>() &&
-                (_config.Item("turnburrowed").GetValue<bool>() &&
-                 !_config.Item("ActiveCombo").GetValue<KeyBind>().Active ||
-                 !_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
-                 !_config.Item("harasstoggle").GetValue<KeyBind>().Active ||
-                 !_config.Item("ActiveLane").GetValue<KeyBind>().Active ||
-                 !_config.Item("ActiveJungle").GetValue<KeyBind>().Active ||
-                 !_config.Item("escapeterino").GetValue<KeyBind>().Active))
+            if (_config.Item("AutoW").GetValue<bool>()
+                && (_config.Item("turnburrowed").GetValue<bool>()
+                    && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active
+                    || !_config.Item("ActiveHarass").GetValue<KeyBind>().Active
+                    || !_config.Item("harasstoggle").GetValue<KeyBind>().Active
+                    || !_config.Item("ActiveLane").GetValue<KeyBind>().Active
+                    || !_config.Item("ActiveJungle").GetValue<KeyBind>().Active
+                    || !_config.Item("escapeterino").GetValue<KeyBind>().Active))
             {
                 AutoW();
             }
@@ -408,15 +405,15 @@ namespace D_RekSai
             {
                 Escapeterino();
             }
-            if ((!_config.Item("ActiveCombo").GetValue<KeyBind>().Active ||
-                 !_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
-                 !_config.Item("harasstoggle").GetValue<KeyBind>().Active ||
-                 !_config.Item("ActiveLane").GetValue<KeyBind>().Active ||
-                 !_config.Item("ActiveJungle").GetValue<KeyBind>().Active ||
-                 !_config.Item("escapeterino").GetValue<KeyBind>().Active) &&
-                _config.Item("turnburrowed").GetValue<bool>() && !_player.burrowed())
+            if ((!_config.Item("ActiveCombo").GetValue<KeyBind>().Active
+                 || !_config.Item("ActiveHarass").GetValue<KeyBind>().Active
+                 || !_config.Item("harasstoggle").GetValue<KeyBind>().Active
+                 || !_config.Item("ActiveLane").GetValue<KeyBind>().Active
+                 || !_config.Item("ActiveJungle").GetValue<KeyBind>().Active
+                 || !_config.Item("escapeterino").GetValue<KeyBind>().Active)
+                && _config.Item("turnburrowed").GetValue<bool>() && !_player.burrowed())
             {
-               autoburrowed();
+                autoburrowed();
             }
         }
 
@@ -436,11 +433,11 @@ namespace D_RekSai
 
             for (float d = 0; d < from.Distance(to); d = d + step)
             {
-                var testPoint = from + d*direction;
+                var testPoint = from + d * direction;
                 var flags = NavMesh.GetCollisionFlags(testPoint.X, testPoint.Y);
                 if (flags.HasFlag(CollisionFlags.Wall) || flags.HasFlag(CollisionFlags.Building))
                 {
-                    return from + (d - step)*direction;
+                    return from + (d - step) * direction;
                 }
             }
 
@@ -461,8 +458,7 @@ namespace D_RekSai
         {
             // Walljumper credits to Hellsing
 
-            if (!_player.burrowed() && _w.IsReady() && _be.IsReady())
-                _w.Cast();
+            if (!_player.burrowed() && _w.IsReady() && _be.IsReady()) _w.Cast();
 
             // We need to define a new move position since jumping over walls
             // requires you to be close to the specified wall. Therefore we set the move
@@ -471,15 +467,14 @@ namespace D_RekSai
             var wallCheck = GetFirstWallPoint(_player.Position, Game.CursorPos);
 
             // Be more precise
-            if (wallCheck != null)
-                wallCheck = GetFirstWallPoint((Vector3) wallCheck, Game.CursorPos, 5);
+            if (wallCheck != null) wallCheck = GetFirstWallPoint((Vector3)wallCheck, Game.CursorPos, 5);
 
             // Define more position point
-            var movePosition = wallCheck != null ? (Vector3) wallCheck : Game.CursorPos;
+            var movePosition = wallCheck != null ? (Vector3)wallCheck : Game.CursorPos;
 
             // Update fleeTargetPosition
             var tempGrid = NavMesh.WorldToGrid(movePosition.X, movePosition.Y);
-            var fleeTargetPosition = NavMesh.GridToWorld((short) tempGrid.X, (short) tempGrid.Y);
+            var fleeTargetPosition = NavMesh.GridToWorld((short)tempGrid.X, (short)tempGrid.Y);
 
             // Also check if we want to AA aswell
             Obj_AI_Base target = null;
@@ -496,25 +491,23 @@ namespace D_RekSai
                 // Check 300 units to the cursor position in a 160 degree cone for a valid non-wall spot
                 Vector2 direction = (Game.CursorPos.To2D() - wallPosition.To2D()).Normalized();
                 float maxAngle = 80;
-                float step = maxAngle/20;
+                float step = maxAngle / 20;
                 float currentAngle = 0;
                 float currentStep = 0;
                 bool jumpTriggered = false;
                 while (true)
                 {
                     // Validate the counter, break if no valid spot was found in previous loops
-                    if (currentStep > maxAngle && currentAngle < 0)
-                        break;
+                    if (currentStep > maxAngle && currentAngle < 0) break;
 
                     // Check next angle
                     if ((currentAngle == 0 || currentAngle < 0) && currentStep != 0)
                     {
-                        currentAngle = (currentStep)*(float) Math.PI/180;
+                        currentAngle = (currentStep) * (float)Math.PI / 180;
                         currentStep += step;
                     }
 
-                    else if (currentAngle > 0)
-                        currentAngle = -currentAngle;
+                    else if (currentAngle > 0) currentAngle = -currentAngle;
 
                     Vector3 checkPoint;
 
@@ -522,11 +515,10 @@ namespace D_RekSai
                     if (currentStep == 0)
                     {
                         currentStep = step;
-                        checkPoint = wallPosition + (_be.Range)*direction.To3D();
+                        checkPoint = wallPosition + (_be.Range) * direction.To3D();
                     }
                     // Rotated check
-                    else
-                        checkPoint = wallPosition + (_be.Range)*direction.Rotated(currentAngle).To3D();
+                    else checkPoint = wallPosition + (_be.Range) * direction.Rotated(currentAngle).To3D();
 
                     // Check if the point is not a wall
                     if (!checkPoint.IsWall())
@@ -537,15 +529,15 @@ namespace D_RekSai
                         {
                             // There is a wall inbetween, get the closes point to the wall, as precise as possible
                             Vector3 wallPositionOpposite =
-                                (Vector3) GetFirstWallPoint((Vector3) wallCheck, wallPosition, 5);
+                                (Vector3)GetFirstWallPoint((Vector3)wallCheck, wallPosition, 5);
 
                             // Check if it's worth to jump considering the path length
-                            if (_player.GetPath(wallPositionOpposite).ToList().To2D().PathLength() -
-                                _player.Distance(wallPositionOpposite) > 200) //200
+                            if (_player.GetPath(wallPositionOpposite).ToList().To2D().PathLength()
+                                - _player.Distance(wallPositionOpposite) > 200) //200
                             {
                                 // Check the distance to the opposite side of the wall
-                                if (_player.Distance(wallPositionOpposite, true) <
-                                    Math.Pow((_be.Range + 200) - _player.BoundingRadius/2, 2))
+                                if (_player.Distance(wallPositionOpposite, true)
+                                    < Math.Pow((_be.Range + 200) - _player.BoundingRadius / 2, 2))
                                 {
                                     // Make the jump happen
                                     _be.Cast(wallPositionOpposite);
@@ -574,16 +566,14 @@ namespace D_RekSai
                 }
 
                 // Check if the loop triggered the jump, if not just orbwalk
-                if (!jumpTriggered)
-                    Orbwalking.Orbwalk(target, Game.CursorPos, 90f, 0f, false, false);
+                if (!jumpTriggered) Orbwalking.Orbwalk(target, Game.CursorPos, 90f, 0f, false, false);
             }
 
             // Either no wall or W on cooldown, just move towards to wall then
             else
             {
                 Orbwalking.Orbwalk(target, Game.CursorPos, 90f, 0f, false, false);
-                if (_player.burrowed() && _be.IsReady())
-                    _be.Cast(Game.CursorPos);
+                if (_player.burrowed() && _be.IsReady()) _be.Cast(Game.CursorPos);
             }
         }
 
@@ -595,11 +585,12 @@ namespace D_RekSai
             }
         }
 
-        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
+        private static void Interrupter2_OnInterruptableTarget(
+            Obj_AI_Hero unit,
+            Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (_player.burrowed() && _bw.IsReady() && unit.IsValidTarget(_q.Range) &&
-                _config.Item("Inter_W").GetValue<bool>())
-                _bw.Cast(unit);
+            if (_player.burrowed() && _bw.IsReady() && unit.IsValidTarget(_q.Range)
+                && _config.Item("Inter_W").GetValue<bool>()) _bw.Cast(unit);
         }
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -621,28 +612,22 @@ namespace D_RekSai
 
         private static void Usecleanse()
         {
-            if (_player.IsDead ||
-                (_config.Item("Cleansemode").GetValue<StringList>().SelectedIndex == 1 &&
-                 !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)) return;
+            if (_player.IsDead
+                || (_config.Item("Cleansemode").GetValue<StringList>().SelectedIndex == 1
+                    && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)) return;
             if (Cleanse(_player) && _config.Item("useqss").GetValue<bool>())
             {
                 if (_player.HasBuff("zedulttargetmark"))
                 {
-                    if (Items.HasItem(3140) && Items.CanUseItem(3140))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3140));
-                    else if (Items.HasItem(3139) && Items.CanUseItem(3139))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3139));
-                    else if (Items.HasItem(3137) && Items.CanUseItem(3137))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3137));
+                    if (Items.HasItem(3140) && Items.CanUseItem(3140)) Utility.DelayAction.Add(500, () => Items.UseItem(3140));
+                    else if (Items.HasItem(3139) && Items.CanUseItem(3139)) Utility.DelayAction.Add(500, () => Items.UseItem(3139));
+                    else if (Items.HasItem(3137) && Items.CanUseItem(3137)) Utility.DelayAction.Add(500, () => Items.UseItem(3137));
                 }
                 else
                 {
-                    if (Items.HasItem(3140) && Items.CanUseItem(3140))
-                        Utility.DelayAction.Add(100, () => Items.UseItem(3140));
-                    else if (Items.HasItem(3139) && Items.CanUseItem(3139))
-                        Utility.DelayAction.Add(100, () => Items.UseItem(3139));
-                    else if (Items.HasItem(3137) && Items.CanUseItem(3137))
-                        Utility.DelayAction.Add(100, () => Items.UseItem(3137));
+                    if (Items.HasItem(3140) && Items.CanUseItem(3140)) Utility.DelayAction.Add(100, () => Items.UseItem(3140));
+                    else if (Items.HasItem(3139) && Items.CanUseItem(3139)) Utility.DelayAction.Add(100, () => Items.UseItem(3139));
+                    else if (Items.HasItem(3137) && Items.CanUseItem(3137)) Utility.DelayAction.Add(100, () => Items.UseItem(3137));
                 }
             }
         }
@@ -737,9 +722,9 @@ namespace D_RekSai
             {
                 var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
                 var usesmite = _config.Item("smitecombo").GetValue<bool>();
-                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(570))
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite
+                    && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready
+                    && hero.IsValidTarget(570))
                 {
                     if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
                     {
@@ -750,9 +735,9 @@ namespace D_RekSai
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                     }
                 }
-                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                    hero.IsValidTarget(570))
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite
+                    && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready
+                    && hero.IsValidTarget(570))
                 {
                     ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
@@ -836,8 +821,8 @@ namespace D_RekSai
             var reksaifury = Equals(_player.Mana, _player.MaxMana);
 
             Smiteontarget();
-            if (_igniteSlot != SpellSlot.Unknown && ignitecombo && t.IsValidTarget(600) &&
-                _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+            if (_igniteSlot != SpellSlot.Unknown && ignitecombo && t.IsValidTarget(600)
+                && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
                 if (t.Health <= ComboDamage(t))
                 {
@@ -852,21 +837,18 @@ namespace D_RekSai
                     if (_be.IsReady() && te.IsValidTarget(_be.Range + _bw.Range) && _player.Distance(te) > _q.Range)
                     {
                         var predE = _be.GetPrediction(te, true);
-                        if (predE.Hitchance >= Echange())
-                            _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -50));
-                       }
+                        if (predE.Hitchance >= Echange()) _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -50));
+                    }
                 }
                 if (_config.Item("UseQCombo").GetValue<bool>())
                 {
                     var tbq = TargetSelector.GetTarget(_bq.Range, TargetSelector.DamageType.Magical);
-                    if (_bq.IsReady() && t.IsValidTarget(_bq.Range))
-                        _bq.CastIfHitchanceEquals(tbq, BQchange());
+                    if (_bq.IsReady() && t.IsValidTarget(_bq.Range)) _bq.CastIfHitchanceEquals(tbq, BQchange());
                 }
                 if (_config.Item("UseWCombo").GetValue<bool>())
                 {
                     var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
-                    if (_w.IsReady() && tw.IsValidTarget(_w.Range) &&
-                        !_bq.IsReady())
+                    if (_w.IsReady() && tw.IsValidTarget(_w.Range) && !_bq.IsReady())
                     {
                         _bw.Cast(t);
                     }
@@ -878,8 +860,7 @@ namespace D_RekSai
                 if (_config.Item("UseQCombo").GetValue<bool>())
                 {
                     var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                    if (_q.IsReady() && tq.IsValidTarget(_q.Range))
-                        _q.Cast(t);
+                    if (_q.IsReady() && tq.IsValidTarget(_q.Range)) _q.Cast(t);
                 }
                 if (_config.Item("UseECombo").GetValue<bool>())
                 {
@@ -907,9 +888,7 @@ namespace D_RekSai
                 if (_config.Item("UseWCombo").GetValue<bool>() && _w.IsReady())
                 {
                     var tw = TargetSelector.GetTarget(_bq.Range, TargetSelector.DamageType.Physical);
-                    if (!_q.IsReady()
-                        && !tw.IsValidTarget(_e.Range) && tw.IsValidTarget(_bq.Range))
-                        _w.Cast();
+                    if (!_q.IsReady() && !tw.IsValidTarget(_e.Range) && tw.IsValidTarget(_bq.Range)) _w.Cast();
                 }
             }
             UseItemes();
@@ -920,15 +899,15 @@ namespace D_RekSai
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
-                var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
-                var iBilgemyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
+                var iBilgeEnemyhp = hero.Health
+                                    <= (hero.MaxHealth * (_config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
+                var iBilgemyhp = _player.Health
+                                 <= (_player.MaxHealth * (_config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
                 var iBlade = _config.Item("Blade").GetValue<bool>();
-                var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
-                var iBlademyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Blademyhp").GetValue<Slider>().Value)/100);
+                var iBladeEnemyhp = hero.Health
+                                    <= (hero.MaxHealth * (_config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
+                var iBlademyhp = _player.Health
+                                 <= (_player.MaxHealth * (_config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
                 var iOmen = _config.Item("Omen").GetValue<bool>();
                 var iOmenenemys = hero.CountEnemiesInRange(450) >= _config.Item("Omenenemys").GetValue<Slider>().Value;
                 var iTiamat = _config.Item("Tiamat").GetValue<bool>();
@@ -962,32 +941,34 @@ namespace D_RekSai
             {
                 foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly || hero.IsMe))
                 {
-                    if (hero.Health <= (hero.MaxHealth*(_config.Item("lotisminhp").GetValue<Slider>().Value)/100) &&
-                        hero.Distance(_player.ServerPosition) <= _lotis.Range && _lotis.IsReady())
-                        _lotis.Cast();
+                    if (hero.Health <= (hero.MaxHealth * (_config.Item("lotisminhp").GetValue<Slider>().Value) / 100)
+                        && hero.Distance(_player.ServerPosition) <= _lotis.Range && _lotis.IsReady()) _lotis.Cast();
                 }
             }
         }
 
         private static void Usepotion()
         {
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
+            var mobs = MinionManager.GetMinions(
+                _player.ServerPosition,
+                _q.Range,
                 MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                MinionTeam.Neutral,
+                MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
-            var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
+            var iusepotionhp = _player.Health
+                               <= (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
-            if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite != null))
+            if (Utility.CountEnemiesInRange(800) > 0
+                || (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite != null))
             {
-                if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
+                if (iusepotionhp && iusehppotion
+                    && !(ObjectManager.Player.HasBuff("RegenerationPotion")
+                         || ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlask")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                         || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
@@ -1018,14 +999,10 @@ namespace D_RekSai
         {
             var dmg = 0d;
 
-            if (_q.IsReady() && !_player.burrowed())
+            if (_q.IsReady() && !_player.burrowed()) dmg += QDamage(hero);
 
-                dmg += QDamage(hero);
-
-            if (_player.burrowed())
-                dmg += BqDamage(hero);
-            if (_w.IsReady() && _player.burrowed())
-                dmg += WDamage(hero);
+            if (_player.burrowed()) dmg += BqDamage(hero);
+            if (_w.IsReady() && _player.burrowed()) dmg += WDamage(hero);
             if (_e.IsReady())
                 if (_player.Mana < 100)
                 {
@@ -1039,16 +1016,12 @@ namespace D_RekSai
             {
                 dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
             }
-            if (Items.HasItem(3077) && Items.CanUseItem(3077))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Tiamat);
-            if (Items.HasItem(3074) && Items.CanUseItem(3074))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hydra);
-            if (Items.HasItem(3153) && Items.CanUseItem(3153))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
-            if (Items.HasItem(3144) && Items.CanUseItem(3144))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Bilgewater);
-            dmg += _player.GetAutoAttackDamage(hero, true)*2;
-            return (float) dmg;
+            if (Items.HasItem(3077) && Items.CanUseItem(3077)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Tiamat);
+            if (Items.HasItem(3074) && Items.CanUseItem(3074)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hydra);
+            if (Items.HasItem(3153) && Items.CanUseItem(3153)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
+            if (Items.HasItem(3144) && Items.CanUseItem(3144)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Bilgewater);
+            dmg += _player.GetAutoAttackDamage(hero, true) * 2;
+            return (float)dmg;
         }
 
         private static void Harass()
@@ -1069,8 +1042,8 @@ namespace D_RekSai
                     _q.Cast();
                 }
             }
-            if (targete.IsValidTarget(_e.Range) && _config.Item("UseEHarass").GetValue<bool>() && _e.IsReady() &&
-                !_player.burrowed() && reksaifury)
+            if (targete.IsValidTarget(_e.Range) && _config.Item("UseEHarass").GetValue<bool>() && _e.IsReady()
+                && !_player.burrowed() && reksaifury)
             {
                 _e.Cast(targete);
             }
@@ -1088,44 +1061,53 @@ namespace D_RekSai
         {
 
             return _e.IsReady()
-                ? _player.CalcDamage(unit, Damage.DamageType.Physical,
-                    new double[] {0.8, 0.9, 1, 1.1, 1.2}[_e.Level - 1]*_player.TotalAttackDamage
-                    *(1 + (_player.Mana/_player.MaxMana)))
-                : 0d;
+                       ? _player.CalcDamage(
+                           unit,
+                           Damage.DamageType.Physical,
+                           new double[] { 0.8, 0.9, 1, 1.1, 1.2 }[_e.Level - 1] * _player.TotalAttackDamage
+                           * (1 + (_player.Mana / _player.MaxMana)))
+                       : 0d;
         }
 
         private static double EDamagetrue(Obj_AI_Base unit)
         {
 
             return _e.IsReady()
-                ? _player.CalcDamage(unit, Damage.DamageType.True,
-                    new double[] {1.6, 1.8, 2, 2.2, 2.4}[_e.Level - 1]*_player.TotalAttackDamage)
-                : 0d;
+                       ? _player.CalcDamage(
+                           unit,
+                           Damage.DamageType.True,
+                           new double[] { 1.6, 1.8, 2, 2.2, 2.4 }[_e.Level - 1] * _player.TotalAttackDamage)
+                       : 0d;
         }
 
         private static double QDamage(Obj_AI_Base unit)
         {
             return _q.IsReady()
-                ? _player.CalcDamage(unit, Damage.DamageType.Physical,
-                    new double[] {45, 75, 105, 135, 165}[_q.Level - 1] +
-                    _player.TotalAttackDamage*0.6)
-                : 0d;
+                       ? _player.CalcDamage(
+                           unit,
+                           Damage.DamageType.Physical,
+                           new double[] { 45, 75, 105, 135, 165 }[_q.Level - 1] + _player.TotalAttackDamage * 0.6)
+                       : 0d;
         }
 
         private static double BqDamage(Obj_AI_Base unit)
         {
             return _bq.IsReady()
-                ? _player.CalcDamage(unit, Damage.DamageType.Magical,
-                    new double[] {60, 90, 120, 150, 180}[_bq.Level - 1] + 0.7*_player.FlatMagicDamageMod)
-                : 0d;
+                       ? _player.CalcDamage(
+                           unit,
+                           Damage.DamageType.Magical,
+                           new double[] { 60, 90, 120, 150, 180 }[_bq.Level - 1] + 0.7 * _player.FlatMagicDamageMod)
+                       : 0d;
         }
 
         private static double WDamage(Obj_AI_Base unit)
         {
             return _bq.IsReady()
-                ? _player.CalcDamage(unit, Damage.DamageType.Physical,
-                    new double[] {40, 80, 120, 160, 200}[_bq.Level - 1] + 0.4*_player.TotalAttackDamage)
-                : 0d;
+                       ? _player.CalcDamage(
+                           unit,
+                           Damage.DamageType.Physical,
+                           new double[] { 40, 80, 120, 160, 200 }[_bq.Level - 1] + 0.4 * _player.TotalAttackDamage)
+                       : 0d;
 
         }
 
@@ -1144,10 +1126,7 @@ namespace D_RekSai
                 {
                     _q.Cast();
                 }
-                else
-                    foreach (var minion in allMinions)
-                        if (minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
-                            _q.Cast();
+                else foreach (var minion in allMinions) if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _q.Cast();
             }
             if (_bq.IsReady() && useQ && _player.burrowed())
             {
@@ -1157,17 +1136,11 @@ namespace D_RekSai
                 {
                     _bq.Cast(fl2.Position);
                 }
-                else
-                    foreach (var minion in allMinions)
-                        if (minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
-                            _bq.Cast(minion);
+                else foreach (var minion in allMinions) if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _bq.Cast(minion);
             }
             if (_e.IsReady() && useE && !_player.burrowed())
             {
-                foreach (var minione in allMinions)
-
-                    if (minione.Health < EDamage(minione))
-                        _e.Cast(minione);
+                foreach (var minione in allMinions) if (minione.Health < EDamage(minione)) _e.Cast(minione);
             }
 
             if (useW && !_player.burrowed() && !_q.IsReady() && !_e.IsReady())
@@ -1188,17 +1161,17 @@ namespace D_RekSai
         }
 
         public static readonly string[] Smitetype =
-         {
-            "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
-            "summonersmite"
-        };
+            {
+                "s5_summonersmiteplayerganker", "s5_summonersmiteduel",
+                "s5_summonersmitequick", "itemsmiteaoe", "summonersmite"
+            };
 
         private static int GetSmiteDmg()
         {
             int level = _player.Level;
-            int index = _player.Level/5;
-            float[] dmgs = {370 + 20*level, 330 + 30*level, 240 + 40*level, 100 + 50*level};
-            return (int) dmgs[index];
+            int index = _player.Level / 5;
+            float[] dmgs = { 370 + 20 * level, 330 + 30 * level, 240 + 40 * level, 100 + 50 * level };
+            return (int)dmgs[index];
         }
 
         //New map Monsters Name By SKO
@@ -1207,19 +1180,19 @@ namespace D_RekSai
             var jungle = _config.Item("ActiveJungle").GetValue<KeyBind>().Active;
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var usered = _config.Item("Usered").GetValue<bool>();
-            var health = (100*(_player.Health/_player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
+            var health = (100 * (_player.Health / _player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {
-                jungleMinions = new string[] {"TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf"};
+                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
             }
             else
             {
                 jungleMinions = new string[]
-                {
-                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak","SRU_RiftHerald", "SRU_Red", "SRU_Krug", "SRU_Dragon",
-                    "SRU_Baron"
-                };
+                                    {
+                                        "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_RiftHerald",
+                                        "SRU_Red", "SRU_Krug", "SRU_Dragon", "SRU_Baron"
+                                    };
             }
             var minions = MinionManager.GetMinions(_player.Position, 1000, MinionTypes.All, MinionTeam.Neutral);
             if (minions.Count() > 0)
@@ -1228,20 +1201,19 @@ namespace D_RekSai
 
                 foreach (Obj_AI_Base minion in minions)
                 {
-                    if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline &&
-                        minion.Health <= smiteDmg &&
-                        jungleMinions.Any(name => minion.Name.Substring(0, minion.Name.Length - 5).Equals(name)))
+                    if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline && minion.Health <= smiteDmg
+                        && jungleMinions.Any(name => minion.Name.Substring(0, minion.Name.Length - 5).Equals(name)))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
-                    if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name)) &&
-                        !jungleMinions.Any(name => minion.Name.Contains("Mini")))
+                    if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name))
+                        && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
-                    else if (jungle && usered && health && minion.Health >= smiteDmg &&
-                             jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red")) &&
-                             !jungleMinions.Any(name => minion.Name.Contains("Mini")))
+                    else if (jungle && usered && health && minion.Health >= smiteDmg
+                             && jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red"))
+                             && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
@@ -1254,19 +1226,22 @@ namespace D_RekSai
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {
-                jungleMinions = new string[] {"TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf"};
+                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
             }
             else
             {
                 jungleMinions = new string[]
-                {
-                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red", "SRU_Krug", "SRU_Dragon",
-                    "SRU_Baron"
-                };
+                                    {
+                                        "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red", "SRU_Krug",
+                                        "SRU_Dragon", "SRU_Baron"
+                                    };
             }
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _bq.Range,
+            var mobs = MinionManager.GetMinions(
+                _player.ServerPosition,
+                _bq.Range,
                 MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                MinionTeam.Neutral,
+                MinionOrderTypes.MaxHealth);
             var useItemsJ = _config.Item("UseItemsjungle").GetValue<bool>();
             var useQ = _config.Item("UseQJungle").GetValue<bool>();
             var useW = _config.Item("UseWJungle").GetValue<bool>();
@@ -1282,8 +1257,8 @@ namespace D_RekSai
                     {
                         _q.Cast();
                     }
-                    if (_e.IsReady() && useE && _player.Distance(mob) < _e.Range &&
-                        !jungleMinions.Any(name => mob.Name.Contains("Mini")))
+                    if (_e.IsReady() && useE && _player.Distance(mob) < _e.Range
+                        && !jungleMinions.Any(name => mob.Name.Contains("Mini")))
                     {
                         if (reksaifury)
                         {
@@ -1293,10 +1268,10 @@ namespace D_RekSai
                         {
                             _e.Cast(mob);
                         }
+                        // RekSaiKnockupImmune , reksaiknockupimmune
                     }
-                    if (useW && !(mob as Obj_AI_Base).HasBuff("reksaiknockupimmune") && _w.IsReady() && !_q.IsReady() &&
-                        !_e.IsReady() &&
-                        mob.IsValidTarget(_w.Range))
+                    if (useW && !mob.HasBuff("RekSaiKnockupImmune") && _w.IsReady() && !_q.IsReady() && !_e.IsReady()
+                        && mob.IsValidTarget(_w.Range))
                     {
                         _w.Cast();
                     }
@@ -1323,9 +1298,9 @@ namespace D_RekSai
             {
                 var igniteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
 
-                if (hero.IsValidTarget(600) && _config.Item("UseIgnite").GetValue<bool>() &&
-                    _igniteSlot != SpellSlot.Unknown &&
-                    _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+                if (hero.IsValidTarget(600) && _config.Item("UseIgnite").GetValue<bool>()
+                    && _igniteSlot != SpellSlot.Unknown
+                    && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
                 {
                     if (igniteDmg > hero.Health)
                     {
@@ -1336,23 +1311,21 @@ namespace D_RekSai
                 {
                     if (_bq.IsReady() && hero.IsValidTarget(_bq.Range) && _player.burrowed())
                     {
-                        if (hero.Health <= BqDamage(hero))
-                            _bq.CastIfHitchanceEquals(hero, Qchangekill());
+                        if (hero.Health <= BqDamage(hero)) _bq.CastIfHitchanceEquals(hero, Qchangekill());
                     }
-                    if (_bq.IsReady() && _w.IsReady() && !hero.IsValidTarget(_q.Range) && hero.IsValidTarget(_bq.Range) &&
-                        hero.Health <= BqDamage(hero))
+                    if (_bq.IsReady() && _w.IsReady() && !hero.IsValidTarget(_q.Range) && hero.IsValidTarget(_bq.Range)
+                        && hero.Health <= BqDamage(hero))
                     {
                         _w.Cast();
                         _bq.CastIfHitchanceEquals(hero, Qchangekill());
                     }
                     if (_q.IsReady() && hero.IsValidTarget(_q.Range) && !_player.burrowed())
                     {
-                        if (hero.Health <= QDamage(hero))
-                            _q.Cast();
+                        if (hero.Health <= QDamage(hero)) _q.Cast();
                     }
                 }
-                if (_e.IsReady() && hero.IsValidTarget(_e.Range) && _config.Item("UseEKs").GetValue<bool>() &&
-                    !_player.burrowed())
+                if (_e.IsReady() && hero.IsValidTarget(_e.Range) && _config.Item("UseEKs").GetValue<bool>()
+                    && !_player.burrowed())
                 {
                     if (_player.Mana <= 100 && hero.Health <= EDamage(hero))
                     {
@@ -1368,8 +1341,8 @@ namespace D_RekSai
 
         private static void AutoW()
         {
-            var reksaiHp = (_player.MaxHealth*(_config.Item("AutoWHP").GetValue<Slider>().Value)/100);
-            var reksaiMp = (_player.MaxMana*(_config.Item("AutoWMP").GetValue<Slider>().Value)/100);
+            var reksaiHp = (_player.MaxHealth * (_config.Item("AutoWHP").GetValue<Slider>().Value) / 100);
+            var reksaiMp = (_player.MaxMana * (_config.Item("AutoWMP").GetValue<Slider>().Value) / 100);
             if (_player.HasBuff("Recall") || _player.InFountain()) return;
             if (_w.IsReady() && _player.Health <= reksaiHp && !_player.burrowed() && _player.Mana >= reksaiMp)
             {
@@ -1387,11 +1360,17 @@ namespace D_RekSai
             {
                 if (harass)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.92f,
+                        System.Drawing.Color.GreenYellow,
                         "Auto harass Enabled");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.92f,
+                        System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
 
@@ -1400,33 +1379,47 @@ namespace D_RekSai
 
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.GreenYellow,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
 
-                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" ||
-                    _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker"
+                    || _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }
-            if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed()&& _q.Level>0)
+            if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed() && _q.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _bq.Range, Color.GreenYellow);
             }
             if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _player.burrowed() ? _be.Range : _e.Range,
+                Render.Circle.DrawCircle(
+                    ObjectManager.Player.Position,
+                    _player.burrowed() ? _be.Range : _e.Range,
                     System.Drawing.Color.GreenYellow);
             }
         }
