@@ -28,7 +28,7 @@ namespace D_RekSai
 
         private static SpellSlot _igniteSlot;
 
-        private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis;
+        private static Items.Item _tiamat, _hydra, _blade, _bilge, _rand, _lotis, _titanhydra;
 
         private static SpellSlot _smiteSlot;
 
@@ -67,6 +67,7 @@ namespace D_RekSai
             _blade = new Items.Item(3153, 425f);
             _hydra = new Items.Item(3074, 250f);
             _tiamat = new Items.Item(3077, 250f);
+            _titanhydra = new Items.Item(3077, 250f);
             _rand = new Items.Item(3143, 490f);
             _lotis = new Items.Item(3190, 590f);
 
@@ -112,7 +113,7 @@ namespace D_RekSai
             _config.AddSubMenu(new Menu("items", "items"));
             _config.SubMenu("items").AddSubMenu(new Menu("Offensive", "Offensive"));
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Tiamat", "Use Tiamat")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hydra", "Use Hydra")).SetValue(true);
+            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hydra", "Use Hydra / titanic")).SetValue(true);
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilge", "Use Bilge")).SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Offensive")
@@ -860,9 +861,17 @@ namespace D_RekSai
                     _tiamat.Cast();
                 }
 
-                if (iHydra && _hydra.IsReady() && hero.IsValidTarget(_hydra.Range))
+                if (iHydra)
                 {
-                    _hydra.Cast();
+                    if (_hydra.IsReady() && hero.IsValidTarget(_hydra.Range))
+                    {
+                        _hydra.Cast();
+                    }
+
+                    if (_titanhydra.IsReady() && hero.IsValidTarget(Orbwalking.GetRealAutoAttackRange(_player)))
+                    {
+                        _titanhydra.Cast();
+                    }
                 }
 
                 if (iOmenenemys && iOmen && _rand.IsReady() && hero.IsValidTarget(450))
@@ -1084,7 +1093,7 @@ namespace D_RekSai
             }
             else
                 foreach (var minion in allMinions)
-                    if (useW && !IsBurrowed() && !_q.IsReady() && !_e.IsReady() && !minion.HasBuff("RekSaiKnockupImmune") && !Qactive(_player))
+                    if (useW && !IsBurrowed() && !_q.IsReady() && !_e.IsReady() && Orbwalking.InAutoAttackRange(minion) && !minion.HasBuff("RekSaiKnockupImmune") && !Qactive(_player))
             {
                 _w.Cast();
             }
@@ -1167,77 +1176,60 @@ namespace D_RekSai
 
         private static void JungleClear()
         {
-            string[] jungleMinions;
-            if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
-            {
-                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
-            }
-            else
-            {
-                jungleMinions = new string[]
-                                    {
-                                        "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red", "SRU_Krug",
-                                        "SRU_Dragon", "SRU_Baron"
-                                    };
-            }
-
-            var mobs = MinionManager.GetMinions(
-                _player.ServerPosition,
-                _bq.Range,
-                MinionTypes.All,
-                MinionTeam.Neutral,
-                MinionOrderTypes.MaxHealth);
+            var mob =
+                MinionManager.GetMinions(
+                    _player.ServerPosition,
+                    _e.Range,
+                    MinionTypes.All,
+                    MinionTeam.Neutral,
+                    MinionOrderTypes.MaxHealth).FirstOrDefault();
             var useItemsJ = _config.Item("UseItemsjungle").GetValue<bool>();
             var useQ = _config.Item("UseQJungle").GetValue<bool>();
             var useW = _config.Item("UseWJungle").GetValue<bool>();
             var useE = _config.Item("UseEJungle").GetValue<bool>();
             var reksaifury = Equals(_player.Mana, _player.MaxMana);
 
-            if (mobs.Count > 0)
+            if (mob == null) return;
+            if (!IsBurrowed())
             {
-                var mob = mobs[0];
-                if (!IsBurrowed())
+                if (useQ && _q.IsReady() && Orbwalking.InAutoAttackRange(mob))
                 {
-                    if (useQ && _q.IsReady() && Orbwalking.InAutoAttackRange(mob))
+                    _q.Cast();
+                }
+
+                if (_e.IsReady() && useE && _player.Distance(mob) < _e.Range && !mob.Name.Contains("Mini"))
+                {
+                    if (reksaifury)
                     {
-                        _q.Cast();
+                        _e.Cast(mob);
                     }
-
-                    if (_e.IsReady() && useE && _player.Distance(mob) < _e.Range
-                        && !jungleMinions.Any(name => mob.Name.Contains("Mini")))
+                    else if (mob.Health <= EDamage(mob))
                     {
-                        if (reksaifury)
-                        {
-                            _e.Cast(mob);
-                        }
-                        else if (mob.Health <= EDamage(mob))
-                        {
-                            _e.Cast(mob);
-                        }
-                        // RekSaiKnockupImmune , reksaiknockupimmune
+                        _e.Cast(mob);
                     }
-
-                    if (useW && !mob.HasBuff("RekSaiKnockupImmune") && _w.IsReady() && !_q.IsReady() && !_e.IsReady()
-                        && mob.IsValidTarget(_w.Range) && !Qactive(_player))
-                    {
-                        _w.Cast();
-                    }
+                    // RekSaiKnockupImmune , reksaiknockupimmune
                 }
 
-                if (IsBurrowed() && _bq.IsReady() && useQ && _player.Distance(mob) < _bq.Range)
+                if (useW && !mob.HasBuff("RekSaiKnockupImmune") && _w.IsReady() && !_q.IsReady() && !_e.IsReady()
+                    && mob.IsValidTarget(_w.Range) && !Qactive(_player))
                 {
-                    _bq.Cast(mob);
+                    _w.Cast();
                 }
+            }
 
-                if (useItemsJ && _tiamat.IsReady() && mob.IsValidTarget(_tiamat.Range))
-                {
-                    _tiamat.Cast();
-                }
+            if (IsBurrowed() && _bq.IsReady() && useQ && _player.Distance(mob) < _bq.Range)
+            {
+                _bq.Cast(mob);
+            }
 
-                if (useItemsJ && _hydra.IsReady() && mob.IsValidTarget(_tiamat.Range))
-                {
-                    _hydra.Cast();
-                }
+            if (useItemsJ && _tiamat.IsReady() && mob.IsValidTarget(_tiamat.Range))
+            {
+                _tiamat.Cast();
+            }
+
+            if (useItemsJ && _hydra.IsReady() && mob.IsValidTarget(_tiamat.Range))
+            {
+                _hydra.Cast();
             }
         }
 

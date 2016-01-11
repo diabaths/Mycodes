@@ -2,8 +2,6 @@
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using ItemData = LeagueSharp.Common.Data.ItemData;
-
 
 namespace D_Corki
 {
