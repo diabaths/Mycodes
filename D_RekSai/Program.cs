@@ -12,6 +12,8 @@ namespace D_RekSai
     {
         private const string ChampionName = "RekSai";
 
+        private const string Activeq = "RekSaiQ";
+
         private static Orbwalking.Orbwalker _orbwalker;
 
         private static Spell _q, _bq, _w, _bw, _e, _be, _r;
@@ -31,9 +33,7 @@ namespace D_RekSai
         private static SpellSlot _smiteSlot;
 
         private static Spell _smite;
-
-        //private static bool burrowed = false;
-
+        
         private static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
@@ -99,9 +99,11 @@ namespace D_RekSai
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseIgnitecombo", "Use Ignite(rush for it)")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("smitecombo", "Use Smite in target")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q Unburrowed")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseQBCombo", "Use Q burrowed")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W")).SetValue(true);
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E Unburrowed")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseEBCombo", "Use E burrowed")).SetValue(true);
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -304,32 +306,6 @@ namespace D_RekSai
                     Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>();
                 };
 
-            //HitChance
-            _config.AddSubMenu(new Menu("HitChance", "HitChance"));
-            _config.SubMenu("HitChance").AddSubMenu(new Menu("Combo", "Combo"));
-            _config.SubMenu("HitChance")
-                .SubMenu("Combo")
-                .AddItem(
-                    new MenuItem("BQchange", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
-            _config.SubMenu("HitChance")
-                .SubMenu("Combo")
-                .AddItem(
-                    new MenuItem("Echange", "burrowed E HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
-            _config.SubMenu("HitChance").AddSubMenu(new Menu("Harass", "Harass"));
-            _config.SubMenu("HitChance")
-                .SubMenu("Harass")
-                .AddItem(
-                    new MenuItem("BQchangeharass", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
-            _config.SubMenu("HitChance").AddSubMenu(new Menu("KillSteal", "KillSteal"));
-            _config.SubMenu("HitChance")
-                .SubMenu("KillSteal")
-                .AddItem(
-                    new MenuItem("Qchangekill", "burrowed Q HitChance").SetValue(
-                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
-
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawQ", "Draw Q")).SetValue(false);
@@ -341,18 +317,11 @@ namespace D_RekSai
 
             _config.AddToMainMenu();
 
-            //new AssassinManager();
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Game.PrintChat("<font color='#87f21d'>RekSai By Diabaths</font> Loaded!");
-            Game.PrintChat(
-                "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
-
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
-            //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            //Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-        }
+          }
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
@@ -366,29 +335,35 @@ namespace D_RekSai
             {
                 Smiteuse();
             }
+
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
             }
+
             if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active
                  || _config.Item("harasstoggle").GetValue<KeyBind>().Active)
                 && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Harass();
             }
+
             if (_config.Item("ActiveLane").GetValue<KeyBind>().Active)
             {
                 Farm();
             }
+
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active)
             {
                 JungleClear();
             }
+
             Usepotion();
             if (_config.Item("ActiveKs").GetValue<bool>())
             {
                 KillSteal();
             }
+
             Usecleanse();
             if (_config.Item("AutoW").GetValue<bool>()
                 && (_config.Item("turnburrowed").GetValue<bool>()
@@ -401,27 +376,29 @@ namespace D_RekSai
             {
                 AutoW();
             }
+
             if (_config.Item("escapeterino").GetValue<KeyBind>().Active)
             {
                 Escapeterino();
             }
+
             if ((!_config.Item("ActiveCombo").GetValue<KeyBind>().Active
                  || !_config.Item("ActiveHarass").GetValue<KeyBind>().Active
                  || !_config.Item("harasstoggle").GetValue<KeyBind>().Active
                  || !_config.Item("ActiveLane").GetValue<KeyBind>().Active
                  || !_config.Item("ActiveJungle").GetValue<KeyBind>().Active
                  || !_config.Item("escapeterino").GetValue<KeyBind>().Active)
-                && _config.Item("turnburrowed").GetValue<bool>() && !_player.burrowed())
+                && _config.Item("turnburrowed").GetValue<bool>() && !IsBurrowed())
             {
                 autoburrowed();
             }
         }
 
-        private static bool burrowed(this Obj_AI_Hero player)
+        public static bool IsBurrowed()
         {
-            return player.Spellbook.GetSpell(SpellSlot.Q).Name == "reksaiqburrowed";
+            return ObjectManager.Player.HasBuff("RekSaiW");
         }
-
+        
         public static Vector2? GetFirstWallPoint(Vector3 from, Vector3 to, float step = 25)
         {
             return GetFirstWallPoint(from.To2D(), to.To2D(), step);
@@ -444,11 +421,10 @@ namespace D_RekSai
             return null;
         }
 
-
-        private static void autoburrowed()
+        public static void autoburrowed()
         {
-            if (_player.burrowed() || _player.HasBuff("recall") || _player.InFountain()) return;
-            if (!_player.burrowed() && _w.IsReady())
+            if (IsBurrowed() || _player.HasBuff("recall") || _player.InFountain()) return;
+            if (!IsBurrowed() && _w.IsReady())
             {
                 _w.Cast();
             }
@@ -458,7 +434,7 @@ namespace D_RekSai
         {
             // Walljumper credits to Hellsing
 
-            if (!_player.burrowed() && _w.IsReady() && _be.IsReady()) _w.Cast();
+            if (!IsBurrowed() && _w.IsReady() && _be.IsReady()) _w.Cast();
 
             // We need to define a new move position since jumping over walls
             // requires you to be close to the specified wall. Therefore we set the move
@@ -483,7 +459,7 @@ namespace D_RekSai
             var wallJumpPossible = false;
 
             // Only calculate stuff when our Q is up and there is a wall inbetween
-            if (_player.burrowed() && _be.IsReady() && wallCheck != null)
+            if (IsBurrowed() && _be.IsReady() && wallCheck != null)
             {
                 // Get our wall position to calculate from
                 var wallPosition = movePosition;
@@ -573,7 +549,7 @@ namespace D_RekSai
             else
             {
                 Orbwalking.Orbwalk(target, Game.CursorPos, 90f, 0f, false, false);
-                if (_player.burrowed() && _be.IsReady()) _be.Cast(Game.CursorPos);
+                if (IsBurrowed() && _be.IsReady()) _be.Cast(Game.CursorPos);
             }
         }
 
@@ -589,7 +565,7 @@ namespace D_RekSai
             Obj_AI_Hero unit,
             Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (_player.burrowed() && _bw.IsReady() && unit.IsValidTarget(_q.Range)
+            if (IsBurrowed() && _bw.IsReady() && unit.IsValidTarget(_q.Range)
                 && _config.Item("Inter_W").GetValue<bool>()) _bw.Cast(unit);
         }
 
@@ -600,10 +576,12 @@ namespace D_RekSai
             {
                 return;
             }
+
             if (spell.Name.ToLower().Contains("reksaiq"))
             {
                 Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
             }
+
             /*if (sender.IsMe)
             {
                  Game.PrintChat("Spell name: " + args.SData.Name.ToString());
@@ -634,7 +612,7 @@ namespace D_RekSai
 
         private static bool Cleanse(Obj_AI_Hero hero)
         {
-            bool cc = false;
+            var cc = false;
             if (_config.Item("blind").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Blind))
@@ -642,6 +620,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("charm").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Charm))
@@ -649,6 +628,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("fear").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Fear))
@@ -656,6 +636,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("flee").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Flee))
@@ -663,6 +644,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("snare").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Snare))
@@ -670,6 +652,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("taunt").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Taunt))
@@ -677,6 +660,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("suppression").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Suppression))
@@ -684,6 +668,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("stun").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Stun))
@@ -691,6 +676,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("polymorph").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Polymorph))
@@ -698,6 +684,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("silence").GetValue<bool>())
             {
                 if (hero.HasBuffOfType(BuffType.Silence))
@@ -705,6 +692,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             if (_config.Item("zedultexecute").GetValue<bool>())
             {
                 if (_player.HasBuff("zedulttargetmark"))
@@ -712,6 +700,7 @@ namespace D_RekSai
                     cc = true;
                 }
             }
+
             return cc;
         }
 
@@ -735,6 +724,7 @@ namespace D_RekSai
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                     }
                 }
+
                 if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite
                     && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready
                     && hero.IsValidTarget(570))
@@ -744,74 +734,10 @@ namespace D_RekSai
             }
         }
 
-        private static HitChance BQchange()
+        private static bool Qactive(this Obj_AI_Hero target)
         {
-            switch (_config.Item("BQchange").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.Medium;
-            }
+            return target.Buffs.Any(b => b.Caster.NetworkId == target.NetworkId && b.IsValidBuff() && b.DisplayName == Activeq);
         }
-
-        private static HitChance Echange()
-        {
-            switch (_config.Item("Echange").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.Medium;
-            }
-        }
-
-        private static HitChance BQchangeharass()
-        {
-            switch (_config.Item("BQchangeharass").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.Medium;
-            }
-        }
-
-        private static HitChance Qchangekill()
-        {
-            switch (_config.Item("Qchangekill").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    return HitChance.Low;
-                case 1:
-                    return HitChance.Medium;
-                case 2:
-                    return HitChance.High;
-                case 3:
-                    return HitChance.VeryHigh;
-                default:
-                    return HitChance.Medium;
-            }
-        }
-
 
         private static void Combo()
         {
@@ -829,22 +755,25 @@ namespace D_RekSai
                     _player.Spellbook.CastSpell(_igniteSlot, t);
                 }
             }
-            if (_player.burrowed())
+
+            if (IsBurrowed())
             {
-                if (_config.Item("UseECombo").GetValue<bool>())
+                if (_config.Item("UseEBCombo").GetValue<bool>())
                 {
                     var te = TargetSelector.GetTarget(_be.Range + _bw.Range, TargetSelector.DamageType.Physical);
                     if (_be.IsReady() && te.IsValidTarget(_be.Range + _bw.Range) && _player.Distance(te) > _q.Range)
                     {
                         var predE = _be.GetPrediction(te, true);
-                        if (predE.Hitchance >= Echange()) _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -50));
+                        if (predE.Hitchance >= HitChance.High) _be.Cast(predE.CastPosition.Extend(_player.ServerPosition, -50));
                     }
                 }
-                if (_config.Item("UseQCombo").GetValue<bool>())
+
+                if (_config.Item("UseQBCombo").GetValue<bool>())
                 {
                     var tbq = TargetSelector.GetTarget(_bq.Range, TargetSelector.DamageType.Magical);
-                    if (_bq.IsReady() && t.IsValidTarget(_bq.Range)) _bq.CastIfHitchanceEquals(tbq, BQchange());
+                    if (_bq.IsReady() && t.IsValidTarget(_bq.Range)) _bq.CastIfHitchanceEquals(tbq, HitChance.High);
                 }
+
                 if (_config.Item("UseWCombo").GetValue<bool>())
                 {
                     var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
@@ -855,13 +784,14 @@ namespace D_RekSai
                 }
             }
 
-            if (!_player.burrowed())
+            if (!IsBurrowed())
             {
                 if (_config.Item("UseQCombo").GetValue<bool>())
                 {
                     var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
                     if (_q.IsReady() && tq.IsValidTarget(_q.Range)) _q.Cast(t);
                 }
+
                 if (_config.Item("UseECombo").GetValue<bool>())
                 {
                     var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
@@ -885,12 +815,14 @@ namespace D_RekSai
                         }
                     }
                 }
+
                 if (_config.Item("UseWCombo").GetValue<bool>() && _w.IsReady())
                 {
                     var tw = TargetSelector.GetTarget(_bq.Range, TargetSelector.DamageType.Physical);
-                    if (!_q.IsReady() && !tw.IsValidTarget(_e.Range) && tw.IsValidTarget(_bq.Range)) _w.Cast();
+                    if (!_q.IsReady() && !tw.IsValidTarget(_e.Range) && tw.IsValidTarget(_bq.Range) && !Qactive(_player)) _w.Cast();
                 }
             }
+
             UseItemes();
         }
 
@@ -916,26 +848,29 @@ namespace D_RekSai
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
                 {
                     _bilge.Cast(hero);
-
                 }
+
                 if (hero.IsValidTarget(450) && iBlade && (iBladeEnemyhp || iBlademyhp) && _blade.IsReady())
                 {
                     _blade.Cast(hero);
                 }
+
                 if (iTiamat && _tiamat.IsReady() && hero.IsValidTarget(_tiamat.Range))
                 {
                     _tiamat.Cast();
-
                 }
+
                 if (iHydra && _hydra.IsReady() && hero.IsValidTarget(_hydra.Range))
                 {
                     _hydra.Cast();
                 }
+
                 if (iOmenenemys && iOmen && _rand.IsReady() && hero.IsValidTarget(450))
                 {
                     _rand.Cast();
                 }
             }
+
             var ilotis = _config.Item("lotis").GetValue<bool>();
             if (ilotis)
             {
@@ -970,23 +905,26 @@ namespace D_RekSai
                          || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
                          || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
-
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
+
                     if (Items.HasItem(2003) && Items.CanUseItem(2003))
                     {
                         Items.UseItem(2003);
                     }
+
                     if (Items.HasItem(2031) && Items.CanUseItem(2031))
                     {
                         Items.UseItem(2031);
                     }
+
                     if (Items.HasItem(2032) && Items.CanUseItem(2032))
                     {
                         Items.UseItem(2032);
                     }
+
                     if (Items.HasItem(2033) && Items.CanUseItem(2033))
                     {
                         Items.UseItem(2033);
@@ -999,23 +937,26 @@ namespace D_RekSai
         {
             var dmg = 0d;
 
-            if (_q.IsReady() && !_player.burrowed()) dmg += QDamage(hero);
+            if (_q.IsReady() && !IsBurrowed()) dmg += QDamage(hero);
 
-            if (_player.burrowed()) dmg += BqDamage(hero);
-            if (_w.IsReady() && _player.burrowed()) dmg += WDamage(hero);
+            if (IsBurrowed()) dmg += BqDamage(hero);
+            if (_w.IsReady() && IsBurrowed()) dmg += WDamage(hero);
             if (_e.IsReady())
                 if (_player.Mana < 100)
                 {
                     dmg += EDamage(hero);
                 }
+
             if (_player.Mana == 100)
             {
                 dmg += EDamagetrue(hero);
             }
+
             if (ObjectManager.Player.GetSpellSlot("SummonerIgnite") != SpellSlot.Unknown)
             {
                 dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
             }
+
             if (Items.HasItem(3077) && Items.CanUseItem(3077)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Tiamat);
             if (Items.HasItem(3074) && Items.CanUseItem(3074)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hydra);
             if (Items.HasItem(3153) && Items.CanUseItem(3153)) dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
@@ -1033,24 +974,28 @@ namespace D_RekSai
             var useItemsH = _config.Item("UseItemsharass").GetValue<bool>();
             if (_config.Item("UseQHarass").GetValue<bool>())
             {
-                if (target.IsValidTarget(_bq.Range) && _bq.IsReady() && _player.burrowed())
+                if (target.IsValidTarget(_bq.Range) && _bq.IsReady() && IsBurrowed())
                 {
-                    _bq.CastIfHitchanceEquals(target, BQchangeharass());
+                    _bq.CastIfHitchanceEquals(target, HitChance.High);
                 }
-                if (targetq.IsValidTarget(_q.Range) && _q.IsReady() && !_player.burrowed())
+
+                if (targetq.IsValidTarget(_q.Range) && _q.IsReady() && !IsBurrowed())
                 {
                     _q.Cast();
                 }
             }
+
             if (targete.IsValidTarget(_e.Range) && _config.Item("UseEHarass").GetValue<bool>() && _e.IsReady()
-                && !_player.burrowed() && reksaifury)
+                && !IsBurrowed() && reksaifury)
             {
                 _e.Cast(targete);
             }
+
             if (useItemsH && _tiamat.IsReady() && target.IsValidTarget(_tiamat.Range))
             {
                 _tiamat.Cast();
             }
+
             if (useItemsH && _hydra.IsReady() && target.IsValidTarget(_hydra.Range))
             {
                 _hydra.Cast();
@@ -1059,19 +1004,13 @@ namespace D_RekSai
 
         private static double EDamage(Obj_AI_Base unit)
         {
-
-            return _e.IsReady()
-                       ? _player.CalcDamage(
-                           unit,
-                           Damage.DamageType.Physical,
-                           new double[] { 0.8, 0.9, 1, 1.1, 1.2 }[_e.Level - 1] * _player.TotalAttackDamage
-                           * (1 + (_player.Mana / _player.MaxMana)))
+            return _e.IsReady() 
+                ? _player.CalcDamage(unit, Damage.DamageType.Physical, new double[] { 0.8, 0.9, 1, 1.1, 1.2 }[_e.Level - 1] * _player.TotalAttackDamage * (1 + _player.Mana / _player.MaxMana))
                        : 0d;
         }
 
         private static double EDamagetrue(Obj_AI_Base unit)
         {
-
             return _e.IsReady()
                        ? _player.CalcDamage(
                            unit,
@@ -1108,7 +1047,6 @@ namespace D_RekSai
                            Damage.DamageType.Physical,
                            new double[] { 40, 80, 120, 160, 200 }[_bq.Level - 1] + 0.4 * _player.TotalAttackDamage)
                        : 0d;
-
         }
 
         private static void Farm()
@@ -1120,7 +1058,7 @@ namespace D_RekSai
             var useW = _config.Item("UseWLane").GetValue<bool>();
             var useE = _config.Item("UseELane").GetValue<bool>();
             var useItemsl = _config.Item("UseItemslane").GetValue<bool>();
-            if (_q.IsReady() && useQ && !_player.burrowed())
+            if (_q.IsReady() && useQ && !IsBurrowed())
             {
                 if (allMinions.Count >= 3)
                 {
@@ -1128,9 +1066,10 @@ namespace D_RekSai
                 }
                 else foreach (var minion in allMinions) if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _q.Cast();
             }
-            if (_bq.IsReady() && useQ && _player.burrowed())
+
+            if (_bq.IsReady() && useQ && IsBurrowed())
             {
-                var fl2 = _q.GetCircularFarmLocation(allMinions, 400);
+                var fl2 = _q.GetLineFarmLocation(allMinions, 400);
 
                 if (fl2.MinionsHit >= 3 && _bq.IsReady())
                 {
@@ -1138,21 +1077,25 @@ namespace D_RekSai
                 }
                 else foreach (var minion in allMinions) if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _bq.Cast(minion);
             }
-            if (_e.IsReady() && useE && !_player.burrowed())
+
+            if (_e.IsReady() && useE && !IsBurrowed())
             {
                 foreach (var minione in allMinions) if (minione.Health < EDamage(minione)) _e.Cast(minione);
             }
-
-            if (useW && !_player.burrowed() && !_q.IsReady() && !_e.IsReady())
+            else
+                foreach (var minion in allMinions)
+                    if (useW && !IsBurrowed() && !_q.IsReady() && !_e.IsReady() && !minion.HasBuff("RekSaiKnockupImmune") && !Qactive(_player))
             {
                 _w.Cast();
             }
+
             foreach (var minion in allMinionsQ)
             {
                 if (useItemsl && _tiamat.IsReady() && minion.IsValidTarget(_tiamat.Range))
                 {
                     _tiamat.Cast();
                 }
+
                 if (useItemsl && _hydra.IsReady() && minion.IsValidTarget(_tiamat.Range))
                 {
                     _hydra.Cast();
@@ -1206,6 +1149,7 @@ namespace D_RekSai
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
+
                     if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name))
                         && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
@@ -1236,6 +1180,7 @@ namespace D_RekSai
                                         "SRU_Dragon", "SRU_Baron"
                                     };
             }
+
             var mobs = MinionManager.GetMinions(
                 _player.ServerPosition,
                 _bq.Range,
@@ -1251,12 +1196,13 @@ namespace D_RekSai
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
-                if (!_player.burrowed())
+                if (!IsBurrowed())
                 {
                     if (useQ && _q.IsReady() && Orbwalking.InAutoAttackRange(mob))
                     {
                         _q.Cast();
                     }
+
                     if (_e.IsReady() && useE && _player.Distance(mob) < _e.Range
                         && !jungleMinions.Any(name => mob.Name.Contains("Mini")))
                     {
@@ -1270,20 +1216,24 @@ namespace D_RekSai
                         }
                         // RekSaiKnockupImmune , reksaiknockupimmune
                     }
+
                     if (useW && !mob.HasBuff("RekSaiKnockupImmune") && _w.IsReady() && !_q.IsReady() && !_e.IsReady()
-                        && mob.IsValidTarget(_w.Range))
+                        && mob.IsValidTarget(_w.Range) && !Qactive(_player))
                     {
                         _w.Cast();
                     }
                 }
-                if (_player.burrowed() && _bq.IsReady() && useQ && _player.Distance(mob) < _bq.Range)
+
+                if (IsBurrowed() && _bq.IsReady() && useQ && _player.Distance(mob) < _bq.Range)
                 {
                     _bq.Cast(mob);
                 }
+
                 if (useItemsJ && _tiamat.IsReady() && mob.IsValidTarget(_tiamat.Range))
                 {
                     _tiamat.Cast();
                 }
+
                 if (useItemsJ && _hydra.IsReady() && mob.IsValidTarget(_tiamat.Range))
                 {
                     _hydra.Cast();
@@ -1307,30 +1257,35 @@ namespace D_RekSai
                         _player.Spellbook.CastSpell(_igniteSlot, hero);
                     }
                 }
+
                 if (_config.Item("UseQKs").GetValue<bool>())
                 {
-                    if (_bq.IsReady() && hero.IsValidTarget(_bq.Range) && _player.burrowed())
+                    if (_bq.IsReady() && hero.IsValidTarget(_bq.Range) && IsBurrowed())
                     {
-                        if (hero.Health <= BqDamage(hero)) _bq.CastIfHitchanceEquals(hero, Qchangekill());
+                        if (hero.Health <= BqDamage(hero)) _bq.CastIfHitchanceEquals(hero, HitChance.High);
                     }
+
                     if (_bq.IsReady() && _w.IsReady() && !hero.IsValidTarget(_q.Range) && hero.IsValidTarget(_bq.Range)
                         && hero.Health <= BqDamage(hero))
                     {
                         _w.Cast();
-                        _bq.CastIfHitchanceEquals(hero, Qchangekill());
+                        _bq.CastIfHitchanceEquals(hero, HitChance.High);
                     }
-                    if (_q.IsReady() && hero.IsValidTarget(_q.Range) && !_player.burrowed())
+
+                    if (_q.IsReady() && hero.IsValidTarget(_q.Range) && !IsBurrowed())
                     {
                         if (hero.Health <= QDamage(hero)) _q.Cast();
                     }
                 }
+
                 if (_e.IsReady() && hero.IsValidTarget(_e.Range) && _config.Item("UseEKs").GetValue<bool>()
-                    && !_player.burrowed())
+                    && !IsBurrowed())
                 {
                     if (_player.Mana <= 100 && hero.Health <= EDamage(hero))
                     {
                         _e.Cast(hero);
                     }
+
                     if (_player.Mana == 100 && hero.Health <= EDamagetrue(hero))
                     {
                         _e.Cast(hero);
@@ -1344,17 +1299,15 @@ namespace D_RekSai
             var reksaiHp = (_player.MaxHealth * (_config.Item("AutoWHP").GetValue<Slider>().Value) / 100);
             var reksaiMp = (_player.MaxMana * (_config.Item("AutoWMP").GetValue<Slider>().Value) / 100);
             if (_player.HasBuff("Recall") || _player.InFountain()) return;
-            if (_w.IsReady() && _player.Health <= reksaiHp && !_player.burrowed() && _player.Mana >= reksaiMp)
+            if (_w.IsReady() && _player.Health <= reksaiHp && !IsBurrowed() && _player.Mana >= reksaiMp)
             {
                 _w.Cast();
             }
-
         }
 
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-
             var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
             if (_config.Item("Drawharass").GetValue<bool>())
             {
@@ -1411,15 +1364,17 @@ namespace D_RekSai
                             "Smite Target Off");
                 }
             }
-            if (_config.Item("DrawQ").GetValue<bool>() && _player.burrowed() && _q.Level > 0)
+
+            if (_config.Item("DrawQ").GetValue<bool>() && IsBurrowed() && _q.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _bq.Range, Color.GreenYellow);
             }
+
             if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
                 Render.Circle.DrawCircle(
                     ObjectManager.Player.Position,
-                    _player.burrowed() ? _be.Range : _e.Range,
+                    IsBurrowed() ? _be.Range : _e.Range,
                     System.Drawing.Color.GreenYellow);
             }
         }
