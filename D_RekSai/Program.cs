@@ -67,7 +67,7 @@ namespace D_RekSai
             _blade = new Items.Item(3153, 425f);
             _hydra = new Items.Item(3074, 250f);
             _tiamat = new Items.Item(3077, 250f);
-            _titanhydra = new Items.Item(3077, 250f);
+            _titanhydra = new Items.Item(3748, 250f);
             _rand = new Items.Item(3143, 490f);
             _lotis = new Items.Item(3190, 590f);
 
@@ -1069,22 +1069,25 @@ namespace D_RekSai
             var useItemsl = _config.Item("UseItemslane").GetValue<bool>();
             if (_q.IsReady() && useQ && !IsBurrowed())
             {
-                if (allMinions.Count >= 3)
+                if (
+                    allMinionsQ.Where(m => m.Distance(_player.Position) <= _q.Range)
+                        .Count(x => _q.GetDamage(x) > x.Health) >= 0)
                 {
                     _q.Cast();
                 }
-                else foreach (var minion in allMinions) if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _q.Cast();
             }
 
             if (_bq.IsReady() && useQ && IsBurrowed())
             {
-                var fl2 = _q.GetLineFarmLocation(allMinions, 400);
-
-                if (fl2.MinionsHit >= 3 && _bq.IsReady())
+                if (allMinions.Where(m => m.Distance(_player.Position) <= _bq.Range).Count(x => BqDamage(x) > x.Health)
+                    >= 0)
                 {
-                    _bq.Cast(fl2.Position);
+                    _bq.Cast(allMinions.FirstOrDefault());
                 }
-                else foreach (var minion in allMinions) if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _bq.Cast(minion);
+                else
+                    foreach (var minion in allMinions)
+                        if (minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)
+                            && minion.IsValidTarget(_bq.Range)) _bq.Cast(minion);
             }
 
             if (_e.IsReady() && useE && !IsBurrowed())
@@ -1093,10 +1096,11 @@ namespace D_RekSai
             }
             else
                 foreach (var minion in allMinions)
-                    if (useW && !IsBurrowed() && !_q.IsReady() && !_e.IsReady() && Orbwalking.InAutoAttackRange(minion) && !minion.HasBuff("RekSaiKnockupImmune") && !Qactive(_player))
-            {
-                _w.Cast();
-            }
+                    if (useW && !IsBurrowed() && !_q.IsReady() && !_e.IsReady() && Orbwalking.InAutoAttackRange(minion)
+                        && !minion.HasBuff("RekSaiKnockupImmune") && !Qactive(_player))
+                    {
+                        _w.Cast();
+                    }
 
             foreach (var minion in allMinionsQ)
             {
@@ -1105,9 +1109,15 @@ namespace D_RekSai
                     _tiamat.Cast();
                 }
 
-                if (useItemsl && _hydra.IsReady() && minion.IsValidTarget(_tiamat.Range))
+                if (useItemsl)
+                    if (_hydra.IsReady() && minion.IsValidTarget(_tiamat.Range))
+                    {
+                        _hydra.Cast();
+                    }
+
+                if (_titanhydra.IsReady() && minion.IsValidTarget(Orbwalking.GetRealAutoAttackRange(_player)))
                 {
-                    _hydra.Cast();
+                    _titanhydra.Cast();
                 }
             }
         }
@@ -1179,7 +1189,7 @@ namespace D_RekSai
             var mob =
                 MinionManager.GetMinions(
                     _player.ServerPosition,
-                    _e.Range,
+                    _bq.Range,
                     MinionTypes.All,
                     MinionTeam.Neutral,
                     MinionOrderTypes.MaxHealth).FirstOrDefault();
@@ -1217,7 +1227,7 @@ namespace D_RekSai
                 }
             }
 
-            if (IsBurrowed() && _bq.IsReady() && useQ && _player.Distance(mob) < _bq.Range)
+            if (IsBurrowed() && _bq.IsReady() && useQ && _player.Distance(mob) <= _bq.Range)
             {
                 _bq.Cast(mob);
             }
@@ -1227,9 +1237,17 @@ namespace D_RekSai
                 _tiamat.Cast();
             }
 
-            if (useItemsJ && _hydra.IsReady() && mob.IsValidTarget(_tiamat.Range))
+            if (useItemsJ)
             {
-                _hydra.Cast();
+                if (_hydra.IsReady() && mob.IsValidTarget(_tiamat.Range))
+                {
+                    _hydra.Cast();
+                }
+
+                if (_titanhydra.IsReady() && mob.IsValidTarget(Orbwalking.GetRealAutoAttackRange(_player)))
+                {
+                    _titanhydra.Cast();
+                }
             }
         }
 
