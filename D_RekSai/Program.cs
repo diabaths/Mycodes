@@ -1221,7 +1221,7 @@ namespace D_RekSai
                 }
 
                 if (useW && !mob.HasBuff("RekSaiKnockupImmune") && _w.IsReady() && !_q.IsReady() && !_e.IsReady()
-                    && mob.IsValidTarget(_w.Range) && !Qactive(_player))
+                    && mob.IsValidTarget(Orbwalking.GetRealAutoAttackRange(_player)) && !Qactive(_player))
                 {
                     _w.Cast();
                 }

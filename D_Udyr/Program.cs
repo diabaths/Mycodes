@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using LeagueSharp;
-using LeagueSharp.Common;
 using System.Linq;
 
+using LeagueSharp;
+using LeagueSharp.Common;
 
 namespace D_Udyr
 {
@@ -119,11 +118,10 @@ namespace D_Udyr
             _config.AddSubMenu(new Menu("Forest Gump", "Forest Gump"));
             _config.SubMenu("Forest Gump").AddItem(new MenuItem("ForestE", "Use E")).SetValue(true);
             _config.SubMenu("Forest Gump").AddItem(new MenuItem("ForestW", "Use W")).SetValue(true);
-            _config.SubMenu("Forest Gump")
-                .AddItem(
-                    new MenuItem("Forest", "Forest gump(Toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
-            _config.SubMenu("Forest Gump")
+            _config.SubMenu("Misc")
+              .AddItem(new MenuItem("Forest", "Forest gump"))
+              .SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Press));
+           _config.SubMenu("Forest Gump")
                 .AddItem(new MenuItem("Forest-Mana", "Forest gump Mana").SetValue(new Slider(50, 100, 0)));
 
             _config.AddSubMenu(new Menu("items", "items"));
@@ -242,44 +240,51 @@ namespace D_Udyr
 
         private static void OnGameUpdate(EventArgs args)
         {
-
             _player = ObjectManager.Player;
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
             }
+
             if (_config.Item("StunCycle").GetValue<KeyBind>().Active)
             {
                 StunCycle();
             }
+
             if (_config.Item("ActiveLane").GetValue<KeyBind>().Active &&
                 (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Farm-Mana").GetValue<Slider>().Value)
             {
                 Farm();
             }
+
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
                 (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Jungle-Mana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
+
             if (_config.Item("AutoShield").GetValue<bool>() && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 AutoW();
             }
+
             if (_config.Item("Forest").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Forest-Mana").GetValue<Slider>().Value)
+                100 * (_player.Mana / _player.MaxMana) > _config.Item("Forest-Mana").GetValue<Slider>().Value)
             {
                 Forest();
             }
+
             Usepotion();
             if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
             {
                 Smiteuse();
             }
+
             _orbwalker.SetAttack(true);
 
             _orbwalker.SetMovement(true);
         }
+
         private static int[] Style()
         {
             switch (_config.Item("udyrStyle").GetValue<StringList>().SelectedIndex)
@@ -302,6 +307,7 @@ namespace D_Udyr
         {
             AutoLevel.Enabled(e.GetNewValue<bool>());
         }
+
         private static void Farm()
         {
             var useItemsl = _config.Item("laneitems").GetValue<bool>();
@@ -316,18 +322,22 @@ namespace D_Udyr
                 {
                     Utility.DelayAction.Add(delay, () => _r.Cast());
                 }
+
                 if (_config.Item("Use-Q-Farm").GetValue<bool>() && _q.IsReady())
                 {
                     Utility.DelayAction.Add(delay, () => _q.Cast());
                 }
+
                 if (_config.Item("Use-W-Farm").GetValue<bool>() && _w.IsReady())
                 {
                     Utility.DelayAction.Add(delay, () => _w.Cast());
                 }
+
                 if (_config.Item("Use-E-Farm").GetValue<bool>() && _e.IsReady())
                 {
                     Utility.DelayAction.Add(delay, () => _e.Cast());
                 }
+
                 if (useItemsl && _hydra.IsReady() && minion.IsValidTarget(_hydra.Range))
                 {
                     _hydra.Cast();
@@ -343,11 +353,12 @@ namespace D_Udyr
         private static void Forest()
         {
             if (_player.HasBuff("Recall") || _player.InFountain()) return;
-
+            _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
             if (_e.IsReady() && _config.Item("ForestE").GetValue<bool>())
             {
                 _e.Cast();
             }
+
             if (_w.IsReady() && _config.Item("ForestW").GetValue<bool>())
             {
                 _w.Cast();
@@ -371,8 +382,7 @@ namespace D_Udyr
         {
             if (!Orbwalking.CanMove(40)) return;
             var useitems = _config.Item("jungleitems").GetValue<bool>();
-            var minions = MinionManager.GetMinions(_player.ServerPosition, 400, MinionTypes.All, MinionTeam.Neutral,
-                MinionOrderTypes.MaxHealth);
+            var minions = MinionManager.GetMinions(_player.ServerPosition, 400, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var delay = _config.Item("delayfarm").GetValue<Slider>().Value;
             foreach (var minion in minions)
             {
@@ -383,10 +393,10 @@ namespace D_Udyr
 
                 if (useitems && _tiamat.IsReady() && minion.IsValidTarget(_hydra.Range))
                 {
-
                     _tiamat.Cast();
                 }
             }
+
             foreach (var minion in minions)
             {
                 if (_config.Item("Use-Q-Jungle").GetValue<bool>() && _q.IsReady() && minion.IsValidTarget())
@@ -394,11 +404,13 @@ namespace D_Udyr
                     Utility.DelayAction.Add(delay, () => _q.Cast());
                     return;
                 }
+
                 if (_config.Item("Use-R-Jungle").GetValue<bool>() && _r.IsReady() && minion.IsValidTarget())
                 {
                     Utility.DelayAction.Add(delay, () => _r.Cast());
                     return;
                 }
+
                 if (_config.Item("Use-W-Jungle").GetValue<bool>() && _w.IsReady() && minion.IsValidTarget())
                 {
                     Utility.DelayAction.Add(delay, () => _w.Cast());
@@ -439,33 +451,35 @@ namespace D_Udyr
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
                 {
                     _bilge.Cast(hero);
-
                 }
+
                 if (hero.IsValidTarget(450) && iBlade && (iBladeEnemyhp || iBlademyhp) && _blade.IsReady())
                 {
                     _blade.Cast(hero);
-
                 }
+
                 if (iTiamat && _tiamat.IsReady() && hero.IsValidTarget(_tiamat.Range))
                 {
                     _tiamat.Cast();
-
                 }
+
                 if (iHydra && _hydra.IsReady() && hero.IsValidTarget(_hydra.Range))
                 {
                     _hydra.Cast();
-
                 }
+
                 if (iOmenenemys && iOmen && _rand.IsReady() && hero.IsValidTarget(450))
                 {
                     Utility.DelayAction.Add(100, () => _rand.Cast());
                 }
+
                 if (iRighteousenemys && iRighteous && Items.HasItem(3800) && Items.CanUseItem(3800) &&
                     hero.IsValidTarget(_config.Item("Righteousenemysrange").GetValue<Slider>().Value))
                 {
                     Items.UseItem(3800);
                 }
             }
+
             var ilotis = _config.Item("lotis").GetValue<bool>();
             if (ilotis)
             {
@@ -478,11 +492,10 @@ namespace D_Udyr
             }
 
         }
+
         private static void Usepotion()
         {
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
-                MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = _player.Health <=
                                (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
@@ -501,28 +514,32 @@ namespace D_Udyr
                       ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
                       || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
-
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
+
                     if (Items.HasItem(2003) && Items.CanUseItem(2003))
                     {
                         Items.UseItem(2003);
                     }
+
                     if (Items.HasItem(2031) && Items.CanUseItem(2031))
                     {
                         Items.UseItem(2031);
                     }
+
                     if (Items.HasItem(2032) && Items.CanUseItem(2032))
                     {
                         Items.UseItem(2032);
                     }
+
                     if (Items.HasItem(2033) && Items.CanUseItem(2033))
                     {
                         Items.UseItem(2033);
                     }
                 }
+
                 if (iusepotionmp && iusemppotion &&
                     !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask") ||
                       ObjectManager.Player.HasBuff("ItemMiniRegenPotion") ||
@@ -533,14 +550,17 @@ namespace D_Udyr
                     {
                         Items.UseItem(2041);
                     }
+
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
                     }
+
                     if (Items.HasItem(2032) && Items.CanUseItem(2032))
                     {
                         Items.UseItem(2032);
                     }
+
                     if (Items.HasItem(2033) && Items.CanUseItem(2033))
                     {
                         Items.UseItem(2033);
@@ -548,6 +568,7 @@ namespace D_Udyr
                 }
             }
         }
+
         private static void Smiteontarget()
         {
             if (_smite == null) return;
@@ -566,6 +587,7 @@ namespace D_Udyr
                     ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
             }
+
             if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
                 ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
                 hero.IsValidTarget(570))
@@ -589,6 +611,7 @@ namespace D_Udyr
                     _e.Cast();
                     return;
                 }
+
                 if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.Q).Level >=
                     ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Level)
                     if (_q.Cast()) return;
@@ -610,6 +633,7 @@ namespace D_Udyr
                     Utility.DelayAction.Add(delay, () => _w.Cast());
                     return;
                 }
+
                 UseItemes();
             }
         }
@@ -626,6 +650,7 @@ namespace D_Udyr
                     {
                         _e.Cast();
                     }
+
                     if (closestEnemy == null)
                     {
                         closestEnemy = enemy;
@@ -639,8 +664,8 @@ namespace D_Udyr
                         Game.PrintChat(closestEnemy.ChampionName + " has buff already !!!");
                         closestEnemy = enemy;
                         Game.PrintChat(enemy.ChampionName + "is the new target");
-
                     }
+
                     if (!enemy.HasBuff("udyrbearstuncheck"))
                     {
                         _player.IssueOrder(GameObjectOrder.AttackUnit, closestEnemy);
@@ -656,34 +681,54 @@ namespace D_Udyr
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.GreenYellow,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
-                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" ||
-                    _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker"
+                    || _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }
+
             if (_config.Item("Forest").GetValue<KeyBind>().Active)
             {
-                Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.GreenYellow,
+                Drawing.DrawText(
+                    Drawing.Width * 0.02f,
+                    Drawing.Height * 0.92f,
+                    System.Drawing.Color.GreenYellow,
                     "Forest Is On");
             }
             else
-                Drawing.DrawText(Drawing.Width * 0.02f, Drawing.Height * 0.92f, System.Drawing.Color.OrangeRed,
+                Drawing.DrawText(
+                    Drawing.Width * 0.02f,
+                    Drawing.Height * 0.92f,
+                    System.Drawing.Color.OrangeRed,
                     "Forest Is Off");
         }
+
         public static readonly string[] Smitetype =
         {
             "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
@@ -720,6 +765,7 @@ namespace D_Udyr
                     "SRU_Baron"
                 };
             }
+
             var minions = MinionManager.GetMinions(_player.Position, 1000, MinionTypes.All, MinionTeam.Neutral);
             if (minions.Count() > 0)
             {
@@ -733,6 +779,7 @@ namespace D_Udyr
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
+
                     if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name)) &&
                         !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
