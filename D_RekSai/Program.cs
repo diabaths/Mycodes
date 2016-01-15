@@ -1094,13 +1094,20 @@ namespace D_RekSai
             {
                 foreach (var minione in allMinions) if (minione.Health < EDamage(minione)) _e.Cast(minione);
             }
-            else
-                foreach (var minion in allMinions)
-                    if (useW && !IsBurrowed() && !_q.IsReady() && !_e.IsReady() && Orbwalking.InAutoAttackRange(minion)
-                        && !minion.HasBuff("RekSaiKnockupImmune") && !Qactive(_player))
-                    {
-                        _w.Cast();
-                    }
+
+            foreach (var minion in allMinions)
+            {
+                if (useW && !IsBurrowed() && !_q.IsReady() && !_e.IsReady() && Orbwalking.InAutoAttackRange(minion)
+                    && !minion.HasBuff("RekSaiKnockupImmune") && !Qactive(_player))
+                {
+                    _w.Cast();
+                }
+
+                if (IsBurrowed() && _bw.IsReady() && useW && minion.IsValidTarget(Orbwalking.GetRealAutoAttackRange(_player)))
+                {
+                    _bw.Cast();
+                }
+            }
 
             foreach (var minion in allMinionsQ)
             {
@@ -1230,6 +1237,11 @@ namespace D_RekSai
             if (IsBurrowed() && _bq.IsReady() && useQ && _player.Distance(mob) <= _bq.Range)
             {
                 _bq.Cast(mob);
+            }
+
+            if (IsBurrowed() && _bw.IsReady() && useW && mob.IsValidTarget(Orbwalking.GetRealAutoAttackRange(_player)))
+            {
+                _bw.Cast();
             }
 
             if (useItemsJ && _tiamat.IsReady() && mob.IsValidTarget(_tiamat.Range))
