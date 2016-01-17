@@ -113,7 +113,10 @@ namespace D_RekSai
             _config.AddSubMenu(new Menu("items", "items"));
             _config.SubMenu("items").AddSubMenu(new Menu("Offensive", "Offensive"));
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Tiamat", "Use Tiamat")).SetValue(true);
-            _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Hydra", "Use Hydra / titanic")).SetValue(true);
+            _config.SubMenu("items")
+                .SubMenu("Offensive")
+                .AddItem(new MenuItem("Hydra", "Use Hydra / titanic"))
+                .SetValue(true);
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilge", "Use Bilge")).SetValue(true);
             _config.SubMenu("items")
                 .SubMenu("Offensive")
@@ -322,7 +325,13 @@ namespace D_RekSai
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
-          }
+            Game.PrintChat("<font color='#881df2'>D-Reksai by Diabaths</font> Loaded.");
+            Game.PrintChat(
+                "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
+            Game.PrintChat(
+                "<font color='#f2f21d'>Buy me cigars </font> <font color='#ff1900'>ssssssssssmith@hotmail.com</font> (10) S");
+        }
+
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
