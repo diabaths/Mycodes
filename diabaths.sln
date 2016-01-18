@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_Lucian", "D_Lucian\D_Luci
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_MissF", "D_MissF\D_MissF.csproj", "{82347018-BCFE-481F-BDE3-4354E689133C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwistedFate", "TwistedFate\TwistedFate.csproj", "{5FF61EC1-3891-40BC-9F68-F117500493F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{82347018-BCFE-481F-BDE3-4354E689133C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82347018-BCFE-481F-BDE3-4354E689133C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82347018-BCFE-481F-BDE3-4354E689133C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FF61EC1-3891-40BC-9F68-F117500493F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FF61EC1-3891-40BC-9F68-F117500493F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FF61EC1-3891-40BC-9F68-F117500493F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF61EC1-3891-40BC-9F68-F117500493F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

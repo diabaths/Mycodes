@@ -293,7 +293,7 @@ namespace D_RekSai
             // _config.SubMenu("Misc").AddItem(new MenuItem("Gap_W", "GapClosers W")).SetValue(true);
             _config.SubMenu("Misc")
                 .AddItem(new MenuItem("escapeterino", "Escape!!!"))
-                .SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Press));
+                .SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press));
             //Kill Steal
             _config.AddSubMenu(new Menu("KillSteal", "Ks"));
             _config.SubMenu("Ks").AddItem(new MenuItem("ActiveKs", "Use KillSteal")).SetValue(true);
@@ -807,7 +807,7 @@ namespace D_RekSai
                     var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
                     if (te.IsValidTarget(_e.Range) && _e.IsReady())
                     {
-                        if (reksaifury)
+                        if (reksaifury && !Qactive(_player))
                         {
                             _e.Cast(te);
                         }
@@ -1101,7 +1101,7 @@ namespace D_RekSai
 
             if (_e.IsReady() && useE && !IsBurrowed())
             {
-                foreach (var minione in allMinions) if (minione.Health < EDamage(minione)) _e.Cast(minione);
+                foreach (var minione in allMinions) if (minione.Health < EDamage(minione) && !Qactive(_player)) _e.Cast(minione);
             }
 
             foreach (var minion in allMinions)
@@ -1225,7 +1225,7 @@ namespace D_RekSai
 
                 if (_e.IsReady() && useE && _player.Distance(mob) < _e.Range && !mob.Name.Contains("Mini"))
                 {
-                    if (reksaifury)
+                    if (reksaifury && !Qactive(_player))
                     {
                         _e.Cast(mob);
                     }
