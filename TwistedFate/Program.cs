@@ -450,6 +450,8 @@ namespace TwistedFate
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            if (Player.IsDead) return;
+            
             if (Config.Item("PingLH").GetValue<bool>())
                 foreach (
                     var enemy in

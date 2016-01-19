@@ -118,7 +118,7 @@ namespace D_Udyr
             _config.AddSubMenu(new Menu("Forest Gump", "Forest Gump"));
             _config.SubMenu("Forest Gump").AddItem(new MenuItem("ForestE", "Use E")).SetValue(true);
             _config.SubMenu("Forest Gump").AddItem(new MenuItem("ForestW", "Use W")).SetValue(true);
-            _config.SubMenu("Misc")
+            _config.SubMenu("Forest Gump")
               .AddItem(new MenuItem("Forest", "Forest gump"))
               .SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Press));
            _config.SubMenu("Forest Gump")
