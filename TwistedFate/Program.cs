@@ -12,6 +12,8 @@ namespace TwistedFate
 {
     using System.Security.Policy;
 
+    using LeagueSharp.SDK.Core.Utils;
+
     internal class Program
     {
         private static Menu Config;
@@ -558,7 +560,7 @@ namespace TwistedFate
                     if (Config.Item("QFarm").GetValue<bool>() && Q.IsReady()
                         && 100 * (Player.Mana / Player.MaxMana) > Config.Item("Lanemana").GetValue<Slider>().Value)
                     {
-                        var farm = Q.GetLineFarmLocation(Minions, 40);
+                        var farm = Q.GetLineFarmLocation(MinionManager.GetMinions(Q.Range));
                         if (farm.MinionsHit >= Config.Item("QMinions").GetValue<Slider>().Value)
                         {
                             Q.Cast(farm.Position, true);
@@ -572,7 +574,8 @@ namespace TwistedFate
                         {
                             CardSelector.StartSelecting(Cards.Blue);
                         }
-                        else
+
+                    else
                         {
                             switch (Config.Item("SelectCard").GetValue<Slider>().Value)
                             {
@@ -587,16 +590,7 @@ namespace TwistedFate
 
                                     break;
                                 case 2:
-                                    if (
-                                        MinionManager.GetMinions(
-                                            SOW.GetTarget().Position,
-                                            125f,
-                                            MinionTypes.All,
-                                            MinionTeam.Enemy).Count > Config.Item("RedMinions").GetValue<Slider>().Value)
-                                    {
-                                        CardSelector.StartSelecting(Cards.Red);
-                                    }
-
+                                    CardSelector.StartSelecting(Cards.Yellow);
                                     break;
                             }
                         }
