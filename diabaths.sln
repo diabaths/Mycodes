@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D_MissF", "D_MissF\D_MissF.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwistedFate", "TwistedFate\TwistedFate.csproj", "{5FF61EC1-3891-40BC-9F68-F117500493F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hi im gosu", "hi im gosu\hi im gosu.csproj", "{C21F8D78-E2E5-47B8-97BC-37CDCFBD7D89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,10 @@ Global
 		{5FF61EC1-3891-40BC-9F68-F117500493F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FF61EC1-3891-40BC-9F68-F117500493F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FF61EC1-3891-40BC-9F68-F117500493F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C21F8D78-E2E5-47B8-97BC-37CDCFBD7D89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C21F8D78-E2E5-47B8-97BC-37CDCFBD7D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C21F8D78-E2E5-47B8-97BC-37CDCFBD7D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C21F8D78-E2E5-47B8-97BC-37CDCFBD7D89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
