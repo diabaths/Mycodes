@@ -363,7 +363,7 @@ namespace D_Lucian
                 if (args.SData.Name == "LucianE")
                 {
                     Ecast = true;
-                    Utility.DelayAction.Add(100, () => Ecast = false);
+                    Utility.DelayAction.Add(200, () => Ecast = false);
                 }
                 if (args.SData.Name == "LucianQ")
                 {

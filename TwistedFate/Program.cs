@@ -198,8 +198,7 @@ namespace TwistedFate
                                <= (Player.MaxMana * (Config.Item("usepotionmp").GetValue<Slider>().Value) / 100);
             if (Player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
-            if (Utility.CountEnemiesInRange(800) > 0
-                || (mobs.Count > 0 && Config.Item("ActiveLane").GetValue<KeyBind>().Active))
+            if (Utility.CountEnemiesInRange(800) > 0)
             {
                 if (iusepotionhp && iusehppotion
                     && !(ObjectManager.Player.HasBuff("RegenerationPotion")
@@ -499,7 +498,7 @@ namespace TwistedFate
                 }
             }
 
-            if (Environment.TickCount - timeToggleGold > 120)
+            if (Environment.TickCount - timeToggleGold > 300)
             {
                 timeToggleGold = Environment.TickCount;
                 if (Config.Item("ToggleGold").GetValue<KeyBind>().Active)

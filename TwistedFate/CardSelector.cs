@@ -18,6 +18,9 @@ namespace TwistedFate
 
     public enum SelectStatus
     {
+        /// <summary>
+        /// The ready.
+        /// </summary>
         Ready,
         Selecting,
         Selected,
