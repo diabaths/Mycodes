@@ -82,7 +82,8 @@ namespace TwistedFate
             {
                 q.AddItem(new MenuItem("QFarm", "Q Farm Key").SetValue(true));
                 q.AddItem(new MenuItem("Lanemana", "Minimum Mana to Use Q").SetValue(new Slider(60, 1, 100)));
-                q.AddItem(new MenuItem("QMinions", "Only use Q to Farm if > X Minions in Range")).SetValue(new Slider(1, 0, 5));
+                q.AddItem(new MenuItem("QMinions", "Only use Q to Farm if > X Minions in Range"))
+                    .SetValue(new Slider(1, 0, 5));
                 q.AddItem(new MenuItem("AutoQI", "Auto-Q Immobile").SetValue(true));
                 q.AddItem(new MenuItem("AutoQD", "Auto-Q Dashing").SetValue(true));
                 q.AddItem(new MenuItem("CastQ", "Cast Q (Tap)").SetValue(new KeyBind('U', KeyBindType.Press)));
@@ -92,14 +93,17 @@ namespace TwistedFate
             /* W */
             var w = new Menu("W - Pick a Card", "W");
             {
-                w.AddItem(new MenuItem("SelectCard", "Card to Pick").SetValue(new Slider(2, 0, 2)));
+                w.AddItem(new MenuItem("SelectCard", "Card to Pick ").SetValue(new Slider(2, 0, 2)));
                 w.AddItem(new MenuItem("Info", "0 = Blue, 1 = Red, 2 = Gold"));
-                //w.AddItem(
-                //    new MenuItem("SelectYellow", "Select Yellow").SetValue(new KeyBind("W".ToCharArray()[0],
-                //        KeyBindType.Press)));
-                //w.AddItem(
-                //    new MenuItem("SelectBlue", "Select Blue").SetValue(new KeyBind("E".ToCharArray()[0],
-                //        KeyBindType.Press)));
+                w.AddItem(
+                  new MenuItem("SelectRed", "Select Red Manual").SetValue(
+                      new KeyBind("W".ToCharArray()[0], KeyBindType.Press)));
+                w.AddItem(
+                    new MenuItem("SelectYellow", "Select Yellow Manual").SetValue(
+                        new KeyBind("E".ToCharArray()[0], KeyBindType.Press)));
+                w.AddItem(
+                    new MenuItem("SelectBlue", "Select Blue Manual").SetValue(
+                        new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
                 w.AddItem(new MenuItem("ChangeCard", "Change Card Pick").SetValue(new KeyBind('T', KeyBindType.Press)));
                 Config.AddSubMenu(w);
                 w.AddItem(new MenuItem("WFarm", "W Farm Key").SetValue(true));
@@ -122,10 +126,16 @@ namespace TwistedFate
                         new StringList(new[] { "No", "Mixed-mode", "Combo-mode", "Both" }, 2)));
 
                 menuItems.AddSubMenu(new Menu("Potions", "Potions"));
-                menuItems.SubMenu("Potions").AddItem(new MenuItem("usehppotions", "Use Healt potion/Refillable/Hunters/Corrupting/Biscuit")).SetValue(true);
-                menuItems.SubMenu("Potions").AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
-                menuItems.SubMenu("Potions").AddItem(new MenuItem("usemppotions", "Use Hunters/Corrupting/Biscuit")).SetValue(true);
-                menuItems.SubMenu("Potions").AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
+                menuItems.SubMenu("Potions")
+                    .AddItem(new MenuItem("usehppotions", "Use Healt potion/Refillable/Hunters/Corrupting/Biscuit"))
+                    .SetValue(true);
+                menuItems.SubMenu("Potions")
+                    .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
+                menuItems.SubMenu("Potions")
+                    .AddItem(new MenuItem("usemppotions", "Use Hunters/Corrupting/Biscuit"))
+                    .SetValue(true);
+                menuItems.SubMenu("Potions")
+                    .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
                 Config.AddSubMenu(menuItems);
             }
 
@@ -597,21 +607,22 @@ namespace TwistedFate
                     }
                 }
             }
-            //if (Config.Item("SelectYellow").GetValue<KeyBind>().Active ||
-            //    combo)
-            //{
-            //    CardSelector.StartSelecting(Cards.Yellow);
-            //}
 
-            //if (Config.Item("SelectBlue").GetValue<KeyBind>().Active)
-            //{
-            //    CardSelector.StartSelecting(Cards.Blue);
-            //}
+            if (Config.Item("SelectYellow").GetValue<KeyBind>().Active)
+            {
+                CardSelector.StartSelecting(Cards.Yellow);
+            }
 
-            //if (Config.Item("SelectRed").GetValue<KeyBind>().Active)
-            //{
-            //    CardSelector.StartSelecting(Cards.Red);
-            //}
+            if (Config.Item("SelectBlue").GetValue<KeyBind>().Active)
+            {
+                CardSelector.StartSelecting(Cards.Blue);
+            }
+
+            if (Config.Item("SelectRed").GetValue<KeyBind>().Active)
+            {
+                CardSelector.StartSelecting(Cards.Red);
+            }
+
             /*
                         if (CardSelector.Status == SelectStatus.Selected && combo)
                         {
