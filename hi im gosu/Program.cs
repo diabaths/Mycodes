@@ -147,7 +147,7 @@ namespace hi_im_gosu
             menu.AddItem(new MenuItem("walltumble", "Wall Tumble"))
                 .SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press));
             menu.AddItem(new MenuItem("useR", "Use R Combo").SetValue(true));
-            menu.AddItem(new MenuItem("enemys", "If Enemys around>=").SetValue(new Slider(1, 1, 5)));
+            menu.AddItem(new MenuItem("enemys", "If Enemys Around >=").SetValue(new Slider(1, 1, 5)));
             Itemsmenu = menu.AddSubMenu(new Menu("Items", "Items"));
             Itemsmenu.AddSubMenu(new Menu("Potions", "Potions"));
             Itemsmenu.SubMenu("Potions")
@@ -375,18 +375,19 @@ namespace hi_im_gosu
             var useQ = qmenu.Item("UseQJ").GetValue<bool>();
           
             int countMinions = 0;
-            foreach (var minions in Minions.Where(minion => minion.Health < Player.GetAutoAttackDamage(minion) + Q.GetDamage(minion)))
+            foreach (var minions in Minions.Where(minion => minion.Health < Player.GetAutoAttackDamage(minion)))
             {
                 countMinions++;
             }
 
-            if (countMinions >= 1 && useQ && Q.IsReady() && Minions != null)
-                Q.Cast(Player.Position.Extend(Game.CursorPos, Q.Range));
+            if (countMinions >= 2 && useQ && Q.IsReady() && Minions != null)
+                Q.Cast(Player.Position.Extend(Game.CursorPos, Q.Range/2));
+          
             if (useQ && Q.IsReady() && Orbwalking.InAutoAttackRange(mob) && mob != null)
             {
                 Q.Cast(Game.CursorPos);
             }
-        }
+        } 
 
         public static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
@@ -486,7 +487,7 @@ namespace hi_im_gosu
             }
 
             Usepotion();
-            if (orbwalker.ActiveMode.ToString() == "LaneClear" && (100 * (Player.Mana / Player.MaxMana)) > qmenu.Item("Junglemana").GetValue<Slider>().Value)
+            if (orbwalker.ActiveMode.ToString() == "LaneClear" && 100 * (Player.Mana / Player.MaxMana) > qmenu.Item("Junglemana").GetValue<Slider>().Value)
             {
                 Farm();
             }
