@@ -196,12 +196,6 @@ namespace TwistedFate
 
         private static void Usepotion()
         {
-            var mobs = MinionManager.GetMinions(
-                Player.ServerPosition,
-                Q.Range,
-                MinionTypes.All,
-                MinionTeam.Neutral,
-                MinionOrderTypes.MaxHealth);
             var iusehppotion = Config.Item("usehppotions").GetValue<bool>();
             var iusepotionhp = Player.Health
                                <= (Player.MaxHealth * (Config.Item("usepotionhp").GetValue<Slider>().Value) / 100);

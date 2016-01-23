@@ -11,10 +11,11 @@ using SharpDX;
 
 namespace hi_im_gosu
 {
-    class Vayne
+    public class Vayne
     {
         public static Spell E;
         public static Spell Q;
+        public static Spell R;
 
         private static Orbwalking.Orbwalker orbwalker;
 
@@ -34,6 +35,8 @@ namespace hi_im_gosu
         private static BuffType[] buffs;
         private static Spell cleanse;
         private static Menu Itemsmenu;
+        private static Menu qmenu;
+        private static Menu emenu;
         private static Menu botrk;
         private static Menu qss;
 
@@ -41,6 +44,7 @@ namespace hi_im_gosu
         private static readonly Vector2 midPos = new Vector2(6707.485f, 8802.744f);
 
         private static readonly Vector2 dragPos = new Vector2(11514, 4462);
+
         private static float LastMoveC;
 
         private static void TumbleHandler()
@@ -118,27 +122,44 @@ namespace hi_im_gosu
 
             menu.AddItem(
                 new MenuItem("aaqaa", "Auto -> Q -> AA").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
-            //menu.AddSubMenu(new Menu("Combo", "combo"));
-            //menu.SubMenu("combo").AddItem(new MenuItem("laugh", "Cancel w/ Laugh")).SetValue(false);
-            menu.AddItem(
-                new MenuItem("UseET", "Use E (Toggle)").SetValue(
-                    new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
-            menu.AddItem(new MenuItem("UseEInterrupt", "Use E To Interrupt").SetValue(true));
-            menu.AddItem(
-                new MenuItem("PushDistance", "E Push Distance").SetValue(new Slider(425, 475, 300)));
-            menu.AddItem(new MenuItem("UseQC", "Use Q").SetValue(true));
-            menu.AddItem(new MenuItem("UseEC", "Use E").SetValue(true));
-            menu.AddItem(
-                new MenuItem("UseEaa", "Use E after auto").SetValue(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
+
+            qmenu = menu.AddSubMenu(new Menu("Tumble", "Tumble"));
+            qmenu.AddItem(new MenuItem("UseQC", "Use Q Combo").SetValue(true));
+            qmenu.AddItem(new MenuItem("hq", "Use Q Harass").SetValue(true));
+            qmenu.AddItem(new MenuItem("restrictq", "Restrict Q usage?").SetValue(true));
+            qmenu.AddItem(new MenuItem("UseQJ", "Use Q Farm").SetValue(true));
+            qmenu.AddItem(new MenuItem("Junglemana", "Minimum Mana to Use Q Farm").SetValue(new Slider(60, 1, 100)));
+
+            emenu = menu.AddSubMenu(new Menu("Condemn", "Condemn"));
+            emenu.AddItem(new MenuItem("UseEC", "Use E Combo").SetValue(true));
+            emenu.AddItem(new MenuItem("he", "Use E Harass").SetValue(true));
+            emenu.AddItem(
+                new MenuItem("UseET", "Use E (Toggle)").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
+            emenu.AddItem(new MenuItem("UseEInterrupt", "Use E To Interrupt").SetValue(true));
+            emenu.AddItem(new MenuItem("PushDistance", "E Push Distance").SetValue(new Slider(425, 475, 300)));
+            emenu.AddItem(
+                new MenuItem("UseEaa", "Use E after auto").SetValue(
+                    new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
             menu.AddSubMenu(new Menu("Gapcloser List", "gap"));
             menu.AddSubMenu(new Menu("Gapcloser List 2", "gap2"));
             menu.AddSubMenu(new Menu("Interrupt List", "int"));
-            menu.AddItem(new MenuItem("restrictq", "Restrict Q usage?").SetValue(true));
-
+           
             menu.AddItem(new MenuItem("walltumble", "Wall Tumble"))
                 .SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press));
-
+            menu.AddItem(new MenuItem("useR", "Use R Combo").SetValue(true));
+            menu.AddItem(new MenuItem("enemys", "If Enemys around>=").SetValue(new Slider(1, 1, 5)));
             Itemsmenu = menu.AddSubMenu(new Menu("Items", "Items"));
+            Itemsmenu.AddSubMenu(new Menu("Potions", "Potions"));
+            Itemsmenu.SubMenu("Potions")
+                .AddItem(new MenuItem("usehppotions", "Use Healt potion/Refillable/Hunters/Corrupting/Biscuit"))
+                .SetValue(true);
+            Itemsmenu.SubMenu("Potions")
+                .AddItem(new MenuItem("usepotionhp", "If Health % <").SetValue(new Slider(35, 1, 100)));
+            Itemsmenu.SubMenu("Potions")
+                .AddItem(new MenuItem("usemppotions", "Use Hunters/Corrupting/Biscuit"))
+                .SetValue(true);
+            Itemsmenu.SubMenu("Potions")
+                .AddItem(new MenuItem("usepotionmp", "If Mana % <").SetValue(new Slider(35, 1, 100)));
             Itemsmenu.AddItem(new MenuItem("BOTRK", "Use BOTRK").SetValue(true));
             botrk = Itemsmenu.AddSubMenu(new Menu("BOTRK Settings", "usebotrk"));
             botrk.AddItem(new MenuItem("myhp", "Use if my HP < %")).SetValue(new Slider(20, 0, 100));
@@ -148,11 +169,11 @@ namespace hi_im_gosu
             qss = menu.SubMenu("Items").AddSubMenu(new Menu("QSS/Merc/Cleanse Settings", "useqss"));
 
             buffs = new[]
-            {
-                BuffType.Blind, BuffType.Charm, BuffType.CombatDehancer, BuffType.Fear, BuffType.Flee, BuffType.Knockback,
-                BuffType.Knockup, BuffType.Polymorph, BuffType.Silence, BuffType.Sleep, BuffType.Snare, BuffType.Stun,
-                BuffType.Suppression, BuffType.Taunt
-            };
+                        {
+                            BuffType.Blind, BuffType.Charm, BuffType.CombatDehancer, BuffType.Fear, BuffType.Flee,
+                            BuffType.Knockback, BuffType.Knockup, BuffType.Polymorph, BuffType.Silence, BuffType.Sleep,
+                            BuffType.Snare, BuffType.Stun, BuffType.Suppression, BuffType.Taunt
+                        };
 
             for (int i = 0; i < buffs.Length; i++)
             {
@@ -160,26 +181,30 @@ namespace hi_im_gosu
             }
 
             Q = new Spell(SpellSlot.Q, 0f);
+            R = new Spell(SpellSlot.R, float.MaxValue);
             E = new Spell(SpellSlot.E, float.MaxValue);
 
             gapcloser = new[]
-            {
-                "AkaliShadowDance", "Headbutt", "DianaTeleport", "IreliaGatotsu", "JaxLeapStrike", "JayceToTheSkies",
-                "MaokaiUnstableGrowth", "MonkeyKingNimbus", "Pantheon_LeapBash", "PoppyHeroicCharge", "QuinnE",
-                "XenZhaoSweep", "blindmonkqtwo", "FizzPiercingStrike", "RengarLeap"
-            };
+                            {
+                                "AkaliShadowDance", "Headbutt", "ekkoe", "fioraq", "DianaTeleport", "illaoiwattack",
+                                "IreliaGatotsu", "JaxLeapStrike", "JayceToTheSkies", "MaokaiUnstableGrowth",
+                                "MonkeyKingNimbus", "Pantheon_LeapBash", "PoppyHeroicCharge", "QuinnE", "XenZhaoSweep",
+                                "blindmonkqtwo", "FizzPiercingStrike", "RengarLeap", "luciane", "alphastrike",
+                                "riventricleave", "rivenfeint", "viq"
+                            };
             notarget = new[]
-            {
-                "AatroxQ", "GragasE", "GravesMove", "HecarimUlt", "JarvanIVDragonStrike", "JarvanIVCataclysm", "KhazixE",
-                "khazixelong", "LeblancSlide", "LeblancSlideM", "LeonaZenithBlade", "UFSlash", "RenektonSliceAndDice",
-                "SejuaniArcticAssault", "ShenShadowDash", "RocketJump", "slashCast"
-            };
+                           {
+                               "AatroxQ", "GragasE", "GravesMove", "HecarimUlt", "JarvanIVDragonStrike",
+                               "JarvanIVCataclysm", "KhazixE", "khazixelong", "LeblancSlide", "LeblancSlideM",
+                               "LeonaZenithBlade", "UFSlash", "RenektonSliceAndDice", "SejuaniArcticAssault",
+                               "ShenShadowDash", "RocketJump", "slashCast", "shyvanatransformcast", "zace"
+                           };
             interrupt = new[]
-            {
-                "KatarinaR", "GalioIdolOfDurand", "Crowstorm", "Drain", "AbsoluteZero", "ShenStandUnited", "UrgotSwap2",
-                "AlZaharNetherGrasp", "FallenOne", "Pantheon_GrandSkyfall_Jump", "VarusQ", "CaitlynAceintheHole",
-                "MissFortuneBulletTime", "InfiniteDuress", "LucianR"
-            };
+                            {
+                                "KatarinaR", "GalioIdolOfDurand", "Crowstorm", "Drain", "AbsoluteZero", "ShenStandUnited",
+                                "UrgotSwap2", "AlZaharNetherGrasp", "FallenOne", "Pantheon_GrandSkyfall_Jump", "VarusQ",
+                                "CaitlynAceintheHole", "MissFortuneBulletTime", "InfiniteDuress", "LucianR"
+                            };
 
             for (int i = 0; i < gapcloser.Length; i++)
             {
@@ -199,15 +224,12 @@ namespace hi_im_gosu
             var cde = ObjectManager.Player.Spellbook.GetSpell(ObjectManager.Player.GetSpellSlot("SummonerBoost"));
             if (cde != null)
             {
-                if (cde.Slot != SpellSlot.Unknown)  //trees
+                if (cde.Slot != SpellSlot.Unknown) //trees
                 {
                     cleanse = new Spell(cde.Slot);
                 }
             }
 
-            menu.AddSubMenu(new Menu("Harass Options", "harass"));
-            menu.SubMenu("harass").AddItem(new MenuItem("hq", "Use Q Harass").SetValue(true));
-            menu.SubMenu("harass").AddItem(new MenuItem("he", "Use E Harass").SetValue(true));
             E.SetTargetted(0.25f, 2200f);
             Obj_AI_Base.OnProcessSpellCast += Game_ProcessSpell;
             Game.OnUpdate += Game_OnGameUpdate;
@@ -266,6 +288,106 @@ namespace hi_im_gosu
             }
         }
 
+        private static void Usepotion()
+        {
+            var iusehppotion = menu.Item("usehppotions").GetValue<bool>();
+            var iusepotionhp = Player.Health
+                               <= (Player.MaxHealth * (menu.Item("usepotionhp").GetValue<Slider>().Value) / 100);
+            var iusemppotion = menu.Item("usemppotions").GetValue<bool>();
+            var iusepotionmp = Player.Mana
+                               <= (Player.MaxMana * (menu.Item("usepotionmp").GetValue<Slider>().Value) / 100);
+            if (Player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
+
+            if (Utility.CountEnemiesInRange(800) > 0)
+            {
+                if (iusepotionhp && iusehppotion
+                    && !(ObjectManager.Player.HasBuff("RegenerationPotion")
+                         || ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlask")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                         || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
+                {
+                    if (Items.HasItem(2010) && Items.CanUseItem(2010))
+                    {
+                        Items.UseItem(2010);
+                    }
+
+                    if (Items.HasItem(2003) && Items.CanUseItem(2003))
+                    {
+                        Items.UseItem(2003);
+                    }
+
+                    if (Items.HasItem(2031) && Items.CanUseItem(2031))
+                    {
+                        Items.UseItem(2031);
+                    }
+
+                    if (Items.HasItem(2032) && Items.CanUseItem(2032))
+                    {
+                        Items.UseItem(2032);
+                    }
+
+                    if (Items.HasItem(2033) && Items.CanUseItem(2033))
+                    {
+                        Items.UseItem(2033);
+                    }
+                }
+
+                if (iusepotionmp && iusemppotion
+                    && !(ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")
+                         || ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlask")))
+                {
+                    if (Items.HasItem(2041) && Items.CanUseItem(2041))
+                    {
+                        Items.UseItem(2041);
+                    }
+
+                    if (Items.HasItem(2010) && Items.CanUseItem(2010))
+                    {
+                        Items.UseItem(2010);
+                    }
+
+                    if (Items.HasItem(2032) && Items.CanUseItem(2032))
+                    {
+                        Items.UseItem(2032);
+                    }
+
+                    if (Items.HasItem(2033) && Items.CanUseItem(2033))
+                    {
+                        Items.UseItem(2033);
+                    }
+                }
+            }
+        }
+
+        private static void Farm()
+        {
+            var mob =
+                MinionManager.GetMinions(
+                    Player.ServerPosition,
+                    E.Range,
+                    MinionTypes.All,
+                    MinionTeam.Neutral,
+                    MinionOrderTypes.MaxHealth).FirstOrDefault();
+            var Minions = MinionManager.GetMinions(Player.Position.Extend(Game.CursorPos, Q.Range), Player.AttackRange, MinionTypes.All);
+            var useQ = qmenu.Item("UseQJ").GetValue<bool>();
+          
+            int countMinions = 0;
+            foreach (var minions in Minions.Where(minion => minion.Health < Player.GetAutoAttackDamage(minion) + Q.GetDamage(minion)))
+            {
+                countMinions++;
+            }
+
+            if (countMinions >= 1 && useQ && Q.IsReady() && Minions != null)
+                Q.Cast(Player.Position.Extend(Game.CursorPos, Q.Range));
+            if (useQ && Q.IsReady() && Orbwalking.InAutoAttackRange(mob) && mob != null)
+            {
+                Q.Cast(Game.CursorPos);
+            }
+        }
+
         public static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             if (!unit.IsMe) return;
@@ -279,36 +401,50 @@ namespace hi_im_gosu
                 {
                     Q.Cast(Game.CursorPos);
                 }
+
                 Orbwalking.Orbwalk(TargetSelector.GetTarget(625, TargetSelector.DamageType.Physical), Game.CursorPos);
             }
-            if (Itemsmenu.Item("BOTRK").GetValue<bool>() && ((tar.Health / tar.MaxHealth) < botrk.Item("theirhp").GetValue<Slider>().Value) && ((ObjectManager.Player.Health / ObjectManager.Player.MaxHealth) < botrk.Item("myhp").GetValue<Slider>().Value))
+            
+            if (orbwalker.ActiveMode.ToString() == "Combo")
             {
-                //Game.PrintChat("in");
-                if (Items.CanUseItem(3153))
+                if (Itemsmenu.Item("BOTRK").GetValue<bool>()
+                    && ((tar.Health / tar.MaxHealth) < botrk.Item("theirhp").GetValue<Slider>().Value)
+                    && ((ObjectManager.Player.Health / ObjectManager.Player.MaxHealth)
+                        < botrk.Item("myhp").GetValue<Slider>().Value))
                 {
-                    Items.UseItem(3153, tar);
+                    //Game.PrintChat("in");
+                    if (Items.CanUseItem(3153))
+                    {
+                        Items.UseItem(3153, tar);
+                    }
+                    else if (Items.CanUseItem(3144))
+                    {
+                        {
+                            Items.UseItem(3144, tar);
+                        }
+                    }
+                }
+
+                if (Itemsmenu.Item("Ghostblade").GetValue<bool>())
+                {
+                    if (Items.CanUseItem(3142))
+                    {
+                        Items.UseItem(3142);
+                    }
                 }
             }
 
-            if (Itemsmenu.Item("Ghostblade").GetValue<bool>())
-            {
-                if (Items.CanUseItem(3142))
-                {
-                    Items.UseItem(3142);
-                }
-            }
-
-            if (menu.Item("UseEaa").GetValue<KeyBind>().Active)
+            if (emenu.Item("UseEaa").GetValue<KeyBind>().Active)
             {
                 E.Cast((Obj_AI_Base)target);
-                menu.Item("UseEaa").SetValue<KeyBind>(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle));
+                emenu.Item("UseEaa").SetValue<KeyBind>(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle));
             }
 
-            if (((orbwalker.ActiveMode.ToString() != "Combo" || !menu.Item("UseQC").GetValue<bool>()) &&
-                 ((orbwalker.ActiveMode.ToString() != "Mixed" || !menu.Item("hq").GetValue<bool>()) || !Q.IsReady())))
+            if (((orbwalker.ActiveMode.ToString() != "Combo" || !qmenu.Item("UseQC").GetValue<bool>()) &&
+                 ((orbwalker.ActiveMode.ToString() != "Mixed" || !qmenu.Item("hq").GetValue<bool>()) || !Q.IsReady())))
                 return;
 
-            if (menu.Item("restrictq").GetValue<bool>())
+            if (qmenu.Item("restrictq").GetValue<bool>())
             {
                 var after = ObjectManager.Player.Position +
                             Normalize(Game.CursorPos - ObjectManager.Player.Position) * 300;
@@ -320,6 +456,7 @@ namespace hi_im_gosu
                 {
                     Q.Cast(Game.CursorPos);
                 }
+
                 if (Vector3.DistanceSquared(tar.Position, ObjectManager.Player.Position) > 630 * 630 &&
                     disafter < 630 * 630)
                 {
@@ -341,6 +478,19 @@ namespace hi_im_gosu
 
         public static void Game_OnGameUpdate(EventArgs args)
         {
+            if (menu.Item("useR").GetValue<bool>() && R.IsReady()
+                && ObjectManager.Player.CountEnemiesInRange(1000) >= menu.Item("enemys").GetValue<Slider>().Value
+                && orbwalker.ActiveMode.ToString() == "Combo")
+            {
+                R.Cast();
+            }
+
+            Usepotion();
+            if (orbwalker.ActiveMode.ToString() == "LaneClear" && (100 * (Player.Mana / Player.MaxMana)) > qmenu.Item("Junglemana").GetValue<Slider>().Value)
+            {
+                Farm();
+            }
+
             if (menu.Item("walltumble").GetValue<KeyBind>().Active)
             {
                 TumbleHandler();
@@ -376,18 +526,18 @@ namespace hi_im_gosu
             if (!E.IsReady()) return; //||
             //(orbwalker.ActiveMode.ToString() != "Combo" || !menu.Item("UseEC").GetValue<bool>()) &&
             //!menu.Item("UseET").GetValue<KeyBind>().Active)) return;
-            if (((orbwalker.ActiveMode.ToString() == "Combo" && menu.Item("UseEC").GetValue<bool>()) || (orbwalker.ActiveMode.ToString() == "Mixed" && menu.Item("he").GetValue<bool>()) || menu.Item("UseET").GetValue<KeyBind>().Active))
+            if (((orbwalker.ActiveMode.ToString() == "Combo" && emenu.Item("UseEC").GetValue<bool>()) || (orbwalker.ActiveMode.ToString() == "Mixed" && emenu.Item("he").GetValue<bool>()) || emenu.Item("UseET").GetValue<KeyBind>().Active))
                 foreach (var hero in from hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(550f))
                                      let prediction = E.GetPrediction(hero)
                                      where NavMesh.GetCollisionFlags(
                                          prediction.UnitPosition.To2D()
                                              .Extend(ObjectManager.Player.ServerPosition.To2D(),
-                                                 -menu.Item("PushDistance").GetValue<Slider>().Value)
+                                                 -emenu.Item("PushDistance").GetValue<Slider>().Value)
                                              .To3D())
                                          .HasFlag(CollisionFlags.Wall) || NavMesh.GetCollisionFlags(
                                              prediction.UnitPosition.To2D()
                                                  .Extend(ObjectManager.Player.ServerPosition.To2D(),
-                                                     -(menu.Item("PushDistance").GetValue<Slider>().Value / 2))
+                                                     -(emenu.Item("PushDistance").GetValue<Slider>().Value / 2))
                                                  .To3D())
                                              .HasFlag(CollisionFlags.Wall)
                                      select hero)
