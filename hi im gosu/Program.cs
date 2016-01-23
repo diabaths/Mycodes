@@ -135,19 +135,18 @@ namespace hi_im_gosu
             emenu.AddItem(new MenuItem("he", "Use E Harass").SetValue(true));
             emenu.AddItem(
                 new MenuItem("UseET", "Use E (Toggle)").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
-            emenu.AddItem(new MenuItem("UseEInterrupt", "Use E To Interrupt").SetValue(true));
+
+            emenu.AddItem(new MenuItem("Int_E", "Use E To Interrupt").SetValue(true));
+            emenu.AddItem(new MenuItem("Gap_E", "Use E To Gabcloser").SetValue(true));
             emenu.AddItem(new MenuItem("PushDistance", "E Push Distance").SetValue(new Slider(425, 475, 300)));
             emenu.AddItem(
                 new MenuItem("UseEaa", "Use E after auto").SetValue(
                     new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
-            menu.AddSubMenu(new Menu("Gapcloser List", "gap"));
-            menu.AddSubMenu(new Menu("Gapcloser List 2", "gap2"));
-            menu.AddSubMenu(new Menu("Interrupt List", "int"));
            
             menu.AddItem(new MenuItem("walltumble", "Wall Tumble"))
                 .SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press));
             menu.AddItem(new MenuItem("useR", "Use R Combo").SetValue(true));
-            menu.AddItem(new MenuItem("enemys", "If Enemys Around >=").SetValue(new Slider(1, 1, 5)));
+            menu.AddItem(new MenuItem("enemys", "If Enemys Around >=").SetValue(new Slider(2, 1, 5)));
             Itemsmenu = menu.AddSubMenu(new Menu("Items", "Items"));
             Itemsmenu.AddSubMenu(new Menu("Potions", "Potions"));
             Itemsmenu.SubMenu("Potions")
@@ -183,44 +182,7 @@ namespace hi_im_gosu
             Q = new Spell(SpellSlot.Q, 0f);
             R = new Spell(SpellSlot.R, float.MaxValue);
             E = new Spell(SpellSlot.E, float.MaxValue);
-
-            gapcloser = new[]
-                            {
-                                "AkaliShadowDance", "Headbutt", "ekkoe", "fioraq", "DianaTeleport", "illaoiwattack",
-                                "IreliaGatotsu", "JaxLeapStrike", "JayceToTheSkies", "MaokaiUnstableGrowth",
-                                "MonkeyKingNimbus", "Pantheon_LeapBash", "PoppyHeroicCharge", "QuinnE", "XenZhaoSweep",
-                                "blindmonkqtwo", "FizzPiercingStrike", "RengarLeap", "luciane", "alphastrike",
-                                "riventricleave", "rivenfeint", "viq"
-                            };
-            notarget = new[]
-                           {
-                               "AatroxQ", "GragasE", "GravesMove", "HecarimUlt", "JarvanIVDragonStrike",
-                               "JarvanIVCataclysm", "KhazixE", "khazixelong", "LeblancSlide", "LeblancSlideM",
-                               "LeonaZenithBlade", "UFSlash", "RenektonSliceAndDice", "SejuaniArcticAssault",
-                               "ShenShadowDash", "RocketJump", "slashCast", "shyvanatransformcast", "zace"
-                           };
-            interrupt = new[]
-                            {
-                                "KatarinaR", "GalioIdolOfDurand", "Crowstorm", "Drain", "AbsoluteZero", "ShenStandUnited",
-                                "UrgotSwap2", "AlZaharNetherGrasp", "FallenOne", "Pantheon_GrandSkyfall_Jump", "VarusQ",
-                                "CaitlynAceintheHole", "MissFortuneBulletTime", "InfiniteDuress", "LucianR"
-                            };
-
-            for (int i = 0; i < gapcloser.Length; i++)
-            {
-                menu.SubMenu("gap").AddItem(new MenuItem(gapcloser[i], gapcloser[i])).SetValue(true);
-            }
-
-            for (int i = 0; i < notarget.Length; i++)
-            {
-                menu.SubMenu("gap2").AddItem(new MenuItem(notarget[i], notarget[i])).SetValue(true);
-            }
-
-            for (int i = 0; i < interrupt.Length; i++)
-            {
-                menu.SubMenu("int").AddItem(new MenuItem(interrupt[i], interrupt[i])).SetValue(true);
-            }
-
+            
             var cde = ObjectManager.Player.Spellbook.GetSpell(ObjectManager.Player.GetSpellSlot("SummonerBoost"));
             if (cde != null)
             {
@@ -234,6 +196,9 @@ namespace hi_im_gosu
             Obj_AI_Base.OnProcessSpellCast += Game_ProcessSpell;
             Game.OnUpdate += Game_OnGameUpdate;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+
             Game.PrintChat("<font color='#881df2'>Blm95 Vayne reworked by Diabaths</font> Loaded.");
             Game.PrintChat(
                 "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
@@ -242,35 +207,26 @@ namespace hi_im_gosu
             menu.AddToMainMenu();
         }
 
+        private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (E.IsReady() && gapcloser.Sender.IsValidTarget(550) && emenu.Item("Gap_E").GetValue<bool>())
+            {
+                E.Cast(gapcloser.Sender);
+            }
+        }
+
+        private static void Interrupter2_OnInterruptableTarget(
+            Obj_AI_Hero unit,
+            Interrupter2.InterruptableTargetEventArgs args)
+        {
+            if (E.IsReady() && unit.IsValidTarget(550) && emenu.Item("Int_E").GetValue<bool>())
+            {
+                E.Cast(unit);
+            }
+        }
+
         public static void Game_ProcessSpell(Obj_AI_Base hero, GameObjectProcessSpellCastEventArgs args)
         {
-            //Game.PrintChat(args.SData.Name);
-            if (menu.Item("UseEInterrupt").GetValue<bool>() && interrupt.Any(x => x.Contains(args.SData.Name)) &&
-                menu.Item(args.SData.Name).GetValue<bool>() && Player.Distance(hero) <= 550)
-            {
-                // Game.PrintChat("in");
-                //if (interrupt.Any(str => str.Contains(args.SData.Name)))
-                //{
-                //  Game.PrintChat("in2");
-                E.Cast(hero);
-                //}
-            }
-
-            if (gapcloser.Any(str => str.Contains(args.SData.Name)) && menu.Item(args.SData.Name).GetValue<bool>() && args.Target.IsMe)
-            {
-                E.Cast(hero);
-            }
-
-            if (notarget.Any(str => str.Contains(args.SData.Name)) &&
-                Vector3.Distance(args.End, ObjectManager.Player.Position) <= 300 && hero.IsValidTarget(550f) &&
-                menu.Item(args.SData.Name).GetValue<bool>())
-            {
-                if (ObjectManager.Player.Distance(args.End) < ObjectManager.Player.Distance(hero.Position))
-                {
-                    E.Cast(hero);
-                }
-            }
-
             if (args.SData.Name.ToLower() == "zedult" && args.Target.IsMe)
             {
                 if (Items.CanUseItem(3140))

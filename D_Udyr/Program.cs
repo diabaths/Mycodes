@@ -16,6 +16,14 @@ namespace D_Udyr
 
         private static readonly List<Spell> SpellList = new List<Spell>();
 
+        public static bool Tiger;
+
+        public static bool Turtle;
+
+        public static bool Bear;
+
+        public static bool Phoenix;
+
         private static Spell _q;
 
         private static Spell _w;
@@ -226,6 +234,7 @@ namespace D_Udyr
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += OnGameUpdate;
             _config.Item("udAutoLevel").ValueChanged += EnabledValueChanged;
+            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             if (_config.Item("udAutoLevel").GetValue<bool>())
             {
                 new AutoLevel(Style());
@@ -236,6 +245,26 @@ namespace D_Udyr
             Game.PrintChat("<font color='#881df2'>StunCycle by xcxooxl");
             Game.PrintChat(
                  "<font color='#f2f21d'>If You like my work and want to support me,  plz donate via paypal in </font> <font color='#00e6ff'>ssssssssssmith@hotmail.com</font> (10) S");
+        }
+
+        private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        { /* (_player.HasBuff("UdyrTigerStance")
+           (_player.HasBuff("UdyrTurtleStance")
+           (_player.HasBuff("UdyrBearStance")
+           (_player.HasBuff("UdyrPhoenixStance") */
+            Tiger = args.SData.Name == "UdyrTigerStance";
+
+            Turtle = args.SData.Name == "UdyrTurtleStance";
+
+            Bear = args.SData.Name == "UdyrBearStance";
+
+            Phoenix = args.SData.Name == "UdyrPhoenixStance";
+
+            var spell = args.SData;
+            if (sender.IsMe)
+            {
+                Game.PrintChat("Spell name: " + args.SData.Name.ToString());
+            }
         }
 
         private static void OnGameUpdate(EventArgs args)
@@ -303,6 +332,12 @@ namespace D_Udyr
             }
         }
 
+        /* (_player.HasBuff("UdyrTigerStance")
+           (_player.HasBuff("UdyrTurtleStance")
+           (_player.HasBuff("UdyrBearStance")
+           (_player.HasBuff("UdyrPhoenixStance") */
+        private static bool Havebuff => _player.GetBuff("UdyrBearStance") || _player.GetBuff("UdyrTurtleStance") || _player.GetBuff("UdyrBearStance") || _player.GetBuff("UdyrPhoenixStance");
+
         private static void EnabledValueChanged(object sender, OnValueChangeEventArgs e)
         {
             AutoLevel.Enabled(e.GetNewValue<bool>());
@@ -318,24 +353,24 @@ namespace D_Udyr
 
             foreach (var minion in minions)
             {
-                if (_config.Item("Use-R-Farm").GetValue<bool>() && _r.IsReady())
+                if (_config.Item("Use-R-Farm").GetValue<bool>() && _r.IsReady() && !(Phoenix || Tiger||Turtle||Bear))
                 {
-                    Utility.DelayAction.Add(delay, () => _r.Cast());
+                    _r.Cast();
                 }
 
-                if (_config.Item("Use-Q-Farm").GetValue<bool>() && _q.IsReady())
+                if (_config.Item("Use-Q-Farm").GetValue<bool>() && _q.IsReady() && !Havebuff)
                 {
-                    Utility.DelayAction.Add(delay, () => _q.Cast());
+                   _q.Cast();
                 }
 
-                if (_config.Item("Use-W-Farm").GetValue<bool>() && _w.IsReady())
+                if (_config.Item("Use-W-Farm").GetValue<bool>() && _w.IsReady() && !Havebuff)
                 {
-                    Utility.DelayAction.Add(delay, () => _w.Cast());
+                  _w.Cast();
                 }
 
-                if (_config.Item("Use-E-Farm").GetValue<bool>() && _e.IsReady())
+                if (_config.Item("Use-E-Farm").GetValue<bool>() && _e.IsReady() && !Havebuff)
                 {
-                    Utility.DelayAction.Add(delay, () => _e.Cast());
+              _e.Cast();
                 }
 
                 if (useItemsl && _hydra.IsReady() && minion.IsValidTarget(_hydra.Range))

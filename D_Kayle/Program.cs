@@ -26,8 +26,6 @@ namespace D_Kayle
 
         private static Obj_AI_Hero _player;
 
-        private static Int32 _lastSkin;
-
         private static SpellSlot _smiteSlot;
 
         private static Spell _smite;
@@ -77,7 +75,6 @@ namespace D_Kayle
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
 
             //D Kayle
-
             _config = new Menu("D-Kayle", "D-Kayle", true);
 
             //TargetSelector
