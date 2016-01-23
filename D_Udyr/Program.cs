@@ -336,8 +336,7 @@ namespace D_Udyr
            (_player.HasBuff("UdyrTurtleStance")
            (_player.HasBuff("UdyrBearStance")
            (_player.HasBuff("UdyrPhoenixStance") */
-        private static bool Havebuff => _player.GetBuff("UdyrBearStance") || _player.GetBuff("UdyrTurtleStance") || _player.GetBuff("UdyrBearStance") || _player.GetBuff("UdyrPhoenixStance");
-
+       
         private static void EnabledValueChanged(object sender, OnValueChangeEventArgs e)
         {
             AutoLevel.Enabled(e.GetNewValue<bool>());
@@ -358,17 +357,17 @@ namespace D_Udyr
                     _r.Cast();
                 }
 
-                if (_config.Item("Use-Q-Farm").GetValue<bool>() && _q.IsReady() && !Havebuff)
+                if (_config.Item("Use-Q-Farm").GetValue<bool>() && _q.IsReady())
                 {
                    _q.Cast();
                 }
 
-                if (_config.Item("Use-W-Farm").GetValue<bool>() && _w.IsReady() && !Havebuff)
+                if (_config.Item("Use-W-Farm").GetValue<bool>() && _w.IsReady())
                 {
                   _w.Cast();
                 }
 
-                if (_config.Item("Use-E-Farm").GetValue<bool>() && _e.IsReady() && !Havebuff)
+                if (_config.Item("Use-E-Farm").GetValue<bool>() && _e.IsReady())
                 {
               _e.Cast();
                 }
