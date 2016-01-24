@@ -566,7 +566,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee)
+            if (useW && _w.IsReady() && !HavePassivee && !_q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -620,7 +620,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee)
+            if (useW && _w.IsReady() && !HavePassivee && !_q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -677,7 +677,7 @@ namespace D_Lucian
                     ExtendedQ();
 
 
-            if (_w.IsReady() && useWl && !HavePassivee)
+            if (_w.IsReady() && useWl && !HavePassivee && !_q.IsReady())
             {
                 if (_w.GetLineFarmLocation(farmminions).MinionsHit >= minionhitw)
                 {
@@ -723,7 +723,7 @@ namespace D_Lucian
                 {
                     _q.Cast(mob);
                 }
-                if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && !HavePassivee && !mob.Name.Contains("Mini"))
+                if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range) && !HavePassivee && !mob.Name.Contains("Mini") && !_q.IsReady())
                 {
                     _w.Cast(mob);
                 }

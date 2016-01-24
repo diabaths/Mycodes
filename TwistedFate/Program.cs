@@ -80,7 +80,8 @@ namespace TwistedFate
             /* Q */
             var q = new Menu("Q - Wildcards", "Q");
             {
-                q.AddItem(new MenuItem("QFarm", "Q Farm Key").SetValue(true));
+                q.AddItem(new MenuItem("QC", "Use Q Combo").SetValue(true));
+                q.AddItem(new MenuItem("QFarm", "Use Q Farm").SetValue(true));
                 q.AddItem(new MenuItem("Lanemana", "Minimum Mana to Use Q").SetValue(new Slider(60, 1, 100)));
                 q.AddItem(new MenuItem("QMinions", "Only use Q to Farm if > X Minions in Range"))
                     .SetValue(new Slider(1, 0, 5));
@@ -477,7 +478,7 @@ namespace TwistedFate
             var qTarget = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (Utils.TickCount - CastQTick < 500)
             {
-                if (qTarget != null)
+                if (qTarget != null && Config.Item("QC").GetValue<bool>())
                 {
                     Q.Cast(qTarget);
                 }
@@ -547,7 +548,7 @@ namespace TwistedFate
                 }
 
                 if (qTarget != null && (qTarget.MoveSpeed < 250 || qTarget.IsStunned || !qTarget.CanMove || qTarget.IsRooted ||
-                    qTarget.IsCharmed || qTarget.Distance(Player) < 400))
+                    qTarget.IsCharmed || qTarget.Distance(Player) < 400) && Config.Item("QC").GetValue<bool>())
                 {
                     Q.Cast(qTarget);
                 }
