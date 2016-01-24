@@ -318,7 +318,7 @@ namespace hi_im_gosu
             }
         }
 
-        private static void Farm()
+       /* private static void Farm()
         {
             var mob =
                 MinionManager.GetMinions(
@@ -331,7 +331,7 @@ namespace hi_im_gosu
             var useQ = qmenu.Item("UseQJ").GetValue<bool>();
           
             int countMinions = 0;
-            foreach (var minions in Minions.Where(minion => minion.Health < Player.GetAutoAttackDamage(minion)))
+            foreach (var minions in Minions.Where(minion => minion.Health < Player.GetAutoAttackDamage(minion) || minion.Health < Q.GetDamage(minion)))
             {
                 countMinions++;
             }
@@ -343,15 +343,50 @@ namespace hi_im_gosu
             {
                 Q.Cast(Game.CursorPos);
             }
-        } 
+        }*/
+
 
         public static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             if (!unit.IsMe) return;
+
+            if (orbwalker.ActiveMode.ToString() == "LaneClear"
+              && 100 * (Player.Mana / Player.MaxMana) > qmenu.Item("Junglemana").GetValue<Slider>().Value)
+            {
+                var mob =
+               MinionManager.GetMinions(
+                   Player.ServerPosition,
+                   E.Range,
+                   MinionTypes.All,
+                   MinionTeam.Neutral,
+                   MinionOrderTypes.MaxHealth).FirstOrDefault();
+                var Minions = MinionManager.GetMinions(
+                    Player.Position.Extend(Game.CursorPos, Q.Range),
+                    Player.AttackRange,
+                    MinionTypes.All);
+                var useQ = qmenu.Item("UseQJ").GetValue<bool>();
+                int countMinions = 0;
+                foreach (
+                         var minions in
+                             Minions.Where(
+                                 minion =>
+                                 minion.Health < Player.GetAutoAttackDamage(minion) || minion.Health < Q.GetDamage(minion) + Player.GetAutoAttackDamage(minion)))
+                {
+                    countMinions++;
+                }
+
+                if (countMinions >=2 && useQ && Q.IsReady() && Minions != null) Q.Cast(Player.Position.Extend(Game.CursorPos, Q.Range / 2));
+
+                if (useQ && Q.IsReady() && Orbwalking.InAutoAttackRange(mob) && mob != null)
+                {
+                    Q.Cast(Game.CursorPos);
+                }
+            }
+
             if (!(target is Obj_AI_Hero)) return;
 
             tar = (Obj_AI_Hero)target;
-
+            
             if (menu.Item("aaqaa").GetValue<KeyBind>().Active)
             {
                 if (Q.IsReady())
@@ -361,7 +396,7 @@ namespace hi_im_gosu
 
                 Orbwalking.Orbwalk(TargetSelector.GetTarget(625, TargetSelector.DamageType.Physical), Game.CursorPos);
             }
-            
+
             if (orbwalker.ActiveMode.ToString() == "Combo")
             {
                 if (Itemsmenu.Item("BOTRK").GetValue<bool>()
@@ -382,7 +417,7 @@ namespace hi_im_gosu
                     }
                 }
 
-                if (Itemsmenu.Item("Ghostblade").GetValue<bool>())
+                if (Itemsmenu.Item("Ghostblade").GetValue<bool>() && tar.IsValidTarget(800))
                 {
                     if (Items.CanUseItem(3142))
                     {
@@ -397,14 +432,13 @@ namespace hi_im_gosu
                 emenu.Item("UseEaa").SetValue<KeyBind>(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle));
             }
 
-            if (((orbwalker.ActiveMode.ToString() != "Combo" || !qmenu.Item("UseQC").GetValue<bool>()) &&
-                 ((orbwalker.ActiveMode.ToString() != "Mixed" || !qmenu.Item("hq").GetValue<bool>()) || !Q.IsReady())))
-                return;
+            if (((orbwalker.ActiveMode.ToString() != "Combo" || !qmenu.Item("UseQC").GetValue<bool>())
+                 && ((orbwalker.ActiveMode.ToString() != "Mixed" || !qmenu.Item("hq").GetValue<bool>()) || !Q.IsReady()))) return;
 
             if (qmenu.Item("restrictq").GetValue<bool>())
             {
-                var after = ObjectManager.Player.Position +
-                            Normalize(Game.CursorPos - ObjectManager.Player.Position) * 300;
+                var after = ObjectManager.Player.Position
+                            + Normalize(Game.CursorPos - ObjectManager.Player.Position) * 300;
                 //Game.PrintChat("After: {0}", after);
                 var disafter = Vector3.DistanceSquared(after, tar.Position);
                 //Game.PrintChat("DisAfter: {0}", disafter);
@@ -414,8 +448,8 @@ namespace hi_im_gosu
                     Q.Cast(Game.CursorPos);
                 }
 
-                if (Vector3.DistanceSquared(tar.Position, ObjectManager.Player.Position) > 630 * 630 &&
-                    disafter < 630 * 630)
+                if (Vector3.DistanceSquared(tar.Position, ObjectManager.Player.Position) > 630 * 630
+                    && disafter < 630 * 630)
                 {
                     Q.Cast(Game.CursorPos);
                 }
@@ -443,11 +477,7 @@ namespace hi_im_gosu
             }
 
             Usepotion();
-            if (orbwalker.ActiveMode.ToString() == "LaneClear" && 100 * (Player.Mana / Player.MaxMana) > qmenu.Item("Junglemana").GetValue<Slider>().Value)
-            {
-                Farm();
-            }
-
+            
             if (menu.Item("walltumble").GetValue<KeyBind>().Active)
             {
                 TumbleHandler();
