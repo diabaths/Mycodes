@@ -22,13 +22,7 @@ namespace hi_im_gosu
         private static Menu menu;
 
         private static Dictionary<string, SpellSlot> spellData;
-
-        private static string[] interrupt;
-
-        private static string[] notarget;
-
-        private static string[] gapcloser;
-
+        
         private static Obj_AI_Hero tar;
         public const string ChampName = "Vayne";
         public static Obj_AI_Hero Player;
@@ -41,15 +35,15 @@ namespace hi_im_gosu
         private static Menu qss;
 
         /* Asuna VayneHunter Copypasta */
-        private static readonly Vector2 midPos = new Vector2(6707.485f, 8802.744f);
+        private static readonly Vector2 MidPos = new Vector2(6707.485f, 8802.744f);
 
-        private static readonly Vector2 dragPos = new Vector2(11514, 4462);
+        private static readonly Vector2 DragPos = new Vector2(11514, 4462);
 
         private static float LastMoveC;
 
         private static void TumbleHandler()
         {
-            if (Player.Distance(midPos) >= Player.Distance(dragPos))
+            if (Player.Distance(MidPos) >= Player.Distance(DragPos))
             {
                 if (Player.Position.X < 12000 || Player.Position.X > 12070 || Player.Position.Y < 4800 ||
                 Player.Position.Y > 4872)
@@ -59,7 +53,7 @@ namespace hi_im_gosu
                 else
                 {
                     MoveToLimited(new Vector2(12050, 4827).To3D());
-                    Q.Cast(dragPos, true);
+                    Q.Cast(DragPos, true);
                 }
             }
             else
@@ -72,7 +66,7 @@ namespace hi_im_gosu
                 else
                 {
                     MoveToLimited(new Vector2(6958, 8944).To3D());
-                    Q.Cast(midPos, true);
+                    Q.Cast(MidPos, true);
                 }
             }
         }
@@ -400,9 +394,8 @@ namespace hi_im_gosu
             if (orbwalker.ActiveMode.ToString() == "Combo")
             {
                 if (Itemsmenu.Item("BOTRK").GetValue<bool>()
-                    && ((tar.Health / tar.MaxHealth) < botrk.Item("theirhp").GetValue<Slider>().Value)
-                    && ((ObjectManager.Player.Health / ObjectManager.Player.MaxHealth)
-                        < botrk.Item("myhp").GetValue<Slider>().Value))
+                    && (tar.Health <= tar.MaxHealth * botrk.Item("theirhp").GetValue<Slider>().Value / 100)
+                    || (Player.Health <= Player.MaxHealth * botrk.Item("myhp").GetValue<Slider>().Value / 100))
                 {
                     //Game.PrintChat("in");
                     if (Items.CanUseItem(3153))

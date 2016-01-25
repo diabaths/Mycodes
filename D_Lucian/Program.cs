@@ -311,8 +311,7 @@ namespace D_Lucian
             }
 
             _player = ObjectManager.Player;
-
-            Orbwalker.SetAttack(true);
+            
             Usecleanse();
             KillSteal();
             Usepotion();
@@ -558,7 +557,7 @@ namespace D_Lucian
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
-            if (useQ && !HavePassivee)
+            if (useQ && !HavePassivee && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget(_q1.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
@@ -566,7 +565,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee && !_q.IsReady())
+            if (useW && _w.IsReady() && !HavePassivee && !_q.IsReady() && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -612,7 +611,7 @@ namespace D_Lucian
             var useQ = _config.Item("UseQH").GetValue<bool>();
             var useW = _config.Item("UseWH").GetValue<bool>();
 
-            if (useQ && _q.IsReady() && !HavePassivee)
+            if (useQ && _q.IsReady() && !HavePassivee && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_q1.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget(_q1.Range) && !t.HasBuffOfType(BuffType.Invulnerability))
@@ -620,7 +619,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee && !_q.IsReady())
+            if (useW && _w.IsReady() && !HavePassivee && !_q.IsReady() && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
@@ -845,7 +844,7 @@ namespace D_Lucian
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
-                if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
+                if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>() && !HavePassivee && !_player.IsDashing())
                 {
                     if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range - 30))
                     {
@@ -856,13 +855,12 @@ namespace D_Lucian
                         CastQ();
                     }
                 }
-                if (_w.IsReady() && _config.Item("UseWM").GetValue<bool>() && hero.IsValidTarget(_w.Range) &&
-                    _w.GetDamage(hero) > hero.Health)
+                if (_w.IsReady() && _config.Item("UseWM").GetValue<bool>() && hero.IsValidTarget(_w.Range)
+                    && _w.GetDamage(hero) > hero.Health && !HavePassivee && !_player.IsDashing())
                 {
                     var predW = _w.GetPrediction(hero);
-                    if (hero.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High &&
-                        predW.CollisionObjects.Count == 0)
-                        _w.Cast(hero, false, true);
+                    if (hero.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High
+                        && predW.CollisionObjects.Count == 0) _w.Cast(hero, false, true);
                     else if (hero.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
                     {
                         _w2.Cast(hero, false, true);
