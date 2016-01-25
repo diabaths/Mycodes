@@ -323,6 +323,7 @@ namespace D_Ezreal
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
+            Orbwalking.BeforeAttack += OnBeforeAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
 
         }
@@ -398,13 +399,8 @@ namespace D_Ezreal
             {
                 Harass();
             }
-
-            if (_config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value)
-            {
-                LastHit();
-            }
-            Muramana();
+            
+            
             KillSteal();
             Usepotion();
             Usecleanse();
@@ -420,19 +416,44 @@ namespace D_Ezreal
             }
         }
 
+        private static void OnBeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        {
+            var changetime = Environment.TickCount - _lastTick;
+            var muranama = _player.Mana >=
+                           (_player.MaxMana * (_config.Item("muramanamin").GetValue<Slider>().Value) / 100);
+            if (!_config.Item("usemuramana").GetValue<bool>()) return;
+            if (muranama && _player.Buffs.Count(buf => buf.Name == "Muramana") == 0 &&
+                _config.Item("ActiveCombo").GetValue<KeyBind>().Active && changetime >= 350)
+            {
+                Items.UseItem(3042);
+                _lastTick = Environment.TickCount;
+            }
+            if ((!muranama || !_config.Item("ActiveCombo").GetValue<KeyBind>().Active) &&
+                _player.Buffs.Count(buf => buf.Name == "Muramana") == 1 && changetime >= 350)
+            {
+                Items.UseItem(3042);
+                _lastTick = Environment.TickCount;
+            }
+        }
+
+
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useW = _config.Item("UseWC").GetValue<bool>();
             var useQH = _config.Item("UseQH").GetValue<bool>();
             var useWH = _config.Item("UseWH").GetValue<bool>();
-            var useqlast =  _config.Item("UseQLH").GetValue<bool>();
+            var useqlast = _config.Item("UseQLH").GetValue<bool>();
             var useqlane = _config.Item("UseQL").GetValue<bool>() || _config.Item("UseQJ").GetValue<bool>();
             var lastmana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value;
-            var lanemana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value || (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value;
-            var harassmana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value;
+            var lanemana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value
+                           || (100 * (_player.Mana / _player.MaxMana))
+                           > _config.Item("Junglemana").GetValue<Slider>().Value;
+            var harassmana = (100 * (_player.Mana / _player.MaxMana))
+                             > _config.Item("Harrasmana").GetValue<Slider>().Value;
             var combo = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
-            var harass = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed || _config.Item("harasstoggle").GetValue<KeyBind>().Active;
+            var harass = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed
+                         || _config.Item("harasstoggle").GetValue<KeyBind>().Active;
             var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
             var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
             if (combo && unit.IsMe && (target is Obj_AI_Hero))
@@ -455,7 +476,7 @@ namespace D_Ezreal
                     }
                 }
             }
-            if (harass && unit.IsMe && (target is Obj_AI_Hero)&& harassmana)
+            if (harass && unit.IsMe && (target is Obj_AI_Hero) && harassmana)
             {
                 if (useQH && _q.IsReady())
                 {
@@ -475,42 +496,30 @@ namespace D_Ezreal
                     }
                 }
             }
+
             //Creditc FlapperDoodle
-            if (lastHit && lastmana && useqlast || laneClear && lanemana && useqlane)
+            if (_q.IsReady() && (lastHit && lastmana && useqlast || laneClear && lanemana && useqlane))
             {
-                foreach (
-                    var minionDie in
-                        MinionManager.GetMinions(_q.Range)
-                            .Where(
-                                minion =>
-                                    target.NetworkId != minion.NetworkId && minion.IsEnemy /*&&
+                int countMinions = 0;
+                foreach (var minionDie in
+                    MinionManager.GetMinions(_q.Range)
+                        .Where(
+                            minion => target.NetworkId != minion.NetworkId && minion.IsEnemy /*&&
                                     HealthPrediction.GetHealthPrediction(minion,
-                                        (int) ((_player.AttackDelay*600)*2.65f + Game.Ping/1.5), 0) <= 0*/ &&
-                                    _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
-                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
-                        _q.Cast(minionDie, true);
+                                        (int) ((_player.AttackDelay*600)*2.65f + Game.Ping/1.5), 0) <= 0*/
+                                      && (_q.GetDamage(minion) >= minion.Health
+                                          || minion.Health < Player.GetAutoAttackDamage(minion)
+                                          || minion.Health < _q.GetDamage(minion) + Player.GetAutoAttackDamage(minion)))
+                    )
+                {
+                    countMinions++;
+
+                    if (countMinions >= 1 && _q.GetPrediction(minionDie).Hitchance >= HitChance.High
+                        && _q.GetPrediction(minionDie).CollisionObjects.Count == 0) _q.Cast(minionDie);
+                }
             }
         }
 
-        private static void Muramana()
-        {
-            var changetime = Environment.TickCount - _lastTick;
-            var muranama = _player.Mana >=
-                           (_player.MaxMana*(_config.Item("muramanamin").GetValue<Slider>().Value)/100);
-            if (!_config.Item("usemuramana").GetValue<bool>()) return;
-            if (muranama && _player.Buffs.Count(buf => buf.Name == "Muramana") == 0 &&
-                _config.Item("ActiveCombo").GetValue<KeyBind>().Active && changetime >= 350)
-            {
-                Items.UseItem(3042);
-                _lastTick = Environment.TickCount;
-            }
-            if ((!muranama || !_config.Item("ActiveCombo").GetValue<KeyBind>().Active) &&
-                _player.Buffs.Count(buf => buf.Name == "Muramana") == 1 && changetime >= 350)
-            {
-                Items.UseItem(3042);
-                _lastTick = Environment.TickCount;
-            }
-        }
 
         private static void Combo()
         {
@@ -577,17 +586,14 @@ namespace D_Ezreal
         private static void Laneclear()
         {
             var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-            if (_config.Item("UseQL").GetValue<bool>()) Farm_skills(_q, true);
+           
             if (tq.IsValidTarget(_q.Range - 50) && _q.GetPrediction(tq).CollisionObjects.Count == 0 && _config.Item("UseQLH").GetValue<bool>())
             {
                 _q.CastIfHitchanceEquals(tq, HitChance.High, true);
             }
         }
 
-        private static void LastHit()
-        {
-            if (_config.Item("UseQLH").GetValue<bool>()) Farm_skills(_q, true);
-        }
+       
 
         private static void JungleClear()
         {
@@ -757,7 +763,7 @@ namespace D_Ezreal
 
         private static void KillSteal()
         {
-            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy && hero.IsValidTarget(_r.Range)))
             {
                 var useq = _config.Item("useQK").GetValue<bool>();
                 var usew = _config.Item("useWK").GetValue<bool>();
@@ -770,6 +776,7 @@ namespace D_Ezreal
                 var wmana = _player.Spellbook.GetSpell(SpellSlot.W).ManaCost;
                 var qmana = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost;
                 var rmana = _player.Spellbook.GetSpell(SpellSlot.R).ManaCost;
+                var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
                 if (usew && _w.IsReady() && whDmg - 20 > hero.Health && !hero.IsInvulnerable)
                 {
                     if (hero.IsValidTarget(_w.Range) && _player.Mana > wmana + emana)
@@ -799,7 +806,7 @@ namespace D_Ezreal
                         _q.Cast(hero, true);
                     }
                 }
-                if (user && !hero.IsInvulnerable)
+                if (user && !hero.IsInvulnerable && _player.Distance(hero) >=minrange)
                 {
                     if (_q.IsReady() && _w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q) + _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_q.Range))
                         return;
@@ -821,7 +828,7 @@ namespace D_Ezreal
             var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
             var rsolo = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
-            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(_r.Range)))
+            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy && hero.IsValidTarget(_r.Range)))
             {
                 var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
                 if (hero == null) return;
@@ -856,43 +863,7 @@ namespace D_Ezreal
             }
         }
 
-        //Creditcs FlapperDoodle
-        private static void Farm_skills(Spell spell, bool skillshot = false)
-        {
-
-            var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
-            var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
-            if (lastHit && _player.ManaPercent > _config.Item("lastmana").GetValue<Slider>().Value)
-            {
-                foreach (var minionDie in
-                   MinionManager.GetMinions(_q.Range)
-                       .Where(
-                           minion =>
-                           minion.IsEnemy
-                           /*&& HealthPrediction.GetHealthPrediction(
-                               minion,
-                               (int)((_player.AttackDelay * 600) * 2.65f + Game.Ping/1.5),
-                               0) <= 0 */&& _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
-                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High
-                        && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
-                        _q.Cast(minionDie, true); 
-            }
-            if (laneClear && _player.ManaPercent > _config.Item("Lanemana").GetValue<Slider>().Value)
-            {
-                foreach (var minionDie in
-                    MinionManager.GetMinions(_q.Range)
-                        .Where(
-                            minion =>
-                            minion.IsEnemy
-                            /*&& HealthPrediction.GetHealthPrediction(
-                                minion,
-                                (int)((_player.AttackDelay * 600) * 2.65f + Game.Ping /1.5),
-                                0) <= 0 */&& _q.GetDamage(minion) >= minion.Health && _q.IsReady()))
-                    if (_q.GetPrediction(minionDie).Hitchance >= HitChance.High
-                        && _q.GetPrediction(minionDie).CollisionObjects.Count == 0)
-                        _q.Cast(minionDie, true); 
-            }
-        }
+       
 
         private static void Usecleanse()
         {
