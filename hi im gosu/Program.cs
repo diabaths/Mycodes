@@ -345,31 +345,31 @@ namespace hi_im_gosu
             if (!unit.IsMe) return;
 
             if (orbwalker.ActiveMode.ToString() == "LaneClear"
-              && 100 * (Player.Mana / Player.MaxMana) > qmenu.Item("Junglemana").GetValue<Slider>().Value)
+                && 100 * (Player.Mana / Player.MaxMana) > qmenu.Item("Junglemana").GetValue<Slider>().Value)
             {
                 var mob =
-               MinionManager.GetMinions(
-                   Player.ServerPosition,
-                   E.Range,
-                   MinionTypes.All,
-                   MinionTeam.Neutral,
-                   MinionOrderTypes.MaxHealth).FirstOrDefault();
+                    MinionManager.GetMinions(
+                        Player.ServerPosition,
+                        E.Range,
+                        MinionTypes.All,
+                        MinionTeam.Neutral,
+                        MinionOrderTypes.MaxHealth).FirstOrDefault();
                 var Minions = MinionManager.GetMinions(
                     Player.Position.Extend(Game.CursorPos, Q.Range),
                     Player.AttackRange,
                     MinionTypes.All);
                 var useQ = qmenu.Item("UseQJ").GetValue<bool>();
                 int countMinions = 0;
-                foreach (
-                         var minions in
-                             Minions.Where(
-                                 minion =>
-                                 minion.Health < Player.GetAutoAttackDamage(minion) || minion.Health < Q.GetDamage(minion) + Player.GetAutoAttackDamage(minion)))
+                foreach (var minions in
+                    Minions.Where(
+                        minion =>
+                        minion.Health < Player.GetAutoAttackDamage(minion)
+                        || minion.Health < Q.GetDamage(minion) + Player.GetAutoAttackDamage(minion)))
                 {
                     countMinions++;
                 }
 
-                if (countMinions >=2 && useQ && Q.IsReady() && Minions != null) Q.Cast(Player.Position.Extend(Game.CursorPos, Q.Range / 2));
+                if (countMinions >= 2 && useQ && Q.IsReady() && Minions != null) Q.Cast(Player.Position.Extend(Game.CursorPos, Q.Range / 2));
 
                 if (useQ && Q.IsReady() && Orbwalking.InAutoAttackRange(mob) && mob != null)
                 {
@@ -380,7 +380,7 @@ namespace hi_im_gosu
             if (!(target is Obj_AI_Hero)) return;
 
             tar = (Obj_AI_Hero)target;
-            
+
             if (menu.Item("aaqaa").GetValue<KeyBind>().Active)
             {
                 if (Q.IsReady())
@@ -425,33 +425,35 @@ namespace hi_im_gosu
                 emenu.Item("UseEaa").SetValue<KeyBind>(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle));
             }
 
-            if (((orbwalker.ActiveMode.ToString() != "Combo" || !qmenu.Item("UseQC").GetValue<bool>())
-                 && ((orbwalker.ActiveMode.ToString() != "Mixed" || !qmenu.Item("hq").GetValue<bool>()) || !Q.IsReady()))) return;
-
-            if (qmenu.Item("restrictq").GetValue<bool>())
+            if (Q.IsReady()
+                && ((orbwalker.ActiveMode.ToString() == "Combo" && qmenu.Item("UseQC").GetValue<bool>())
+                    || (orbwalker.ActiveMode.ToString() == "Mixed" && qmenu.Item("hq").GetValue<bool>())))
             {
-                var after = ObjectManager.Player.Position
-                            + Normalize(Game.CursorPos - ObjectManager.Player.Position) * 300;
-                //Game.PrintChat("After: {0}", after);
-                var disafter = Vector3.DistanceSquared(after, tar.Position);
-                //Game.PrintChat("DisAfter: {0}", disafter);
-                //Game.PrintChat("first calc: {0}", (disafter) - (630*630));
-                if ((disafter < 630 * 630) && disafter > 150 * 150)
+                if (qmenu.Item("restrictq").GetValue<bool>())
+                {
+                    var after = ObjectManager.Player.Position
+                                + Normalize(Game.CursorPos - ObjectManager.Player.Position) * 300;
+                    //Game.PrintChat("After: {0}", after);
+                    var disafter = Vector3.DistanceSquared(after, tar.Position);
+                    //Game.PrintChat("DisAfter: {0}", disafter);
+                    //Game.PrintChat("first calc: {0}", (disafter) - (630*630));
+                    if ((disafter < 630 * 630) && disafter > 150 * 150)
+                    {
+                        Q.Cast(Game.CursorPos);
+                    }
+
+                    if (Vector3.DistanceSquared(tar.Position, ObjectManager.Player.Position) > 630 * 630
+                        && disafter < 630 * 630)
+                    {
+                        Q.Cast(Game.CursorPos);
+                    }
+                }
+                else
                 {
                     Q.Cast(Game.CursorPos);
                 }
-
-                if (Vector3.DistanceSquared(tar.Position, ObjectManager.Player.Position) > 630 * 630
-                    && disafter < 630 * 630)
-                {
-                    Q.Cast(Game.CursorPos);
-                }
+                //Q.Cast(Game.CursorPos);
             }
-            else
-            {
-                Q.Cast(Game.CursorPos);
-            }
-            //Q.Cast(Game.CursorPos);
         }
 
         public static Vector3 Normalize(Vector3 A)
@@ -506,7 +508,7 @@ namespace hi_im_gosu
             if (!E.IsReady()) return; //||
             //(orbwalker.ActiveMode.ToString() != "Combo" || !menu.Item("UseEC").GetValue<bool>()) &&
             //!menu.Item("UseET").GetValue<KeyBind>().Active)) return;
-            if (((orbwalker.ActiveMode.ToString() == "Combo" && emenu.Item("UseEC").GetValue<bool>()) || (orbwalker.ActiveMode.ToString() == "Mixed" && emenu.Item("he").GetValue<bool>()) || emenu.Item("UseET").GetValue<KeyBind>().Active))
+            if ((orbwalker.ActiveMode.ToString() == "Combo" && emenu.Item("UseEC").GetValue<bool>()) || (orbwalker.ActiveMode.ToString() == "Mixed" && emenu.Item("he").GetValue<bool>()) || emenu.Item("UseET").GetValue<KeyBind>().Active)
                 foreach (var hero in from hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(550f))
                                      let prediction = E.GetPrediction(hero)
                                      where NavMesh.GetCollisionFlags(

@@ -863,7 +863,7 @@ namespace D_Lucian
                         && predW.CollisionObjects.Count == 0) _w.Cast(hero, false, true);
                     else if (hero.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
                     {
-                        _w2.Cast(hero, false, true);
+                               _w2.Cast(hero, false, true);
                     }
                 }
             }
