@@ -352,7 +352,7 @@ namespace D_Udyr
 
             foreach (var minion in minions)
             {
-                if (_config.Item("Use-R-Farm").GetValue<bool>() && _r.IsReady() && !(Phoenix || Tiger||Turtle||Bear))
+                if (_config.Item("Use-R-Farm").GetValue<bool>() && _r.IsReady())
                 {
                     _r.Cast();
                 }
