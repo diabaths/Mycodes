@@ -260,11 +260,11 @@ namespace D_Udyr
 
             Phoenix = args.SData.Name == "UdyrPhoenixStance";
 
-            var spell = args.SData;
+           /* var spell = args.SData;
             if (sender.IsMe)
             {
                 Game.PrintChat("Spell name: " + args.SData.Name.ToString());
-            }
+            }*/
         }
 
         private static void OnGameUpdate(EventArgs args)

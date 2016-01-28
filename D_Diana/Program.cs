@@ -15,11 +15,9 @@ namespace D_Diana
 
         private static Spell _q, _w, _e, _r;
 
-        private static Obj_SpellMissile _qpos;
-
         private static int _lastTick;
 
-        private static bool _qcreated = false;
+        private static bool _qcreated;
 
         private static Menu _config;
 
@@ -51,8 +49,8 @@ namespace D_Diana
             _w = new Spell(SpellSlot.W, 200f);
             _e = new Spell(SpellSlot.E, 450f);
             _r = new Spell(SpellSlot.R, 825f);
-            _q.SetSkillshot(0.35f, 190f, 1800, false, SkillshotType.SkillshotCircle);
-
+            _q.SetSkillshot(0.5f, 195f, 1600, false, SkillshotType.SkillshotCircle);
+            
             SpellList.Add(_q);
             SpellList.Add(_w);
             SpellList.Add(_e);
@@ -64,7 +62,7 @@ namespace D_Diana
             _tiamat = new Items.Item(3077, 250f);
             _rand = new Items.Item(3143, 490f);
             _lotis = new Items.Item(3190, 590f);
-            _zhonya = new Items.Item(3157, 0);
+            _zhonya = new Items.Item(3157);
 
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
 
@@ -453,10 +451,9 @@ namespace D_Diana
             var combo = _config.Item("ActiveCombo").GetValue<KeyBind>().Active;
             try
             {
-                if (sender.IsMe || !sender.IsEnemy || sender.IsMinion || _w.Level < 1 || !sender.IsValid) return;
-                if (sender.Distance(_player.Position) > 1100) return;
-
-                if (args.Target.IsMe && _w.IsReady() && sender.IsEnemy && autoW && !combo) _w.Cast();
+                if (sender.IsMe || !sender.IsEnemy || sender.IsMinion || _w.Level < 1 || !sender.IsValidTarget(1000)) return;
+               
+                if (args.Target.IsMe && _w.IsReady() && autoW && !combo) _w.Cast();
             }
             catch (Exception)
             {
@@ -635,25 +632,30 @@ namespace D_Diana
         private static void Smiteontarget()
         {
             if (_smite == null) return;
-            var hero = HeroManager.Enemies.FirstOrDefault(x => x.IsValidTarget(570));
-            var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
-            var usesmite = _config.Item("smitecombo").GetValue<bool>();
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite
-                && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
-                if (hero != null && (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow)))
+                var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+                var usesmite = _config.Item("smitecombo").GetValue<bool>();
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite
+                    && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready
+                    && hero.IsValidTarget(570))
+                {
+                    if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                    }
+                    else if (smiteDmg >= hero.Health)
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
+                    }
+                }
+
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite
+                    && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready
+                    && hero.IsValidTarget(570))
                 {
                     ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
-                else if (hero != null && smiteDmg >= hero.Health)
-                {
-                    ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
-                }
-            }
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite
-                && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready && hero.IsValidTarget(570))
-            {
-                ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
             }
         }
 
@@ -744,7 +746,7 @@ namespace D_Diana
             }
 
             if (target.IsValidTarget(_r.Range) && _config.Item("UseRCombo").GetValue<bool>() && _r.IsReady())
-                if(_qcreated == true || target.HasBuff("dianamoonlight"))
+                if(_qcreated  || target.HasBuff("dianamoonlight"))
             {
                 _r.Cast(target);
             }
@@ -815,7 +817,6 @@ namespace D_Diana
                 if (iTiamat && _tiamat.IsReady() && hero.IsValidTarget(_tiamat.Range))
                 {
                     _tiamat.Cast();
-
                 }
 
                 if (iHydra && _hydra.IsReady() && hero.IsValidTarget(_hydra.Range))
@@ -933,15 +934,18 @@ namespace D_Diana
             {
                 dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
             }
+
             dmg += _player.GetAutoAttackDamage(hero, true) * 2;
             if (_player.HasBuff("dianaarcready"))
             {
                 dmg += 15 + 5 * ObjectManager.Player.Level;
             }
+
             if (ObjectManager.Player.HasBuff("LichBane"))
             {
                 dmg += _player.BaseAttackDamage * 0.75 + _player.FlatMagicDamageMod * 0.5;
             }
+
             return (float)dmg;
         }
 
@@ -1039,6 +1043,7 @@ namespace D_Diana
                                         "SRU_Red", "SRU_Krug", "SRU_Dragon", "SRU_Baron"
                                     };
             }
+
             var minions = MinionManager.GetMinions(_player.Position, 1000, MinionTypes.All, MinionTeam.Neutral);
             if (minions.Count() > 0)
             {
@@ -1144,10 +1149,12 @@ namespace D_Diana
                 {
                     _q.Cast(mob);
                 }
+
                 if (_w.IsReady() && useW && _player.Distance(mob) < _w.Range && !mob.Name.Contains("Mini"))
                 {
                     _w.Cast();
                 }
+
                 if (_r.IsReady() && useR && _player.Distance(mob) < _r.Range && mob.HasBuff("dianamoonlight")
                     && !mob.Name.Contains("Mini"))
                 {
@@ -1201,37 +1208,18 @@ namespace D_Diana
 
         private static void OnCreate(GameObject sender, EventArgs args)
         {
-            var missile = sender as Obj_SpellMissile;
-            if (missile != null)
+            if (sender.IsMe && sender.Name.Contains("dianaarcthrow"))
             {
-                var spell = missile;
-                var unit = spell.SpellCaster.Name;
-                var name = spell.SData.Name;
-                var caster = spell.SpellCaster;
-
-                if (unit == ObjectManager.Player.Name && (name == "dianaarcthrow"))
-                {
-                    _qpos = spell;
-                    _qcreated = true;
-                    return;
-                }
+                _qcreated = true;
             }
         }
 
+
         private static void OnDelete(GameObject sender, EventArgs args)
         {
-            //if (sender is Obj_SpellMissile)
-            var missile = sender as Obj_SpellMissile;
-            if (missile == null) return;
-            var spell = missile;
-            var unit = spell.SpellCaster.Name;
-            var name = spell.SData.Name;
-
-            if (unit == ObjectManager.Player.Name && (name == "dianaarcthrow"))
+            if (sender.IsMe && sender.Name.Contains("dianaarcthrow"))
             {
-                _qpos = null;
                 _qcreated = false;
-                return;
             }
         }
 
@@ -1308,7 +1296,7 @@ namespace D_Diana
                             "Smite Target Off");
                 }
             }
-            if (_qpos != null) Utility.DrawCircle(_qpos.Position, _qpos.BoundingRadius, System.Drawing.Color.Tomato, 5, 30, false);
+           
             if (_config.Item("ShowPassive").GetValue<bool>())
             {
                 if (_player.HasBuff("dianaarcready")) Drawing.DrawText(diana[0] - 10, diana[1], Color.GreenYellow, "P On");
@@ -1317,12 +1305,14 @@ namespace D_Diana
 
             if (_config.Item("DrawQ").GetValue<bool>() && _q.Level > 0)
             {
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, System.Drawing.Color.GreenYellow);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, _q.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
             }
+
             if (_config.Item("DrawW").GetValue<bool>() && _w.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, System.Drawing.Color.GreenYellow);
             }
+
             if (_config.Item("DrawE").GetValue<bool>() && _e.Level > 0)
             {
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, System.Drawing.Color.GreenYellow);
