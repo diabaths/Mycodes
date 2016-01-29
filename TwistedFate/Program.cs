@@ -172,6 +172,7 @@ namespace TwistedFate
                 drawings.AddItem(
                     new MenuItem("Rcircle2", "R Range (on minimap)").SetValue(
                         new Circle(true, Color.FromArgb(255, 255, 255, 255))));
+                drawings.AddItem(new MenuItem("drawtext", "Draw Texts")).SetValue(false);
                 drawings.AddItem(dmgAfterComboItem);
                 Config.AddSubMenu(drawings);
             }
@@ -308,26 +309,29 @@ namespace TwistedFate
                 Render.Circle.DrawCircle(ObjectManager.Player.Position, 5500, rCircle.Color);
             }
 
-
-            Vector2 screenPos = Drawing.WorldToScreen(Player.Position);
-            switch (Config.Item("SelectCard").GetValue<Slider>().Value)
+            if (Config.Item("drawtext").GetValue<bool>())
             {
-                case 0:
-                    Drawing.DrawText(screenPos.X, screenPos.Y, Color.Blue, "Blue Card");
-                    break;
-                case 1:
-                    Drawing.DrawText(screenPos.X, screenPos.Y, Color.Red, "Red Card");
-                    break;
-                case 2:
-                    Drawing.DrawText(screenPos.X, screenPos.Y, Color.Yellow, "Gold Card");
-                    break;
+                Vector2 screenPos = Drawing.WorldToScreen(Player.Position);
+                switch (Config.Item("SelectCard").GetValue<Slider>().Value)
+                {
+                    case 0:
+                        Drawing.DrawText(screenPos.X, screenPos.Y, Color.Blue, "Blue Card");
+                        break;
+                    case 1:
+                        Drawing.DrawText(screenPos.X, screenPos.Y, Color.Red, "Red Card");
+                        break;
+                    case 2:
+                        Drawing.DrawText(screenPos.X, screenPos.Y, Color.Yellow, "Gold Card");
+                        break;
+                }
+
+                if (Config.Item("AlwaysGold").GetValue<bool>())
+                {
+                    Drawing.DrawText(screenPos.X, screenPos.Y + 13, Color.Yellow, "Always Combo Gold");
+                }
             }
 
-            if (Config.Item("AlwaysGold").GetValue<bool>())
-            {
-                Drawing.DrawText(screenPos.X, screenPos.Y + 13, Color.Yellow, "Always Combo Gold");
-            }
-
+            Vector2 screenPoss = Drawing.WorldToScreen(Player.Position);
             if (Config.Item("DisplayLH").GetValue<bool>())
             {
                 var ydiff = 13;
@@ -339,7 +343,7 @@ namespace TwistedFate
                                     ObjectManager.Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
                                     h.IsValidTarget() && ComboDamage(h) > h.Health))
                 {
-                    Drawing.DrawText(screenPos.X, screenPos.Y + ydiff + 13, Color.White, enemy.Name);
+                    Drawing.DrawText(screenPoss.X, screenPoss.Y + ydiff + 13, Color.White, enemy.Name);
                     ydiff += 13;
                 }
             }
