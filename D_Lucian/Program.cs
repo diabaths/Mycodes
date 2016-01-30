@@ -278,6 +278,7 @@ namespace D_Lucian
         {
             if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
             {
+                _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget(_r.Range) && !_player.HasBuff("LucianR"))
                     _r.Cast(t.Position);
@@ -335,11 +336,10 @@ namespace D_Lucian
             if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
             {
                 Qcast = true;
-                Wcast = true;
-                Ecast = true;
-                Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
                 Utility.DelayAction.Add(200, () => Qcast = false);
+                Wcast = true;
                 Utility.DelayAction.Add(200, () => Wcast = false);
+                Ecast = true;
                 Utility.DelayAction.Add(200, () => Ecast = false);
             }
             if (_player.HasBuff("LucianR"))
@@ -358,10 +358,12 @@ namespace D_Lucian
                 {
                     Wcast = true;
                     Utility.DelayAction.Add(200, () => Wcast = false);
+                    Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
                 }
                 if (args.SData.Name == "LucianE")
                 {
                     Ecast = true;
+                    Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
                     Utility.DelayAction.Add(200, () => Ecast = false);
                 }
                 if (args.SData.Name == "LucianQ")
