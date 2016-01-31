@@ -526,22 +526,22 @@ namespace D_Ezreal
             var useW = _config.Item("UseWC").GetValue<bool>();
             UseItemes();
 
-            if (target.IsValidTarget(600) && _igniteSlot != SpellSlot.Unknown && ignitecombo &&
-                _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+            if (target.IsValidTarget(600) && _igniteSlot != SpellSlot.Unknown && ignitecombo
+                && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
                 if (target.Health <= ComboDamage(target))
                 {
                     _player.Spellbook.CastSpell(_igniteSlot, target);
                 }
 
-                if (_q.IsReady() && useQ)
+            }
+            if (_q.IsReady() && useQ)
+            {
+                var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+                if (tq.IsValidTarget(_q.Range) && _q.GetPrediction(tq).CollisionObjects.Count == 0
+                    && _q.GetPrediction(tq).Hitchance >= HitChance.High)
                 {
-                    var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                    if (tq.IsValidTarget(_q.Range) &&
-                        _q.GetPrediction(tq).CollisionObjects.Count == 0 && _q.GetPrediction(tq).Hitchance >= HitChance.High)
-                    {
-                        _q.Cast(tq);
-                    }
+                    _q.Cast(tq);
                 }
             }
             if (_w.IsReady() && useW)
