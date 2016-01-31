@@ -364,7 +364,7 @@ namespace hi_im_gosu
                     Minions.Where(
                         minion =>
                         minion.Health < Player.GetAutoAttackDamage(minion)
-                        || minion.Health < Q.GetDamage(minion) + Player.GetAutoAttackDamage(minion)))
+                        || minion.Health < Q.GetDamage(minion) + Player.GetAutoAttackDamage(minion) || minion.Health < Q.GetDamage(minion)))
                 {
                     countMinions++;
                 }

@@ -58,14 +58,14 @@ namespace D_Ezreal
             _player = ObjectManager.Player;
             if (ObjectManager.Player.ChampionName != ChampionName) return;
 
-            _q = new Spell(SpellSlot.Q, 1150);
-            _w = new Spell(SpellSlot.W, 1000);
+            _q = new Spell(SpellSlot.Q, 1180);
+            _w = new Spell(SpellSlot.W, 950);
             _e = new Spell(SpellSlot.E, 475);
             _r = new Spell(SpellSlot.R, 3000);
 
-            _q.SetSkillshot(0.25f, 50f, 2000f, true, SkillshotType.SkillshotLine);
+            _q.SetSkillshot(0.25f, 60f, 2000f, true, SkillshotType.SkillshotLine);
             _w.SetSkillshot(0.25f, 80f, 1600f, false, SkillshotType.SkillshotLine);
-            _r.SetSkillshot(1.1f, 160f, 2000f, false, SkillshotType.SkillshotLine);
+            _r.SetSkillshot(1f, 160f, 2000f, false, SkillshotType.SkillshotLine);
 
             _archangel = Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline ||
                          Utility.Map.GetMap().Type == Utility.Map.MapType.CrystalScar
@@ -456,23 +456,22 @@ namespace D_Ezreal
                          || _config.Item("harasstoggle").GetValue<KeyBind>().Active;
             var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
             var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
-            if (combo && unit.IsMe && (target is Obj_AI_Hero))
+            var t = target as Obj_AI_Hero;
+            if (combo && unit.IsMe)
             {
-                if (useQ && _q.IsReady())
+                if (useQ && _q.IsReady() && t.IsValidTarget(_q.Range))
                 {
-                    var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
                     var qpred = _q.GetPrediction(t);
-                    if (t.IsValidTarget(_q.Range) && qpred.CollisionObjects.Count == 0)
+                    if ( qpred.CollisionObjects.Count == 0 && _q.GetPrediction(t).Hitchance >= HitChance.High)
                     {
-                        _q.CastIfHitchanceEquals(t, HitChance.High, true);
+                        _q.Cast(t);
                     }
                 }
-                if (useW && _w.IsReady())
+                if (useW && _w.IsReady() && t.IsValidTarget(_w.Range))
                 {
-                    var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (t.IsValidTarget(_w.Range))
+                   if ( _w.GetPrediction(t).Hitchance >= HitChance.High)
                     {
-                        _w.CastIfHitchanceEquals(t, HitChance.High, true);
+                        _w.Cast(t, false, true);
                     }
                 }
             }
@@ -480,19 +479,17 @@ namespace D_Ezreal
             {
                 if (useQH && _q.IsReady())
                 {
-                    var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
                     var qpred = _q.GetPrediction(t);
-                    if (t.IsValidTarget(_q.Range) && qpred.CollisionObjects.Count == 0)
+                    if (t.IsValidTarget(_q.Range) && qpred.CollisionObjects.Count == 0 && _q.GetPrediction(t).Hitchance >= HitChance.High)
                     {
-                        _q.CastIfHitchanceEquals(t, HitChance.High, true);
+                        _q.Cast(t);
                     }
                 }
                 if (useWH && _w.IsReady())
                 {
-                    var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                    if (t.IsValidTarget(_w.Range))
+                    if (t.IsValidTarget(_w.Range) && _w.GetPrediction(t).Hitchance >= HitChance.High)
                     {
-                        _w.CastIfHitchanceEquals(t, HitChance.High, true);
+                        _w.Cast(t, false, true);
                     }
                 }
             }
@@ -540,19 +537,19 @@ namespace D_Ezreal
                 if (_q.IsReady() && useQ)
                 {
                     var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                    if (tq.IsValidTarget(_q.Range - 50) &&
-                        _q.GetPrediction(tq).CollisionObjects.Count == 0)
+                    if (tq.IsValidTarget(_q.Range) &&
+                        _q.GetPrediction(tq).CollisionObjects.Count == 0 && _q.GetPrediction(tq).Hitchance >= HitChance.High)
                     {
-                        _q.CastIfHitchanceEquals(tq, HitChance.High, true);
+                        _q.Cast(tq);
                     }
                 }
             }
             if (_w.IsReady() && useW)
             {
                 var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
-                if (tw.IsValidTarget(_w.Range - 50))
+                if (tw.IsValidTarget(_w.Range) && _w.GetPrediction(tw).Hitchance >= HitChance.High)
                 {
-                    _w.CastIfHitchanceEquals(tw, HitChance.High, true);
+                    _w.Cast(tw, false, true);
                 }
             }
 
@@ -566,19 +563,19 @@ namespace D_Ezreal
             if (_q.IsReady() && useQ)
             {
                 var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                if (tq.IsValidTarget(_q.Range - 50) &&
-                    _q.GetPrediction(tq).CollisionObjects.Count == 0)
+                if (tq.IsValidTarget(_q.Range) &&
+                    _q.GetPrediction(tq).CollisionObjects.Count == 0 && _q.GetPrediction(tq).Hitchance >= HitChance.High)
                 {
-                    _q.CastIfHitchanceEquals(tq, HitChance.High, true);
+                    _q.Cast(tq);
                 }
             }
 
             if (_w.IsReady() && useW)
             {
                 var tw = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
-                if (tw.IsValidTarget(_w.Range - 50) )
+                if (tw.IsValidTarget(_w.Range) && _w.GetPrediction(tw).Hitchance >= HitChance.High)
                 {
-                    _w.CastIfHitchanceEquals(tw, HitChance.High, true);
+                    _w.Cast(tw, false, true);
                 }
             }
         }
@@ -587,9 +584,9 @@ namespace D_Ezreal
         {
             var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
            
-            if (tq.IsValidTarget(_q.Range - 50) && _q.GetPrediction(tq).CollisionObjects.Count == 0 && _config.Item("UseQLH").GetValue<bool>())
+            if (tq.IsValidTarget(_q.Range) && _q.GetPrediction(tq).CollisionObjects.Count == 0 && _config.Item("UseQLH").GetValue<bool>() && _q.GetPrediction(tq).Hitchance >= HitChance.High)
             {
-                _q.CastIfHitchanceEquals(tq, HitChance.High, true);
+                _q.Cast(tq);
             }
         }
 
