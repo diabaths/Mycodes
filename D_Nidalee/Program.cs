@@ -71,10 +71,11 @@ namespace D_Nidalee
             EC = new Spell(SpellSlot.E, 300f);
             R = new Spell(SpellSlot.R, 0);
 
-            Q.SetSkillshot(0.125f, 40f, 1300, true, SkillshotType.SkillshotLine);
-            W.SetSkillshot(0.500f, 80f, 1450, false, SkillshotType.SkillshotCircle);
-            WC.SetSkillshot(0.50f, 400f, 1500f, false, SkillshotType.SkillshotCone);
-            EC.SetSkillshot(0.50f, 375f, 1500f, false, SkillshotType.SkillshotCone);
+            Q.SetSkillshot(0.25f, 40f, 1300, true, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.500f, 90f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            WC.SetSkillshot(0.50f, 400f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            EC.SetSkillshot(0.50f, (float)(15 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCone);
+            EC.SetSkillshot(0.50f, (float)(15 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCone);
             SpellList.Add(Q);
             SpellList.Add(W);
             SpellList.Add(E);
@@ -665,13 +666,13 @@ namespace D_Nidalee
                     if (WC.IsReady() && Config.Item("UseWComboCougar").GetValue<bool>() &&
                         target.IsValidTarget(WC.Range))
                     {
-                        WC.Cast(target);
+                        WC.Cast(target.ServerPosition);
                     }
 
                     if (EC.IsReady() && Config.Item("UseEComboCougar").GetValue<bool>() &&
                         target.IsValidTarget(EC.Range))
                     {
-                        EC.Cast(target);
+                        EC.Cast(target.ServerPosition);
                     }
 
                     if (QC.IsReady() && Config.Item("UseQComboCougar").GetValue<bool>() &&
@@ -695,13 +696,13 @@ namespace D_Nidalee
                     if (WC.IsReady() && Config.Item("UseWComboCougar").GetValue<bool>() &&
                         target.IsValidTarget(WC.Range))
                     {
-                        WC.Cast(target);
+                        WC.Cast(target.ServerPosition);
                     }
 
                     if (EC.IsReady() && Config.Item("UseEComboCougar").GetValue<bool>() &&
                        target.IsValidTarget(EC.Range))
                     {
-                        EC.Cast(target);
+                        EC.Cast(target.ServerPosition);
                     }
 
                     if (QC.IsReady() && Config.Item("UseQComboCougar").GetValue<bool>() &&
@@ -719,7 +720,7 @@ namespace D_Nidalee
                 R.Cast();
             }
 
-            if (R.IsReady() && IsCougar && Player.Distance(target) > WC.Range &&
+            if (R.IsReady() && IsCougar && !QC.IsReady() && !WC.IsReady() && !EC.IsReady() &&
                 Config.Item("UseRCombo").GetValue<bool>())
             {
                 R.Cast();
@@ -961,7 +962,7 @@ namespace D_Nidalee
 
                     if (EC.IsReady() && Cougare && Player.Distance(Minion) < EC.Range)
                     {
-                        EC.Cast(Minion);
+                        EC.Cast(Minion.ServerPosition);
                     }
 
                     foreach (var Minio in allMinions)
@@ -969,7 +970,7 @@ namespace D_Nidalee
                         WC.Range = Minion.HasBuff("nidaleepassivehunted") ? 730 : 375;
                         if (WC.IsReady() && Cougarw && Player.Distance(Minion) > 200f)
                         {
-                            WC.Cast(Minio);
+                            WC.Cast(Minio.ServerPosition);
                         }
                     }
 
@@ -993,7 +994,7 @@ namespace D_Nidalee
                         if (prediction.Hitchance >= HitChance.Medium) W.Cast(Minion.ServerPosition);
                     }
 
-                    if ((Config.Item("farm_R").GetValue<KeyBind>().Active && !Q.IsReady()) || !lanemana)
+                    if (Config.Item("farm_R").GetValue<KeyBind>().Active && !Q.IsReady() || !lanemana || !Humanq)
                     {
                         if (R.IsReady())
                         {
@@ -1088,8 +1089,8 @@ namespace D_Nidalee
             {
                 var forms = Config.Item("AutoSwitchform").GetValue<bool>();
                 var health = Player.Health
-                             <= (Player.MaxHealth * (Config.Item("HPercent").GetValue<Slider>().Value) / 100);
-                var mana = Player.Mana >= (Player.MaxMana * (Config.Item("MPPercent").GetValue<Slider>().Value) / 100);
+                             <= Player.MaxHealth * Config.Item("HPercent").GetValue<Slider>().Value / 100;
+                var mana = Player.Mana >= Player.MaxMana * Config.Item("MPPercent").GetValue<Slider>().Value / 100;
                 if (Player.HasBuff("Recall") || Player.InFountain()) return;
                 if (E.IsReady() && health)
                 {
@@ -1137,13 +1138,12 @@ namespace D_Nidalee
                 {
                     if (IsHuman && mana)
                     {
-                        Player.Spellbook.CastSpell(SpellSlot.E, hero);
+                        E.Cast(hero);
                     }
 
                     if (IsCougar && R.IsReady() && mana && forms)
                     {
                         R.Cast();
-                        Player.Spellbook.CastSpell(SpellSlot.E, hero);
                     }
                 }
             }
