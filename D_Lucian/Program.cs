@@ -587,7 +587,10 @@ namespace D_Lucian
                 if (ta == null) return;
                 if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
                 {
-
+                    var direction2 = (ta.ServerPosition - _player.ServerPosition).To2D().Normalized();
+                    var currentAngle = step * (float)Math.PI / 120;
+                    var currentCheckPoint = ta.ServerPosition.To2D() +
+                                            475 * direction2.Rotated(currentAngle);
                     if (!ta.UnderTurret()&& ta.IsValidTarget(_q.Range))
                     {
                         _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
