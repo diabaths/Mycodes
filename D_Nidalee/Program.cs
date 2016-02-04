@@ -36,7 +36,11 @@ namespace D_Nidalee
 
         private static readonly float[] HumanEcd = {13, 12, 11, 10, 9};
 
-        private static readonly float[] CougarQcd, CougarWcd, CougarEcd = {5, 5, 5, 5, 5};
+        private static readonly float[] CougarQcd = { 5, 5, 5, 5, 5 };
+
+        private static readonly float[] CougarWcd = { 5, 5, 5, 5, 5 };
+
+        private static readonly float[] CougarEcd = {5, 5, 5, 5, 5};
 
         private static float _humQcd, _humWcd, _humEcd;
 
@@ -436,10 +440,10 @@ namespace D_Nidalee
             {
                 return;
             }
-
+            
             if (spell.Name.ToLower().Contains("takedown"))
             {
-                //Game.PrintChat("reset");
+               // Game.PrintChat("reset");
                 Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
             }
 
@@ -448,10 +452,23 @@ namespace D_Nidalee
                   Game.PrintChat("Spell name: " + args.SData.Name.ToString());
              }*/
             if (sender.IsMe && Config.Item("DrawCooldown").GetValue<bool>())
+            {
                 //Game.PrintChat("Spell name: " + args.SData.Name.ToString());
-                GetCDs(args);
+                if (IsHuman)
+                {
+                    if (args.SData.Name == "JavelinToss") _humQcd = Game.Time + CalculateCd(HumanQcd[Q.Level-1]);
+                    if (args.SData.Name == "Bushwhack") _humWcd = Game.Time + CalculateCd(HumanWcd[W.Level-1]);
+                    if (args.SData.Name == "PrimalSurge") _humEcd = Game.Time + CalculateCd(HumanEcd[E.Level-1]);
+                }
+                else
+                {
+                    if (args.SData.Name == "Takedown") _spidQcd = Game.Time + CalculateCd(CougarQcd[QC.Level-1]);
+                    if (args.SData.Name == "Pounce") _spidWcd = Game.Time + CalculateCd(CougarWcd[WC.Level-1]);
+                    if (args.SData.Name == "Swipe") _spidEcd = Game.Time + CalculateCd(CougarEcd[EC.Level-1]);
+                }
+            }
         }
-
+       
         private static float CalculateCd(float time)
         {
             return time + (time * Player.PercentCooldownMod);
@@ -466,28 +483,7 @@ namespace D_Nidalee
             _spideWcd = ((_spidWcd - Game.Time) > 0) ? (_spidWcd - Game.Time) : 0;
             _spideEcd = ((_spidEcd - Game.Time) > 0) ? (_spidEcd - Game.Time) : 0;
         }
-
-        private static void GetCDs(GameObjectProcessSpellCastEventArgs spell)
-        {
-            if (IsHuman)
-            {
-                if (spell.SData.Name == "JavelinToss")
-                    _humQcd = Game.Time + CalculateCd(HumanQcd[Q.Level]);
-                if (spell.SData.Name == "Bushwhack")
-                    _humWcd = Game.Time + CalculateCd(HumanWcd[W.Level]);
-                if (spell.SData.Name == "PrimalSurge")
-                    _humEcd = Game.Time + CalculateCd(HumanEcd[E.Level]);
-            }
-            else
-            {
-                if (spell.SData.Name == "Takedown")
-                    _spidQcd = Game.Time + CalculateCd(CougarQcd[QC.Level]);
-                if (spell.SData.Name == "Pounce")
-                    _spidWcd = Game.Time + CalculateCd(CougarWcd[WC.Level]);
-                if (spell.SData.Name == "Swipe")
-                    _spidEcd = Game.Time + CalculateCd(CougarEcd[EC.Level]);
-            }
-        }
+        
 
         private static HitChance QHitChanceCombo()
         {
@@ -720,8 +716,8 @@ namespace D_Nidalee
                 R.Cast();
             }
 
-            if (R.IsReady() && IsCougar && !QC.IsReady() && !WC.IsReady() && !EC.IsReady() &&
-                Config.Item("UseRCombo").GetValue<bool>())
+            if (R.IsReady() && IsCougar && !QC.IsReady() && !WC.IsReady() && !EC.IsReady() && Q.IsReady()
+                && Config.Item("UseRCombo").GetValue<bool>())
             {
                 R.Cast();
             }
@@ -1045,7 +1041,7 @@ namespace D_Nidalee
                         if (prediction.Hitchance >= HitChance.Medium) W.Cast(mob.ServerPosition);
                     }
 
-                    if ((Switch && !Q.IsReady() && !W.IsReady()) || !junglemana)
+                    if (Switch && (!Q.IsReady() || !Humanq) && (!W.IsReady() || !Humanw) || !junglemana)
                     {
                         if (R.IsReady())
                         {
@@ -1129,10 +1125,10 @@ namespace D_Nidalee
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly && !hero.IsMe))
             {
                 var forms = Config.Item("AutoSwitchform").GetValue<bool>();
-                var mana = Player.Mana >= (Player.MaxMana * (Config.Item("MPPercent").GetValue<Slider>().Value) / 100);
+                var mana = Player.Mana >= Player.MaxMana * Config.Item("MPPercent").GetValue<Slider>().Value / 100;
                 if (Player.HasBuff("Recall") || hero.HasBuff("Recall") || hero.InFountain()) return;
                 if (E.IsReady() &&
-                    (hero.Health / hero.MaxHealth) * 100 <= Config.Item("AllyHPercent").GetValue<Slider>().Value &&
+                    hero.Health / hero.MaxHealth * 100 <= Config.Item("AllyHPercent").GetValue<Slider>().Value &&
                     Utility.CountEnemiesInRange(1200) > 0 &&
                     hero.Distance(Player.ServerPosition) <= E.Range)
                 {
@@ -1199,7 +1195,7 @@ namespace D_Nidalee
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            var harass = (Config.Item("harasstoggle").GetValue<KeyBind>().Active);
+            var harass = Config.Item("harasstoggle").GetValue<KeyBind>().Active;
             var cat = Drawing.WorldToScreen(Player.Position);
             if (Config.Item("Drawharass").GetValue<bool>())
             {
@@ -1218,9 +1214,9 @@ namespace D_Nidalee
                         System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
+
             if (Config.Item("Drawsmite").GetValue<bool>() && _smite != null)
             {
-
                 if (Config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
                     Drawing.DrawText(
@@ -1260,7 +1256,7 @@ namespace D_Nidalee
             {
                 if (Config.Item("DrawQ").GetValue<bool>())
                 {
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range, System.Drawing.Color.GreenYellow);
+                    Render.Circle.DrawCircle(Player.Position, Q.Range, Q.IsReady() ? System.Drawing.Color.GreenYellow : System.Drawing.Color.OrangeRed);
                 }
 
                 if (Config.Item("DrawW").GetValue<bool>())
@@ -1281,6 +1277,7 @@ namespace D_Nidalee
                     Render.Circle.DrawCircle(ObjectManager.Player.Position, WC.Range, System.Drawing.Color.GreenYellow);
                 }
             }
+
             if (Config.Item("DrawCooldown").GetValue<bool>())
             {
                 if (!IsCougar)

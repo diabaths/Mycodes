@@ -336,11 +336,11 @@ namespace D_Lucian
             if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
             {
                 Qcast = true;
-                Utility.DelayAction.Add(200, () => Qcast = false);
+                Utility.DelayAction.Add(300, () => Qcast = false);
                 Wcast = true;
-                Utility.DelayAction.Add(200, () => Wcast = false);
+                Utility.DelayAction.Add(300, () => Wcast = false);
                 Ecast = true;
-                Utility.DelayAction.Add(200, () => Ecast = false);
+                Utility.DelayAction.Add(300, () => Ecast = false);
             }
             if (_player.HasBuff("LucianR"))
 
@@ -357,19 +357,20 @@ namespace D_Lucian
                 if (args.SData.Name == "LucianW")
                 {
                     Wcast = true;
-                    Utility.DelayAction.Add(200, () => Wcast = false);
                     Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
+                    Utility.DelayAction.Add(300, () => Wcast = false);
                 }
                 if (args.SData.Name == "LucianE")
                 {
                     Ecast = true;
                     Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
-                    Utility.DelayAction.Add(200, () => Ecast = false);
+                    Utility.DelayAction.Add(300, () => Ecast = false);
                 }
                 if (args.SData.Name == "LucianQ")
                 {
                     Qcast = true;
-                    Utility.DelayAction.Add(200, () => Qcast = false);
+                    Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
+                    Utility.DelayAction.Add(300, () => Qcast = false);
                 }
             }
         }
