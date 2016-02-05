@@ -1017,7 +1017,7 @@ namespace D_Nidalee
             var Cougare = Config.Item("UseECJungle").GetValue<bool>();
             var Switch = Config.Item("Switchungle").GetValue<bool>();
             var junglemana = Player.Mana
-                             >= (Player.MaxMana * (Config.Item("junglemana").GetValue<Slider>().Value) / 100);
+                             >= Player.MaxMana * Config.Item("junglemana").GetValue<Slider>().Value / 100;
             var mobs = MinionManager.GetMinions(
                 Player.ServerPosition,
                 700,
@@ -1083,6 +1083,7 @@ namespace D_Nidalee
         {
             if (Player.Spellbook.CanUseSpell(SpellSlot.E) == SpellState.Ready && Player.IsMe)
             {
+               if(Config.Item("escapeterino").GetValue<KeyBind>().Active) return;
                 var forms = Config.Item("AutoSwitchform").GetValue<bool>();
                 var health = Player.Health
                              <= Player.MaxHealth * Config.Item("HPercent").GetValue<Slider>().Value / 100;

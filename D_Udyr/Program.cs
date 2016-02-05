@@ -109,7 +109,7 @@ namespace D_Udyr
 
             //Combo
             _config.AddSubMenu(new Menu("Main", "Main"));
-            _config.SubMenu("Main").AddItem(new MenuItem("delaycombo", "Delay between Skills").SetValue(new Slider(200, 100, 1500)));
+            _config.SubMenu("Main").AddItem(new MenuItem("delaycombo", "Delay between Skills").SetValue(new Slider(200, 0, 1500)));
             _config.SubMenu("Main").AddItem(new MenuItem("AutoShield", "Auto Shield")).SetValue(true);
             _config.SubMenu("Main")
                 .AddItem(new MenuItem("AutoShield%", "AutoShield HP %").SetValue(new Slider(50, 100, 0)));
