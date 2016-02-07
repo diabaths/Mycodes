@@ -124,7 +124,6 @@ namespace D_Ezreal
             _config.AddSubMenu(new Menu("Farm", "Farm"));
             _config.SubMenu("Farm").AddSubMenu(new Menu("LaneClear", "LaneClear"));
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQL", "Q LaneClear")).SetValue(true);
-            _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQLH", "Q To Harass")).SetValue(true);
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(new MenuItem("Lanemana", "Minimum Mana").SetValue(new Slider(60, 1, 100)));
@@ -346,12 +345,7 @@ namespace D_Ezreal
                     Ping(enemy.Position.To2D());
                 }
             }
-
-            if (_config.Item("ActiveLane").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
-            {
-                Laneclear();
-            }
+            
             _r.Range = _config.Item("Maxrange").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
             var qpred = _q.GetPrediction(target);
@@ -579,19 +573,7 @@ namespace D_Ezreal
                 }
             }
         }
-
-        private static void Laneclear()
-        {
-            var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-           
-            if (tq.IsValidTarget(_q.Range) && _q.GetPrediction(tq).CollisionObjects.Count == 0 && _config.Item("UseQLH").GetValue<bool>() && _q.GetPrediction(tq).Hitchance >= HitChance.High)
-            {
-                _q.Cast(tq);
-            }
-        }
-
-       
-
+        
         private static void JungleClear()
         {
             var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
@@ -828,9 +810,8 @@ namespace D_Ezreal
             foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy && hero.IsValidTarget(_r.Range)))
             {
                 var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
-                if (hero == null) return;
                 if (hero.IsInvulnerable) return;
-                if (!hero.IsInvulnerable && _player.Distance(hero) >= minrange)
+                if (_player.Distance(hero) >= minrange && hero.IsValidTarget(_r.Range))
                 {
                     if (rsolo)
                     {
