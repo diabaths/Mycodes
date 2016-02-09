@@ -203,7 +203,7 @@ namespace hi_im_gosu
 
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (E.IsReady() && gapcloser.Sender.IsValidTarget(550) && emenu.Item("Gap_E").GetValue<bool>())
+            if (E.IsReady() && gapcloser.Sender.IsValidTarget(200) && emenu.Item("Gap_E").GetValue<bool>())
             {
                 E.Cast(gapcloser.Sender);
             }
