@@ -650,6 +650,7 @@ namespace D_Corki
             if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range) && Rdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 _q.Cast(mob);
+                Qcast = Environment.TickCount;
             }
 
             if (_e.IsReady() && useE && mob.IsValidTarget(_e.Range))
@@ -660,6 +661,7 @@ namespace D_Corki
             if (_r.IsReady() && useR && rlimJ < UltiStucks() && mob.IsValidTarget(_q.Range) && Qdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 _r.Cast(mob);
+                Rcast = Environment.TickCount;
             }
         }
 
