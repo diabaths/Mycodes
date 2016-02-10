@@ -17,6 +17,8 @@ namespace D_Corki
 
         private static Obj_AI_Hero _player;
 
+        private static int Qcast, Rcast;
+
         private static Items.Item _youmuu, _blade, _bilge, _hextech;
 
         private static void Main(string[] args)
@@ -246,6 +248,7 @@ namespace D_Corki
             _config.SubMenu("Misc").AddItem(new MenuItem("UseQM", "Use Q KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("UseEM", "Use E KillSteal")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("UseRM", "Use R KillSteal")).SetValue(true);
+            _config.SubMenu("Misc").AddItem(new MenuItem("delaycombo", "Delay between Q-R Use").SetValue(new Slider(200, 0, 1500)));
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -262,7 +265,6 @@ namespace D_Corki
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -420,6 +422,7 @@ namespace D_Corki
                     cc = true;
                 }
             }
+
             return cc;
         }
 
@@ -433,12 +436,14 @@ namespace D_Corki
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useE = _config.Item("UseEC").GetValue<bool>();
             var useR = _config.Item("UseRC").GetValue<bool>();
+            var Qdelay = Environment.TickCount - Qcast;
+            var Rdelay = Environment.TickCount - Rcast;
 
-
-            if (useQ && _q.IsReady())
+            if (useQ && _q.IsReady() && Rdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= HitChance.High) _q.Cast(t, false, true);
+                Qcast = Environment.TickCount;
             }
 
             if (useE && _e.IsReady())
@@ -447,10 +452,11 @@ namespace D_Corki
                 if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= HitChance.High) _e.Cast(t, false, true);
             }
 
-            if (useR && _r.IsReady())
+            if (useR && _r.IsReady() && Qdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= HitChance.High) _r.Cast(t, false, true);
+                Rcast = Environment.TickCount;
             }
 
             UseItemes();
@@ -462,10 +468,13 @@ namespace D_Corki
             var useE = _config.Item("UseEH").GetValue<bool>();
             var useR = _config.Item("UseRH").GetValue<bool>();
             var rlimH = _config.Item("RlimH").GetValue<Slider>().Value;
-            if (useQ && _q.IsReady())
+            var Qdelay = Environment.TickCount - Qcast;
+            var Rdelay = Environment.TickCount - Rcast;
+            if (useQ && _q.IsReady() && Rdelay>= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= HitChance.High) _q.Cast(t, false, true);
+                Qcast = Environment.TickCount;
             }
 
             if (useE && _e.IsReady())
@@ -474,10 +483,11 @@ namespace D_Corki
                 if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= HitChance.High) _e.Cast(t, false, true);
             }
 
-            if (useR && _r.IsReady() && rlimH < UltiStucks())
+            if (useR && _r.IsReady() && rlimH < UltiStucks() && Qdelay>= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= HitChance.High) _r.Cast(t, false, true);
+                Rcast = Environment.TickCount;
             }
         }
 
@@ -487,13 +497,16 @@ namespace D_Corki
             var useQ = _config.Item("UseQC").GetValue<bool>();
             var useE = _config.Item("UseEC").GetValue<bool>();
             var useR = _config.Item("UseRC").GetValue<bool>();
+            var Qdelay = Environment.TickCount - Qcast;
+            var Rdelay = Environment.TickCount - Rcast;
             if (combo && unit.IsMe && (target is Obj_AI_Hero))
             {
                 {
-                    if (useQ && _q.IsReady())
+                    if (useQ && _q.IsReady() && Rdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
                     {
                         var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
                         if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= HitChance.High) _q.Cast(t, false, true);
+                        Qcast = Environment.TickCount;
                     }
 
                     if (useE && _e.IsReady())
@@ -502,10 +515,11 @@ namespace D_Corki
                         if (t.IsValidTarget(_e.Range) && _e.GetPrediction(t).Hitchance >= HitChance.High) _e.Cast(t, false, true);
                     }
 
-                    if (useR && _r.IsReady())
+                    if (useR && _r.IsReady() && Qdelay>= _config.Item("delaycombo").GetValue<Slider>().Value)
                     {
                         var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                         if (t.IsValidTarget(_r.Range) && _r.GetPrediction(t).Hitchance >= HitChance.High) _r.Cast(t, false, true);
+                        Rcast = Environment.TickCount;
                     }
                 }
             }
@@ -514,7 +528,8 @@ namespace D_Corki
         private static void Laneclear()
         {
             if (!Orbwalking.CanMove(40)) return;
-
+            var Qdelay = Environment.TickCount - Qcast;
+            var Rdelay = Environment.TickCount - Rcast;
             var rangedMinionsQ = MinionManager.GetMinions(
                 ObjectManager.Player.ServerPosition,
                 _q.Range + _q.Width + 30,
@@ -533,7 +548,7 @@ namespace D_Corki
             var useEl = _config.Item("UseEL").GetValue<bool>();
             var useRl = _config.Item("UseRL").GetValue<bool>();
             var rlimL = _config.Item("RlimL").GetValue<Slider>().Value;
-            if (_q.IsReady() && useQl)
+            if (_q.IsReady() && useQl && Rdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 var fl1 = _q.GetCircularFarmLocation(rangedMinionsQ, _q.Width);
                 var fl2 = _q.GetCircularFarmLocation(allMinionsQ, _q.Width);
@@ -541,15 +556,18 @@ namespace D_Corki
                 if (fl1.MinionsHit >= 3)
                 {
                     _q.Cast(fl1.Position);
+                    Qcast = Environment.TickCount;
                 }
                 else if (fl2.MinionsHit >= 2 || allMinionsQ.Count == 1)
                 {
                     _q.Cast(fl2.Position);
+                    Qcast = Environment.TickCount;
                 }
                 else
                     foreach (var minion in allMinionsQ)
                         if (!Orbwalking.InAutoAttackRange(minion)
                             && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q)) _q.Cast(minion);
+                Qcast = Environment.TickCount;
             }
 
             if (_e.IsReady() && useEl)
@@ -566,7 +584,7 @@ namespace D_Corki
                             && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.E)) _e.Cast(minion);
             }
 
-            if (_r.IsReady() && useRl && rlimL < UltiStucks() && allMinionsR.Count > 3)
+            if (_r.IsReady() && useRl && rlimL < UltiStucks() && allMinionsR.Count > 3 && Qdelay>= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 var fl1 = _w.GetLineFarmLocation(rangedMinionsR, _r.Width);
                 var fl2 = _w.GetLineFarmLocation(allMinionsR, _r.Width);
@@ -574,15 +592,18 @@ namespace D_Corki
                 if (fl1.MinionsHit >= 3)
                 {
                     _r.Cast(fl1.Position);
+                    Rcast = Environment.TickCount;
                 }
                 else if (fl2.MinionsHit >= 2 || allMinionsR.Count == 1)
                 {
                     _r.Cast(fl2.Position);
+                    Rcast = Environment.TickCount;
                 }
                 else
                     foreach (var minion in allMinionsR)
                         if (!Orbwalking.InAutoAttackRange(minion)
                             && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.R)) _r.Cast(minion);
+                Rcast = Environment.TickCount;
             }
         }
 
@@ -608,6 +629,8 @@ namespace D_Corki
 
         private static void JungleClear()
         {
+            var Qdelay = Environment.TickCount - Qcast;
+            var Rdelay = Environment.TickCount - Rcast;
             var mob =
                 MinionManager.GetMinions(
                     _player.ServerPosition,
@@ -624,7 +647,7 @@ namespace D_Corki
                 return;
             }
 
-            if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range))
+            if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range) && Rdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 _q.Cast(mob);
             }
@@ -634,7 +657,7 @@ namespace D_Corki
                 _e.Cast(mob);
             }
 
-            if (_r.IsReady() && useR && rlimJ < UltiStucks() && mob.IsValidTarget(_q.Range))
+            if (_r.IsReady() && useR && rlimJ < UltiStucks() && mob.IsValidTarget(_q.Range) && Qdelay >= _config.Item("delaycombo").GetValue<Slider>().Value)
             {
                 _r.Cast(mob);
             }
@@ -647,12 +670,15 @@ namespace D_Corki
 
         private static void KillSteal()
         {
+            var Qdelay = Environment.TickCount - Qcast;
+            var Rdelay = Environment.TickCount - Rcast;
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
-                if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>())
+                if (_q.IsReady() && _config.Item("UseQM").GetValue<bool>() && Rdelay>= _config.Item("delaycombo").GetValue<Slider>().Value)
                 {
                     if (_q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range)
                         && _q.GetPrediction(hero).Hitchance >= HitChance.High) _q.Cast(hero, false, true);
+                    Qcast = Environment.TickCount;
                 }
 
                 if (_e.IsReady() && _config.Item("UseEM").GetValue<bool>())
@@ -661,12 +687,13 @@ namespace D_Corki
                         && _e.GetPrediction(hero).Hitchance >= HitChance.High) _e.Cast(hero, false, true);
                 }
 
-                if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>())
+                if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>() && Qdelay>= _config.Item("delaycombo").GetValue<Slider>().Value)
                 {
                     var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                     var bigRocket = HasBigRocket();
                     if (hero.IsValidTarget(bigRocket ? _r2.Range : _r1.Range)
                         && _r1.GetDamage(hero) * (bigRocket ? 1.5f : 1f) > hero.Health) if (_r.GetPrediction(t).Hitchance >= HitChance.High) _r.Cast(t, false, true);
+                    Rcast = Environment.TickCount;
                 }
             }
         }
