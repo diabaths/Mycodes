@@ -817,12 +817,7 @@ namespace D_Ezreal
                         if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_w.Range))
                             return;
                         if (rDmg > hero.Health)
-                            _r.CastIfHitchanceEquals(hero, HitChance.High, true);
-
-                        else if (ComboDamage(hero) > hero.Health)
-                        {
-                            _r.CastIfHitchanceEquals(hero, HitChance.High, true);
-                        }
+                            _r.CastIfHitchanceEquals(hero, HitChance.VeryHigh, true);
                     }
                 }
                 if (autoR)
