@@ -331,55 +331,49 @@ namespace D_Ezreal
         {
             if (_player.IsDead) return;
             _r.Range = _config.Item("Maxrange").GetValue<Slider>().Value;
-            /*   if (_config.Item("pingulti").GetValue<bool>())
-               {
-                   foreach (
-                       var enemy in
-                           Get<Obj_AI_Hero>()
-                               .Where(
-                                   hero =>
-                                       Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
-                                       hero.IsValidTarget(30000) &&
-                                       _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health && Player.Distance(hero)>1000)
-                       )
-                   {
+            if (_config.Item("pingulti").GetValue<bool>())
+            {
+                foreach (var enemy in
+                    Get<Obj_AI_Hero>()
+                        .Where(
+                            hero =>
+                            Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready && hero.IsValidTarget(30000)
+                            && _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health
+                            && Player.Distance(hero) > 1000))
+                {
 
-                       Ping(enemy.Position.To2D());
-                   }
-               }*/
+                    Ping(enemy.Position.To2D());
+                }
+            }
 
             var target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
             var qpred = _q.GetPrediction(target);
-            var manacheck = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost +
-                            _player.Spellbook.GetSpell(SpellSlot.E).ManaCost;
+            var manacheck = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost
+                            + _player.Spellbook.GetSpell(SpellSlot.E).ManaCost;
             if (target.IsValidTarget(_q.Range) && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
-                if (_player.Mana >= manacheck &&
-                    qpred.CollisionObjects.Count == 0 && _q.IsReady() &&
-                    _config.Item("useQimmo").GetValue<bool>())
+                if (_player.Mana >= manacheck && qpred.CollisionObjects.Count == 0 && _q.IsReady()
+                    && _config.Item("useQimmo").GetValue<bool>())
                 {
                     _q.CastIfHitchanceEquals(target, HitChance.Immobile, true);
                 }
-                if (_player.Mana >= manacheck &&
-                    qpred.CollisionObjects.Count == 0 && _q.IsReady() &&
-                    _config.Item("useQdash").GetValue<bool>())
+                if (_player.Mana >= manacheck && qpred.CollisionObjects.Count == 0 && _q.IsReady()
+                    && _config.Item("useQdash").GetValue<bool>())
                 {
                     _q.CastIfHitchanceEquals(target, HitChance.Dashing, true);
                 }
-                if (_player.Mana >= manacheck && qpred.CollisionObjects.Count == 0 &&
-                    _q.IsReady() &&
-                    _config.Item("useQstun").GetValue<bool>() &&
-                    (target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Charm) ||
-                     target.HasBuffOfType(BuffType.Fear) ||
-                     target.HasBuffOfType(BuffType.Taunt)))
+                if (_player.Mana >= manacheck && qpred.CollisionObjects.Count == 0 && _q.IsReady()
+                    && _config.Item("useQstun").GetValue<bool>()
+                    && (target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Charm)
+                        || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Taunt)))
                 {
                     _q.CastIfHitchanceEquals(target, HitChance.High, true);
                 }
             }
             _player = Player;
             _orbwalker.SetAttack(true);
-            if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                100 * (_player.Mana / _player.MaxMana) > _config.Item("Junglemana").GetValue<Slider>().Value)
+            if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active
+                && 100 * (_player.Mana / _player.MaxMana) > _config.Item("Junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
@@ -387,19 +381,18 @@ namespace D_Ezreal
             {
                 Combo();
             }
-            if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
-                 _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-               100 * (_player.Mana / _player.MaxMana) > _config.Item("Harrasmana").GetValue<Slider>().Value &&
-                !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
+            if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active
+                 || _config.Item("harasstoggle").GetValue<KeyBind>().Active)
+                && 100 * (_player.Mana / _player.MaxMana) > _config.Item("Harrasmana").GetValue<Slider>().Value
+                && !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Harass();
             }
-            
-            
+
+
             KillSteal();
             Usepotion();
             Usecleanse();
-
         }
 
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
