@@ -329,24 +329,25 @@ namespace D_Ezreal
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            if (_config.Item("pingulti").GetValue<bool>())
-            {
-                foreach (
-                    var enemy in
-                        Get<Obj_AI_Hero>()
-                            .Where(
-                                hero =>
-                                    Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
-                                    hero.IsValidTarget(30000) &&
-                                    _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health && Player.Distance(hero)>1000)
-                    )
-                {
-
-                    Ping(enemy.Position.To2D());
-                }
-            }
-            
+            if (_player.IsDead) return;
             _r.Range = _config.Item("Maxrange").GetValue<Slider>().Value;
+            /*   if (_config.Item("pingulti").GetValue<bool>())
+               {
+                   foreach (
+                       var enemy in
+                           Get<Obj_AI_Hero>()
+                               .Where(
+                                   hero =>
+                                       Player.Spellbook.CanUseSpell(SpellSlot.R) == SpellState.Ready &&
+                                       hero.IsValidTarget(30000) &&
+                                       _player.GetSpellDamage(hero, SpellSlot.R) * 0.9 > hero.Health && Player.Distance(hero)>1000)
+                       )
+                   {
+
+                       Ping(enemy.Position.To2D());
+                   }
+               }*/
+
             var target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
             var qpred = _q.GetPrediction(target);
             var manacheck = _player.Spellbook.GetSpell(SpellSlot.Q).ManaCost +
@@ -378,7 +379,7 @@ namespace D_Ezreal
             _player = Player;
             _orbwalker.SetAttack(true);
             if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
+                100 * (_player.Mana / _player.MaxMana) > _config.Item("Junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
@@ -388,7 +389,7 @@ namespace D_Ezreal
             }
             if ((_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
                  _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value &&
+               100 * (_player.Mana / _player.MaxMana) > _config.Item("Harrasmana").GetValue<Slider>().Value &&
                 !_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Harass();
@@ -416,6 +417,7 @@ namespace D_Ezreal
             var muranama = _player.Mana >=
                            (_player.MaxMana * (_config.Item("muramanamin").GetValue<Slider>().Value) / 100);
             if (!_config.Item("usemuramana").GetValue<bool>()) return;
+            if (!Items.HasItem(3042) || !Items.CanUseItem(3042)) return;
             if (muranama && _player.Buffs.Count(buf => buf.Name == "Muramana") == 0 &&
                 _config.Item("ActiveCombo").GetValue<KeyBind>().Active && changetime >= 350)
             {
@@ -438,7 +440,7 @@ namespace D_Ezreal
             var useQH = _config.Item("UseQH").GetValue<bool>();
             var useWH = _config.Item("UseWH").GetValue<bool>();
             var useqlast = _config.Item("UseQLH").GetValue<bool>();
-            var useqlane = _config.Item("UseQL").GetValue<bool>() || _config.Item("UseQJ").GetValue<bool>();
+            var useqlane = _config.Item("UseQL").GetValue<bool>();
             var lastmana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("lastmana").GetValue<Slider>().Value;
             var lanemana = (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value
                            || (100 * (_player.Mana / _player.MaxMana))
@@ -451,7 +453,7 @@ namespace D_Ezreal
             var lastHit = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit;
             var laneClear = _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
             var t = target as Obj_AI_Hero;
-            if (combo && unit.IsMe)
+            /*if (combo && target is Obj_AI_Hero) //unit.IsMe)
             {
                 if (useQ && _q.IsReady() && t.IsValidTarget(_q.Range))
                 {
@@ -469,7 +471,7 @@ namespace D_Ezreal
                     }
                 }
             }
-            if (harass && unit.IsMe && (target is Obj_AI_Hero) && harassmana)
+            if (harass &&  target is Obj_AI_Hero && harassmana && !combo)
             {
                 if (useQH && _q.IsReady())
                 {
@@ -486,10 +488,10 @@ namespace D_Ezreal
                         _w.Cast(t, false, true);
                     }
                 }
-            }
+            }*/
 
             //Creditc FlapperDoodle
-            if (_q.IsReady() && (lastHit && lastmana && useqlast || laneClear && lanemana && useqlane))
+            if (_q.IsReady() && ((lastHit && lastmana && useqlast) || (laneClear && lanemana && useqlane)))
             {
                 int countMinions = 0;
                 foreach (var minionDie in
@@ -762,7 +764,7 @@ namespace D_Ezreal
                     {
                         _w.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
-                    else if (usee && !hero.IsValidTarget(_w.Range) && hero.IsValidTarget(_w.Range + _e.Range) && _player.Mana > wmana + emana &&
+                    if (usee && !hero.IsValidTarget(_w.Range) && hero.IsValidTarget(_w.Range + _e.Range) && _player.Mana > wmana + emana &&
                              _e.IsReady()
                         )
                     {
@@ -778,7 +780,7 @@ namespace D_Ezreal
                     {
                         _q.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
-                    else if (_e.IsReady() && usee && !hero.IsValidTarget(_q.Range) &&
+                    if (_e.IsReady() && usee && !hero.IsValidTarget(_q.Range) &&
                              _player.Mana > qmana + emana && hero.IsValidTarget(_q.Range + _e.Range) && _q.GetPrediction(hero).Hitchance >= HitChance.VeryHigh)
                     {
                         _e.Cast(hero.Position);
