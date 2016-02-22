@@ -782,18 +782,20 @@ namespace D_Ezreal
                         _q.Cast(hero);
                     }
                 }
-                if (user && !hero.IsInvulnerable && _player.Distance(hero) >= minrange)
+                if (user && rhDmg - 20 > hero.Health && hero.IsValidTarget(_r.Range))
                 {
-                    if (rhDmg - 20 > hero.Health && hero.IsValidTarget(_r.Range))
+                    if (!hero.IsInvulnerable && _player.Distance(hero) >= minrange)
+                    {
                         if (_q.IsReady() && _w.IsReady()
                             && hero.Health
                             <= _player.GetSpellDamage(hero, SpellSlot.Q) + _player.GetSpellDamage(hero, SpellSlot.W)
                             && hero.IsValidTarget(_q.Range)) return;
-                    if (_q.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q)
-                        && hero.IsValidTarget(_q.Range)) return;
-                    if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W)
-                        && hero.IsValidTarget(_w.Range)) return;
-                    if (_player.Mana > rmana && _r.IsReady()) _r.CastIfHitchanceEquals(hero, HitChance.High, true);
+                        if (_q.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q)
+                            && hero.IsValidTarget(_q.Range)) return;
+                        if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W)
+                            && hero.IsValidTarget(_w.Range)) return;
+                        if (_player.Mana > rmana && _r.IsReady()) _r.CastIfHitchanceEquals(hero, HitChance.High, true);
+                    }
                 }
             }
         }
