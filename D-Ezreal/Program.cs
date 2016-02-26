@@ -92,7 +92,9 @@ namespace D_Ezreal
 
             //Combo
             _config.AddSubMenu(new Menu("Combo", "Combo"));
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseIgnitecombo", "Use Ignite(rush for it)")).SetValue(true);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseIgnitecombo", "Use Ignite")).SetValue(true);
+            _config.SubMenu("Combo")
+               .AddItem(new MenuItem("ignitehp", "use ignite if Enemy HP%<").SetValue(new Slider(30, 1, 100)));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRC", "Use R")).SetValue(true);
@@ -284,16 +286,7 @@ namespace D_Ezreal
             _config.SubMenu("Misc").AddItem(new MenuItem("useQimmo", "Auto Q Immobile")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("useQstun", "Auto Q Taunt/Fear/Charm/Snare")).SetValue(true);
             _config.SubMenu("Misc").AddItem(new MenuItem("Gap_E", "Use E to Gapcloser")).SetValue(true);
-
-            //Damage after combo:
-            MenuItem dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Draw damage after combo").SetValue(true);
-            Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
-            Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
-            dmgAfterComboItem.ValueChanged +=
-                delegate (object sender, OnValueChangeEventArgs eventArgs)
-                {
-                    Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>();
-                };
+            
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -301,8 +294,6 @@ namespace D_Ezreal
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawW", "Draw W")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawE", "Draw E")).SetValue(false);
             _config.SubMenu("Drawings").AddItem(new MenuItem("DrawR", "Draw R")).SetValue(false);
-            _config.SubMenu("Drawings").AddItem(dmgAfterComboItem);
-            _config.SubMenu("Drawings").AddItem(new MenuItem("damagetest", "Damage Text")).SetValue(true);
             _config.SubMenu("Drawings").AddItem(new MenuItem("Drawharass", "Draw AutoHarass")).SetValue(true);
 
 
@@ -491,7 +482,7 @@ namespace D_Ezreal
             if (target.IsValidTarget(600) && _igniteSlot != SpellSlot.Unknown && ignitecombo
                 && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
-                if (target.Health <= ComboDamage(target))
+                if (target.HealthPercent<= _config.Item("ignitehp").GetValue<Slider>().Value)
                 {
                     _player.Spellbook.CastSpell(_igniteSlot, target);
                 }
@@ -554,36 +545,6 @@ namespace D_Ezreal
             {
                 _q.Cast(mob);
             }
-        }
-
-        private static float ComboDamage(Obj_AI_Hero hero)
-        {
-            var dmg = 0d;
-
-            if (_q.IsReady())
-                dmg += _player.GetSpellDamage(hero, SpellSlot.Q);
-            if (_w.IsReady())
-                dmg += _player.GetSpellDamage(hero, SpellSlot.W);
-            if (_e.IsReady())
-                dmg += _player.GetSpellDamage(hero, SpellSlot.E);
-            if (_r.IsReady())
-                dmg += _player.GetSpellDamage(hero, SpellSlot.R)*0.9;
-            if (Items.HasItem(3144) && Items.CanUseItem(3144))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Bilgewater);
-            if (Items.HasItem(3153) && Items.CanUseItem(3153))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Botrk);
-            if (Items.HasItem(3146) && Items.CanUseItem(3146))
-                dmg += _player.GetItemDamage(hero, Damage.DamageItems.Hexgun);
-            if (Player.GetSpellSlot("SummonerIgnite") != SpellSlot.Unknown)
-            {
-                dmg += _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Ignite);
-            }
-            if (Player.HasBuff("LichBane"))
-            {
-                dmg += _player.BaseAttackDamage*0.75 + _player.FlatMagicDamageMod*0.5;
-            }
-            dmg += _player.GetAutoAttackDamage(hero, true)*2;
-            return (float) dmg;
         }
 
         private static void Usepotion()
@@ -710,7 +671,7 @@ namespace D_Ezreal
 
         private static void KillSteal()
         {
-            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy && hero.IsValidTarget(_r.Range)))
+            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var useq = _config.Item("useQK").GetValue<bool>();
                 var usew = _config.Item("useWK").GetValue<bool>();
@@ -916,31 +877,6 @@ namespace D_Ezreal
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if (_config.Item("damagetest").GetValue<bool>())
-            {
-                foreach (
-                    var enemyVisible in
-                        Get<Obj_AI_Hero>().Where(enemyVisible => enemyVisible.IsValidTarget()))
-                {
-                    if (ComboDamage(enemyVisible) > enemyVisible.Health)
-                    {
-                        Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Red,
-                            "Combo=Rekt");
-                    }
-                    else if (ComboDamage(enemyVisible) + _player.GetAutoAttackDamage(enemyVisible, true)*2 >
-                             enemyVisible.Health)
-                    {
-                        Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Orange,
-                            "Combo+AA=Rekt");
-                    }
-                    else
-                        Drawing.DrawText(Drawing.WorldToScreen(enemyVisible.Position)[0] + 50,
-                            Drawing.WorldToScreen(enemyVisible.Position)[1] - 40, Color.Green,
-                            "Unkillable");
-                }
-            }
             var harass = (_config.Item("harasstoggle").GetValue<KeyBind>().Active);
 
             if (_config.Item("Drawharass").GetValue<bool>())
