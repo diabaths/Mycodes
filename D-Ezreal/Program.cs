@@ -153,13 +153,6 @@ namespace D_Ezreal
             //items
             _config.AddSubMenu(new Menu("items", "items"));
             _config.SubMenu("items").AddSubMenu(new Menu("Offensive", "Offensive"));
-            _config.SubMenu("items")
-                .SubMenu("Offensive")
-                .AddItem(new MenuItem("usemuramana", "Use Muramana"))
-                .SetValue(true);
-            _config.SubMenu("items")
-                .SubMenu("Offensive")
-                .AddItem(new MenuItem("muramanamin", "Use Muramana until MP < %").SetValue(new Slider(25, 1, 100)));
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Youmuu", "Use Youmuu's")).SetValue(true);
             _config.SubMenu("items").SubMenu("Offensive").AddItem(new MenuItem("Bilge", "Use Bilge")).SetValue(true);
             _config.SubMenu("items")
@@ -322,7 +315,6 @@ namespace D_Ezreal
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-            Orbwalking.BeforeAttack += OnBeforeAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
 
         }
@@ -406,29 +398,7 @@ namespace D_Ezreal
                 _e.Cast(Player.Position.Extend(gapcloser.Sender.Position, -_e.Range));
             }
         }
-
-        private static void OnBeforeAttack(Orbwalking.BeforeAttackEventArgs args)
-        {
-            var changetime = Environment.TickCount - _lastTick;
-            var muranama = _player.Mana >=
-                           (_player.MaxMana * (_config.Item("muramanamin").GetValue<Slider>().Value) / 100);
-            if (!_config.Item("usemuramana").GetValue<bool>()) return;
-            if (!Items.HasItem(3042) || !Items.CanUseItem(3042)) return;
-            if (muranama && _player.Buffs.Count(buf => buf.Name == "Muramana") == 0 &&
-                _config.Item("ActiveCombo").GetValue<KeyBind>().Active && changetime >= 350)
-            {
-                Items.UseItem(3042);
-                _lastTick = Environment.TickCount;
-            }
-            if ((!muranama || !_config.Item("ActiveCombo").GetValue<KeyBind>().Active) &&
-                _player.Buffs.Count(buf => buf.Name == "Muramana") == 1 && changetime >= 350)
-            {
-                Items.UseItem(3042);
-                _lastTick = Environment.TickCount;
-            }
-        }
-
-
+        
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             var useQ = _config.Item("UseQC").GetValue<bool>();

@@ -43,7 +43,7 @@ namespace D_Rengar
             _e = new Spell(SpellSlot.E, 980f);
             _r = new Spell(SpellSlot.R, 2000f);
 
-            _e.SetSkillshot(0.25f, 70f, 1500f, true, SkillshotType.SkillshotLine);
+            _e.SetSkillshot(0.125f, 70f, 1500f, true, SkillshotType.SkillshotLine);
 
             _bilge = new Items.Item(3144, 450f);
             _blade = new Items.Item(3153, 450f);
