@@ -725,7 +725,7 @@ namespace D_Ezreal
                             && hero.IsValidTarget(_q.Range)) return;
                         if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W)
                             && hero.IsValidTarget(_w.Range)) return;
-                        if (_player.Mana > rmana && _r.IsReady()) _r.CastIfHitchanceEquals(hero, HitChance.High, true);
+                        if (_r.IsReady()) _r.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
                 }
             }
@@ -733,24 +733,27 @@ namespace D_Ezreal
 
         private static void UseRcombo()
         {
-            if (!_r.IsReady()) return;
-            var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
-            var rsolo = _config.Item("UseRC").GetValue<bool>();
-            var autoR = _config.Item("UseRE").GetValue<bool>();
-            var hero = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
-            var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
+            foreach (var hero in Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
+            {
+                if (!_r.IsReady()) return;
+                var minrange = _config.Item("Minrange").GetValue<Slider>().Value;
+                var rsolo = _config.Item("UseRC").GetValue<bool>();
+                var autoR = _config.Item("UseRE").GetValue<bool>();
+                var rDmg = _player.GetSpellDamage(hero, SpellSlot.R) * 0.9;
                 if (hero.IsInvulnerable) return;
                 if (_player.Distance(hero) >= minrange && hero.IsValidTarget(_r.Range) && rDmg > hero.Health)
                 {
                     if (rsolo)
                     {
-                        if (_q.IsReady() && _w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q) + _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_q.Range))
-                            return;
-                        if (_q.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q) && hero.IsValidTarget(_q.Range))
-                            return;
-                        if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W) && hero.IsValidTarget(_w.Range))
-                            return;
-                        _r.CastIfHitchanceEquals(hero, HitChance.VeryHigh);
+                        if (_q.IsReady() && _w.IsReady()
+                            && hero.Health
+                            <= _player.GetSpellDamage(hero, SpellSlot.Q) + _player.GetSpellDamage(hero, SpellSlot.W)
+                            && hero.IsValidTarget(_q.Range)) return;
+                        if (_q.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.Q)
+                            && hero.IsValidTarget(_q.Range)) return;
+                        if (_w.IsReady() && hero.Health <= _player.GetSpellDamage(hero, SpellSlot.W)
+                            && hero.IsValidTarget(_w.Range)) return;
+                        if (!hero.IsDead) _r.CastIfHitchanceEquals(hero, HitChance.VeryHigh);
                     }
                 }
                 if (autoR)
@@ -762,9 +765,10 @@ namespace D_Ezreal
                     }
                 }
             }
-      
+        }
 
-       
+
+
 
         private static void Usecleanse()
         {
