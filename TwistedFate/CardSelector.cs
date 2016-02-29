@@ -86,17 +86,17 @@ namespace TwistedFate
                 Status = SelectStatus.Selected;
             }
 
-            if (Select == Cards.Blue && wName == "bluecardlock")
+            if (Select == Cards.Blue && wName.Equals("BlueCardLock", StringComparison.InvariantCultureIgnoreCase))
             {
                 SendWPacket();
             }
             else
-            if (Select == Cards.Yellow && wName == "goldcardlock")
+            if (Select == Cards.Yellow && wName.Equals("GoldCardLock", StringComparison.InvariantCultureIgnoreCase))
             {
                 SendWPacket();
             }
             else
-            if (Select == Cards.Red && wName == "redcardlock")
+            if (Select == Cards.Red && wName.Equals("RedCardLock", StringComparison.InvariantCultureIgnoreCase))
             {
                 SendWPacket();
             }
@@ -109,13 +109,14 @@ namespace TwistedFate
                 return;
             }
 
-            if (args.SData.Name == "PickACard")
+            if (args.SData.Name.Equals("PickACard", StringComparison.InvariantCultureIgnoreCase))
             {
                 Status = SelectStatus.Selecting;
             }
 
-            if (args.SData.Name == "goldcardlock" || args.SData.Name == "bluecardlock" ||
-                args.SData.Name == "redcardlock")
+            if (args.SData.Name.Equals("GoldCardLock", StringComparison.InvariantCultureIgnoreCase)
+                || args.SData.Name.Equals("BlueCardLock", StringComparison.InvariantCultureIgnoreCase)
+                || args.SData.Name.Equals("RedCardLock", StringComparison.InvariantCultureIgnoreCase))
             {
                 Status = SelectStatus.Selected;
             }

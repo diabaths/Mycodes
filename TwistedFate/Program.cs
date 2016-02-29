@@ -26,6 +26,7 @@ namespace TwistedFate
         private static int LastPingT = 0;
         private static Obj_AI_Hero Player;
         private static int CastQTick;
+        private static SpellSlot _igniteSlot;
 
         private static void Main(string[] args)
         {
@@ -66,6 +67,7 @@ namespace TwistedFate
             W = new Spell(SpellSlot.W);
             Q.SetSkillshot(0.25f, 40f, 1000f, false, SkillshotType.SkillshotLine);
 
+            _igniteSlot = Player.GetSpellSlot("SummonerDot");
             //Make the menu
             Config = new Menu("Twisted Fate", "TwistedFate", true);
 
@@ -120,6 +122,8 @@ namespace TwistedFate
 
             var menuItems = new Menu("Items", "Items");
             {
+                menuItems.AddItem(new MenuItem("UseIgnitecombo", "Use Ignite").SetValue(true));
+                menuItems.AddItem(new MenuItem("ignitehp", "use ignite if Enemy HP%<").SetValue(new Slider(30, 1, 100)));
                 menuItems.AddItem(new MenuItem("itemBotrk", "BotRK").SetValue(true));
                 menuItems.AddItem(new MenuItem("itemYoumuu", "Youmuu").SetValue(true));
                 menuItems.AddItem(
@@ -661,7 +665,7 @@ namespace TwistedFate
                   (SOW.ActiveMode == Orbwalking.OrbwalkingMode.Mixed &&
                    (useItemModes == 1 || useItemModes == 3))))
                 return;
-
+            var UseIgnitecombo = Config.Item("UseIgnitecombo").GetValue<bool>();
             var botrk = Config.Item("itemBotrk").GetValue<bool>();
             var youmuu = Config.Item("itemYoumuu").GetValue<bool>();
             var target = SOW.GetTarget() as Obj_AI_Base;
@@ -689,6 +693,16 @@ namespace TwistedFate
             if (youmuu && target != null && target.Type == ObjectManager.Player.Type &&
                 Orbwalking.InAutoAttackRange(target) && Items.CanUseItem(3142))
                 Items.UseItem(3142);
+
+            if (target.IsValidTarget(600) && _igniteSlot != SpellSlot.Unknown && UseIgnitecombo
+                && Player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+            {
+                if (target.HealthPercent <= Config.Item("ignitehp").GetValue<Slider>().Value)
+                {
+                    Player.Spellbook.CastSpell(_igniteSlot, target);
+                }
+
+            }
 
             Usepotion();
         }
