@@ -344,7 +344,8 @@ namespace D_Lucian
             }
             if (_player.HasBuff("LucianR") )
             {
-                args.Process = false;
+                _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                //args.Process = false;
             }
 
         }
