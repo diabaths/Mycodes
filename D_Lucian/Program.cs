@@ -342,9 +342,11 @@ namespace D_Lucian
                 Ecast = true;
                 Utility.DelayAction.Add(300, () => Ecast = false);
             }
-            if (_player.HasBuff("LucianR"))
-
+            if (_player.HasBuff("LucianR") )
+            {
+                _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 args.Process = false;
+            }
 
         }
         
@@ -568,7 +570,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee && !_q.IsReady() && !_player.IsDashing())
+            if (useW && _w.IsReady() && !HavePassivee && !_player.IsDashing())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
