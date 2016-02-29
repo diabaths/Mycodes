@@ -344,7 +344,6 @@ namespace D_Lucian
             }
             if (_player.HasBuff("LucianR") )
             {
-                _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 args.Process = false;
             }
 
@@ -373,6 +372,10 @@ namespace D_Lucian
                     Qcast = true;
                     Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
                     Utility.DelayAction.Add(300, () => Qcast = false);
+                }
+                if (_player.HasBuff("LucianR"))
+                {
+                    _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 }
             }
         }
