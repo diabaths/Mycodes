@@ -6,6 +6,7 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 using Color = System.Drawing.Color;
+
 #endregion
 
 namespace TwistedFate
@@ -27,6 +28,7 @@ namespace TwistedFate
         private static Obj_AI_Hero Player;
         private static int CastQTick;
         private static SpellSlot _igniteSlot;
+        public static Dictionary<SpellSlot, int> LastCast = new Dictionary<SpellSlot, int>();
 
         private static void Main(string[] args)
         {
@@ -199,7 +201,7 @@ namespace TwistedFate
             Game.PrintChat(
                 "<font color='#f2f21d'>Buy me cigars </font> <font color='#ff1900'>ssssssssssmith@hotmail.com</font> (10) S");
         }
-
+        
         private static void Usepotion()
         {
             var iusehppotion = Config.Item("usehppotions").GetValue<bool>();
@@ -283,7 +285,7 @@ namespace TwistedFate
 
         private static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe && args.SData.Name == "gate" && Config.Item("AutoY").GetValue<bool>())
+            if (sender.IsMe && args.SData.Name == "Gate" && Config.Item("AutoY").GetValue<bool>())
             {
                 CardSelector.StartSelecting(Cards.Yellow);
             }
