@@ -40,16 +40,16 @@ namespace D_Lucian
 
             _q = new Spell(SpellSlot.Q, 675);
             _q1 = new Spell(SpellSlot.Q, 1200);
-            _w = new Spell(SpellSlot.W, 1200, TargetSelector.DamageType.Magical);
-            _w2 = new Spell(SpellSlot.W, 1200, TargetSelector.DamageType.Magical);
+            _w = new Spell(SpellSlot.W, 1000, TargetSelector.DamageType.Magical);
+            _w2 = new Spell(SpellSlot.W, 1000, TargetSelector.DamageType.Magical);
             _e = new Spell(SpellSlot.E, 475f);
-            _r = new Spell(SpellSlot.R, 1400);
+            _r = new Spell(SpellSlot.R, 1200);
 
 
             _q.SetTargetted(0.25f, 1400f);
             _q1.SetSkillshot(0.5f, 50, float.MaxValue, false, SkillshotType.SkillshotLine);
             _w.SetSkillshot(0.30f, 80f, 1600f, true, SkillshotType.SkillshotLine);
-            _w2.SetSkillshot(0.30f, 80f, 1600, false, SkillshotType.SkillshotCircle);
+            _w2.SetSkillshot(0.30f, 80f, 1600f, false, SkillshotType.SkillshotCircle);
             _r.SetSkillshot(0.2f, 110f, 2500, true, SkillshotType.SkillshotLine);
 
             _youmuu = new Items.Item(3142, 10);
@@ -347,7 +347,6 @@ namespace D_Lucian
                 _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 //args.Process = false;
             }
-
         }
         
         private static bool HavePassivee => Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff");
@@ -574,7 +573,7 @@ namespace D_Lucian
                 else if (t.IsValidTarget(_q.Range) && _q.IsReady() && !t.HasBuffOfType(BuffType.Invulnerability))
                     CastQ();
             }
-            if (useW && _w.IsReady() && !HavePassivee && !_player.IsDashing())
+            if (useW && _w.IsReady() && !HavePassivee && !_player.IsDashing() && !_q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
