@@ -78,12 +78,12 @@ namespace D_Udyr
             _rand = new Items.Item(3143, 490f);
             _lotis = new Items.Item(3190, 590f);
 
-            if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner1).Name))
+            if (_player.GetSpell(SpellSlot.Summoner1).Name.ToLower().Contains("smite"))
             {
                 _smite = new Spell(SpellSlot.Summoner1, 570f);
                 _smiteSlot = SpellSlot.Summoner1;
             }
-            else if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner2).Name))
+            else if (_player.GetSpell(SpellSlot.Summoner2).Name.ToLower().Contains("smite"))
             {
                 _smite = new Spell(SpellSlot.Summoner2, 570f);
                 _smiteSlot = SpellSlot.Summoner2;

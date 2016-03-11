@@ -93,12 +93,12 @@ namespace D_Nidalee
                              ? new Items.Item(3048, float.MaxValue)
                              : new Items.Item(3040, float.MaxValue);
 
-            if (Smitetype.Contains(Player.Spellbook.GetSpell(SpellSlot.Summoner1).Name))
+            if (_player.GetSpell(SpellSlot.Summoner1).Name.ToLower().Contains("smite"))
             {
                 _smite = new Spell(SpellSlot.Summoner1, 570f);
                 _smiteSlot = SpellSlot.Summoner1;
             }
-            else if (Smitetype.Contains(Player.Spellbook.GetSpell(SpellSlot.Summoner2).Name))
+            else if (_player.GetSpell(SpellSlot.Summoner2).Name.ToLower().Contains("smite"))
             {
                 _smite = new Spell(SpellSlot.Summoner2, 570f);
                 _smiteSlot = SpellSlot.Summoner2;

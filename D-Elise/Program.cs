@@ -80,16 +80,17 @@ namespace D_Elise
             _lotis = new Items.Item(3190, 590f);
             _zhonya = new Items.Item(3157, 10);
 
-            if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner1).Name))
+            if (_player.GetSpell(SpellSlot.Summoner1).Name.ToLower().Contains("smite"))
             {
                 _smite = new Spell(SpellSlot.Summoner1, 570f);
                 _smiteSlot = SpellSlot.Summoner1;
             }
-            else if (Smitetype.Contains(_player.Spellbook.GetSpell(SpellSlot.Summoner2).Name))
+            else if (_player.GetSpell(SpellSlot.Summoner2).Name.ToLower().Contains("smite"))
             {
                 _smite = new Spell(SpellSlot.Summoner2, 570f);
                 _smiteSlot = SpellSlot.Summoner2;
             }
+
             _igniteSlot = _player.GetSpellSlot("SummonerDot");
 
             _config = new Menu("D-Elise", "D-Elise", true);
