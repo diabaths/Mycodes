@@ -601,6 +601,7 @@ namespace D_Graves
             {
                 Smiteontarget();
             }
+
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
@@ -617,20 +618,18 @@ namespace D_Graves
             {
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
                 if (t.IsInvulnerable) return;
-                if (t.IsValidTarget(_r.Range))
+                if (_q.IsReady() && t.IsValidTarget(_q.Range)
+                    && (_q.GetDamage(t) > t.Health || _player.GetAutoAttackDamage(t, true) > t.Health)) return;
+                if (_r.GetDamage(t) - 80 > t.Health && t.IsValidTarget(_r.Range))
                 {
-                    if (_q.IsReady() && t.IsValidTarget(_q.Range)
-                        && (_q.GetDamage(t) > t.Health || _player.GetAutoAttackDamage(t, true) > t.Health)) return;
-                    if (_r.GetDamage(t) - 50 > t.Health)
-                    {
-                        _r.CastIfHitchanceEquals(t, HitChance.High, true);
-                    }
+                    _r.CastIfHitchanceEquals(t, HitChance.High, true);
                 }
 
                 if (autoR)
                 {
                     var fuckr = _r.GetPrediction(t, true);
-                    if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value) _r.CastIfHitchanceEquals(t, HitChance.High, true);
+                    if (fuckr.AoeTargetsHitCount >= _config.Item("MinTargets").GetValue<Slider>().Value
+                        && t.IsValidTarget(_r.Range)) _r.CastIfHitchanceEquals(t, HitChance.High, true);
                 }
             }
 
@@ -932,7 +931,7 @@ namespace D_Graves
                 if (_r.IsReady() && _config.Item("UseRM").GetValue<bool>() && hero.IsValidTarget(_r.Range))
                 {
                     if (_q.IsReady() && _q.GetDamage(hero) > hero.Health && hero.IsValidTarget(_q.Range)) return;
-                    if (!hero.IsInvulnerable && _r.GetDamage(hero) > hero.Health)
+                    if (!hero.IsInvulnerable && _r.GetDamage(hero) - 80 > hero.Health)
                     {
                         _r.CastIfHitchanceEquals(hero, HitChance.High, true);
                     }
