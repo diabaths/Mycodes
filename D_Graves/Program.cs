@@ -10,6 +10,8 @@ using LeagueSharp.Common;
 
 namespace D_Graves
 {
+    using SharpDX;
+
     internal class Program
     {
         private const string ChampionName = "Graves";
@@ -81,6 +83,7 @@ namespace D_Graves
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQC", "Use Q")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWC", "Use W")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseEC", "Use E")).SetValue(false);
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseEreload", "Use E to Reload")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRC", "Use R")).SetValue(true);
             _config.SubMenu("Combo").AddItem(new MenuItem("UseRE", "Use R if Hit X Enemys")).SetValue(true);
             _config.SubMenu("Combo")
@@ -662,8 +665,11 @@ namespace D_Graves
 
                     var useE = _config.Item("UseEC").GetValue<bool>();
                     var ta = TargetSelector.GetTarget(700, TargetSelector.DamageType.Magical);
-                    if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && useE && _e.IsReady())
-                        if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
+                    if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && _e.IsReady())
+                    {
+                        if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1
+                            && useE)
+                        {
                             if (!ta.UnderTurret()) _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
                             else if (ta.UnderTurret() && _e.IsReady() && ta.IsValidTarget()
                                      && _q.ManaCost + _e.ManaCost < _player.Mana)
@@ -672,9 +678,32 @@ namespace D_Graves
                                     _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
                                     _q.CastIfHitchanceEquals(ta, HitChance.High, true);
                                 }
+                        }
+
+                        var useEreload = _config.Item("UseEreload").GetValue<bool>();
+                        if (!_player.HasBuff("GravesBasicAttackAmmo2") && _e.IsReady() && useEreload)
+                        {
+                            var direction = (Game.CursorPos - _player.ServerPosition).To2D().Normalized();
+                            Game.PrintChat("1");
+                            for (var step = 0f; step < 360; step += 30)
+                            {
+                                for (var a = 450; a > 0; a -= 50)
+                                {
+                                    var currentAngle = step * (float)Math.PI / 90;
+                                    var currentCheckPoint = _player.ServerPosition.To2D()
+                                                            + a * direction.Rotated(currentAngle);
+                                    if (currentCheckPoint.To3D().UnderTurret(true) || currentCheckPoint.To3D().IsWall())
+                                    {
+                                        return;
+                                    }
+
+                                    _e.Cast((Vector3)currentCheckPoint);
+                                }
+                            }
+                        }
+                    }
                 }
         }
-
 
         private static void Harass()
         {
