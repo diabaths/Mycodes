@@ -638,7 +638,7 @@ namespace D_Graves
 
             UseItemes();
         }
-
+       
         private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             var mana = _player.ManaPercent > _config.Item("Harrasmana").GetValue<Slider>().Value;
@@ -684,7 +684,6 @@ namespace D_Graves
                         if (!_player.HasBuff("GravesBasicAttackAmmo2") && _e.IsReady() && useEreload)
                         {
                             var direction = (Game.CursorPos - _player.ServerPosition).To2D().Normalized();
-                            Game.PrintChat("1");
                             for (var step = 0f; step < 360; step += 30)
                             {
                                 for (var a = 450; a > 0; a -= 50)
