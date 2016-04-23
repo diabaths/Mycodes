@@ -11,10 +11,6 @@ using Color = System.Drawing.Color;
 
 namespace TwistedFate
 {
-    using System.Security.Policy;
-
-    using LeagueSharp.SDK.Core.Utils;
-
     internal class Program
     {
         private static Menu Config;
