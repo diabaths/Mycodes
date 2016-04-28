@@ -75,8 +75,8 @@ namespace D_Lucian
             _config.SubMenu("Combo").AddItem(new MenuItem("UseEC", "Use E")).SetValue(true);
             _config.SubMenu("Combo")
                 .AddItem(
-                    new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(new KeyBind("T".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("useRaim", "Use R(Semi-Manual)").SetValue(
+                        new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
             _config.SubMenu("Combo")
                 .AddItem(new MenuItem("ActiveCombo", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -86,13 +86,14 @@ namespace D_Lucian
             _config.SubMenu("Harass").AddItem(new MenuItem("UseWH", "Use W")).SetValue(false);
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
+                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(
+                        new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
             _config.SubMenu("Harass")
                 .AddItem(new MenuItem("Harrasmana", "Minimum Mana").SetValue(new Slider(70, 1, 100)));
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("ActiveHarass", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
+                    new MenuItem("ActiveHarass", "Harass!").SetValue(
+                        new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
 
             //Farm
             _config.AddSubMenu(new Menu("Farm", "Farm"));
@@ -106,7 +107,8 @@ namespace D_Lucian
             _config.SubMenu("Farm")
                 .SubMenu("LastHit")
                 .AddItem(
-                    new MenuItem("ActiveLast", "LastHit!").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
+                    new MenuItem("ActiveLast", "LastHit!").SetValue(
+                        new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
             //Lane Clear
             _config.SubMenu("Farm").AddSubMenu(new Menu("LaneClear", "LaneClear"));
             _config.SubMenu("Farm").SubMenu("LaneClear").AddItem(new MenuItem("UseQLP", "Q To Harass")).SetValue(true);
@@ -124,8 +126,8 @@ namespace D_Lucian
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(
-                    new MenuItem("ActiveLane", "LaneClear!").SetValue(new KeyBind("V".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("ActiveLane", "LaneClear!").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
             //Jungle clear
             _config.SubMenu("Farm").AddSubMenu(new Menu("JungleClear", "JungleClear"));
             _config.SubMenu("Farm").SubMenu("JungleClear").AddItem(new MenuItem("UseQJ", "Q Jungle")).SetValue(true);
@@ -136,8 +138,8 @@ namespace D_Lucian
             _config.SubMenu("Farm")
                 .SubMenu("JungleClear")
                 .AddItem(
-                    new MenuItem("ActiveJungle", "Jungle key").SetValue(new KeyBind("V".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("ActiveJungle", "Jungle key").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
 
             //items
@@ -280,39 +282,38 @@ namespace D_Lucian
             {
                 _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_r.Range) && !_player.HasBuff("LucianR"))
-                    _r.Cast(t.Position);
+                if (t.IsValidTarget(_r.Range) && !_player.HasBuff("LucianR")) _r.Cast(t.Position);
             }
             if (_config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
                 Combo();
             }
-            if (!_config.Item("ActiveCombo").GetValue<KeyBind>().Active &&
-                (_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
-                 _config.Item("harasstoggle").GetValue<KeyBind>().Active) &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value)
+            if (!_config.Item("ActiveCombo").GetValue<KeyBind>().Active
+                && (_config.Item("ActiveHarass").GetValue<KeyBind>().Active
+                    || _config.Item("harasstoggle").GetValue<KeyBind>().Active)
+                && (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Harrasmana").GetValue<Slider>().Value)
             {
                 Harass();
 
             }
-            if (_config.Item("ActiveLane").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
+            if (_config.Item("ActiveLane").GetValue<KeyBind>().Active
+                && (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lanemana").GetValue<Slider>().Value)
             {
                 Laneclear();
             }
-            if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
+            if (_config.Item("ActiveJungle").GetValue<KeyBind>().Active
+                && (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Junglemana").GetValue<Slider>().Value)
             {
                 JungleClear();
             }
-            if (_config.Item("ActiveLast").GetValue<KeyBind>().Active &&
-                (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lastmana").GetValue<Slider>().Value)
+            if (_config.Item("ActiveLast").GetValue<KeyBind>().Active
+                && (100 * (_player.Mana / _player.MaxMana)) > _config.Item("Lastmana").GetValue<Slider>().Value)
             {
                 LastHit();
             }
 
             _player = ObjectManager.Player;
-            
+
             Usecleanse();
             KillSteal();
             Usepotion();
@@ -322,33 +323,39 @@ namespace D_Lucian
         {
             return NavMesh.GetCollisionFlags(vector.X, vector.Y).HasFlag(CollisionFlags.Wall);
         }*/
-      
+
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
-            if (sender.IsMe)
-                if (args.Animation == "Spell1" || args.Animation == "Spell2")
-                    if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
-                        ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            if (sender.IsMe) if (args.Animation == "Spell1" || args.Animation == "Spell2") if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None) ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
         }
 
         private static void OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E)
+            if (args.Slot == SpellSlot.Q)
             {
                 Qcast = true;
                 Utility.DelayAction.Add(300, () => Qcast = false);
+            }
+            if (args.Slot == SpellSlot.W)
+            {
                 Wcast = true;
+
                 Utility.DelayAction.Add(300, () => Wcast = false);
+            }
+
+            if (args.Slot == SpellSlot.E)
+            {
                 Ecast = true;
                 Utility.DelayAction.Add(300, () => Ecast = false);
             }
-            if (_player.HasBuff("LucianR") )
+
+            if (_player.HasBuff("LucianR"))
             {
                 _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 //args.Process = false;
             }
         }
-        
+    
         private static bool HavePassivee => Qcast || Wcast || Ecast || _player.HasBuff("LucianPassiveBuff");
         
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -577,9 +584,9 @@ namespace D_Lucian
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
                 var predW = _w.GetPrediction(t);
-                if (t.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.High && predW.CollisionObjects.Count == 0)
+                if (t.IsValidTarget(_w.Range) && predW.Hitchance >= HitChance.Medium && predW.CollisionObjects.Count == 0)
                     _w.Cast(t, false, true);
-                else if (t.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.High)
+                else if (t.IsValidTarget(_w2.Range) && predW.Hitchance >= HitChance.Medium)
                 {
                     _w2.Cast(t, false, true);
                 }
