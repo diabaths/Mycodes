@@ -448,7 +448,7 @@ namespace D_Jarvan
             var useR = _config.Item("UseRC").GetValue<bool>();
             var autoR = _config.Item("UseRE").GetValue<bool>();
             var cooldown = _player.GetSpell(SpellSlot.E).CooldownExpires;
-            var CD = (int)(cooldown -(Game.Time - 1));
+            var CD = (int)(cooldown - (Game.Time - 1));
             var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
             Smiteontarget();
             if (t.IsValidTarget(600) && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown
@@ -478,9 +478,9 @@ namespace D_Jarvan
                 if (t.IsValidTarget(_w.Range)) Utility.DelayAction.Add(1000, () => _w.Cast());
             }
 
-            if (useQ && _q.IsReady() && !_e.IsReady() && CD>=3)
+            if (useQ && _q.IsReady() && !_e.IsReady() && CD >= 3)
             {
-                if (t.IsValidTarget(_q.Range) && _r.GetPrediction(t).Hitchance >= HitChance.High) _q.Cast(t);
+                if (t.IsValidTarget(_q.Range) && _q.GetPrediction(t).Hitchance >= HitChance.High) _q.Cast(t);
             }
 
             if (_r.IsReady() && autoR && !_haveulti)
@@ -972,7 +972,6 @@ namespace D_Jarvan
                          || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
                          || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
-
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
                     {
                         Items.UseItem(2010);
@@ -1086,7 +1085,7 @@ namespace D_Jarvan
         {
             if (!(sender is Obj_GeneralParticleEmitter)) return;
             var obj = (Obj_GeneralParticleEmitter)sender;
-           
+
             if (obj.IsMe && obj.Name == "JarvanCataclysm_tar")
             {
                 _haveulti = true;
@@ -1096,7 +1095,7 @@ namespace D_Jarvan
         private static void OnDeleteObj(GameObject sender, EventArgs args)
         {
             if (!(sender is Obj_GeneralParticleEmitter)) return;
-            
+
             var obj = (Obj_GeneralParticleEmitter)sender;
             if (obj.IsMe && obj.Name == "JarvanCataclysm_tar")
             {

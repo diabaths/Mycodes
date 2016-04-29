@@ -79,7 +79,6 @@ namespace D_Nidalee
             W.SetSkillshot(0.500f, 90f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             WC.SetSkillshot(0.50f, 400f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             EC.SetSkillshot(0.50f, (float)(15 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCone);
-            EC.SetSkillshot(0.50f, (float)(15 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCone);
             SpellList.Add(Q);
             SpellList.Add(W);
             SpellList.Add(E);
