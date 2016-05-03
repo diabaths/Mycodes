@@ -1122,7 +1122,7 @@ namespace D_Nidalee
 
         private static void AllyAutoE()
         {
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly && !hero.IsMe))
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly && !hero.IsMe && hero.IsValidTarget(E.Range)))
             {
                 var forms = Config.Item("AutoSwitchform").GetValue<bool>();
                 var mana = Player.Mana >= Player.MaxMana * Config.Item("MPPercent").GetValue<Slider>().Value / 100;

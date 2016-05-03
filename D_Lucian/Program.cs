@@ -278,6 +278,7 @@ namespace D_Lucian
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            if (_player.IsDead) return;
             if (_config.Item("useRaim").GetValue<KeyBind>().Active && _r.IsReady())
             {
                 _player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
@@ -326,7 +327,12 @@ namespace D_Lucian
 
         private static void Obj_AI_Base_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
         {
-            if (sender.IsMe) if (args.Animation == "Spell1" || args.Animation == "Spell2") if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None) ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            if (sender.IsMe)
+                if (args.Animation == "Spell1" || args.Animation == "Spell2")
+                {
+                    if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None) ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                }
+
         }
 
         private static void OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
@@ -362,19 +368,19 @@ namespace D_Lucian
         {
             if (sender.IsMe)
             {
-                if (args.SData.Name == "LucianW")
+               if (args.SData.Name.Equals("LucianW", StringComparison.InvariantCultureIgnoreCase))
                 {
                     Wcast = true;
                     Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
                     Utility.DelayAction.Add(300, () => Wcast = false);
                 }
-                if (args.SData.Name == "LucianE")
+                if (args.SData.Name.Equals("LucianE", StringComparison.InvariantCultureIgnoreCase))
                 {
                     Ecast = true;
                     Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
                     Utility.DelayAction.Add(300, () => Ecast = false);
                 }
-                if (args.SData.Name == "LucianQ")
+                if (args.SData.Name.Equals("LucianQ", StringComparison.InvariantCultureIgnoreCase))
                 {
                     Qcast = true;
                     Utility.DelayAction.Add(100, Orbwalking.ResetAutoAttackTimer);
@@ -600,7 +606,7 @@ namespace D_Lucian
                 if (ta == null) return;
                 if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
                 {
-                    if (!ta.UnderTurret()&& ta.IsValidTarget(_q.Range))
+                    if (!ta.UnderTurret()&& ta.IsValidTarget(_q.Range) && !Orbwalking.InAutoAttackRange(ta))
                     {
                         _e.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, 450));
                     }
