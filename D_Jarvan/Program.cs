@@ -836,7 +836,8 @@ namespace D_Jarvan
                 jungleMinions = new string[]
                                     {
                                         "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_RiftHerald",
-                                        "SRU_Red", "SRU_Krug", "SRU_Dragon", "SRU_Baron"
+                                        "SRU_Red", "SRU_Krug", "SRU_Dragon_Air", "SRU_Dragon_Water", "SRU_Dragon_Fire",
+                                        "SRU_Dragon_Elder", "SRU_Baron"
                                     };
             }
 

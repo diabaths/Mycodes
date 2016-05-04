@@ -476,11 +476,11 @@ namespace D_Lucian
                 if (_player.HasBuff("zedulttargetmark"))
                 {
                     if (Items.HasItem(3140) && Items.CanUseItem(3140))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3140));
+                        Utility.DelayAction.Add(1000, () => Items.UseItem(3140));
                     else if (Items.HasItem(3139) && Items.CanUseItem(3139))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3139));
+                        Utility.DelayAction.Add(1000, () => Items.UseItem(3139));
                     else if (Items.HasItem(3137) && Items.CanUseItem(3137))
-                        Utility.DelayAction.Add(500, () => Items.UseItem(3137));
+                        Utility.DelayAction.Add(1000, () => Items.UseItem(3137));
                 }
                 else
                 {

@@ -135,8 +135,8 @@ namespace D_Shyvana
             _config.SubMenu("items")
                 .SubMenu("Deffensive")
                 .AddItem(
-                    new MenuItem("Righteousenemysrange", "Righteous Glory Range Check").SetValue(new Slider(800, 400,
-                        1400)));
+                    new MenuItem("Righteousenemysrange", "Righteous Glory Range Check").SetValue(
+                        new Slider(800, 400, 1400)));
 
             _config.SubMenu("items").AddSubMenu(new Menu("Potions", "Potions"));
             _config.SubMenu("items")
@@ -155,11 +155,12 @@ namespace D_Shyvana
             _config.SubMenu("Harass").AddItem(new MenuItem("UseItemsharass", "Use Tiamat/Hydra")).SetValue(true);
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(new KeyBind("G".ToCharArray()[0],
-                        KeyBindType.Toggle)));
+                    new MenuItem("harasstoggle", "AutoHarass (toggle)").SetValue(
+                        new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
             _config.SubMenu("Harass")
                 .AddItem(
-                    new MenuItem("ActiveHarass", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
+                    new MenuItem("ActiveHarass", "Harass!").SetValue(
+                        new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
 
             //LaneClear
             _config.AddSubMenu(new Menu("Farm", "Farm"));
@@ -170,7 +171,8 @@ namespace D_Shyvana
             _config.SubMenu("Farm")
                 .SubMenu("LastHit")
                 .AddItem(
-                    new MenuItem("ActiveLast", "LastHit!").SetValue(new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
+                    new MenuItem("ActiveLast", "LastHit!").SetValue(
+                        new KeyBind("X".ToCharArray()[0], KeyBindType.Press)));
 
             _config.SubMenu("Farm").AddSubMenu(new Menu("LaneClear", "LaneClear"));
             _config.SubMenu("Farm")
@@ -183,8 +185,8 @@ namespace D_Shyvana
             _config.SubMenu("Farm")
                 .SubMenu("LaneClear")
                 .AddItem(
-                    new MenuItem("ActiveLane", "LaneClear!").SetValue(new KeyBind("V".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("ActiveLane", "LaneClear!").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
             _config.SubMenu("Farm").AddSubMenu(new Menu("JungleClear", "JungleClear"));
             _config.SubMenu("Farm")
@@ -197,15 +199,15 @@ namespace D_Shyvana
             _config.SubMenu("Farm")
                 .SubMenu("JungleClear")
                 .AddItem(
-                    new MenuItem("ActiveJungle", "JungleClear!").SetValue(new KeyBind("V".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("ActiveJungle", "JungleClear!").SetValue(
+                        new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
             //Smite 
             _config.AddSubMenu(new Menu("Smite", "Smite"));
             _config.SubMenu("Smite")
                 .AddItem(
-                    new MenuItem("Usesmite", "Use Smite(toggle)").SetValue(new KeyBind("H".ToCharArray()[0],
-                        KeyBindType.Toggle)));
+                    new MenuItem("Usesmite", "Use Smite(toggle)").SetValue(
+                        new KeyBind("H".ToCharArray()[0], KeyBindType.Toggle)));
             _config.SubMenu("Smite").AddItem(new MenuItem("Usered", "Smite Red Early ")).SetValue(true);
             _config.SubMenu("Smite")
                 .AddItem(new MenuItem("healthJ", "Smite Red Early if HP% <").SetValue(new Slider(35, 1, 100)));
@@ -217,8 +219,8 @@ namespace D_Shyvana
             _config.SubMenu("Forest Gump").AddItem(new MenuItem("UseRF", "Use R ")).SetValue(true);
             _config.SubMenu("Forest Gump")
                 .AddItem(
-                    new MenuItem("Forest", "Active Forest Gump!").SetValue(new KeyBind("Z".ToCharArray()[0],
-                        KeyBindType.Press)));
+                    new MenuItem("Forest", "Active Forest Gump!").SetValue(
+                        new KeyBind("Z".ToCharArray()[0], KeyBindType.Press)));
 
 
             //Misc
@@ -231,11 +233,13 @@ namespace D_Shyvana
             //Misc
             _config.AddSubMenu(new Menu("HitChance", "HitChance"));
             _config.SubMenu("HitChance")
-                .AddItem(new MenuItem("Echange", "E Hit").SetValue(
-                    new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                .AddItem(
+                    new MenuItem("Echange", "E Hit").SetValue(
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
             _config.SubMenu("HitChance")
-                .AddItem(new MenuItem("Rchange", "R Hit").SetValue(
-                    new StringList(new[] {"Low", "Medium", "High", "Very High"})));
+                .AddItem(
+                    new MenuItem("Rchange", "R Hit").SetValue(
+                        new StringList(new[] { "Low", "Medium", "High", "Very High" })));
 
             //Drawings
             _config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -265,9 +269,9 @@ namespace D_Shyvana
             {
                 Combo();
             }
-            if (!_config.Item("ActiveCombo").GetValue<KeyBind>().Active &&
-                (_config.Item("ActiveHarass").GetValue<KeyBind>().Active ||
-                 _config.Item("harasstoggle").GetValue<KeyBind>().Active))
+            if (!_config.Item("ActiveCombo").GetValue<KeyBind>().Active
+                && (_config.Item("ActiveHarass").GetValue<KeyBind>().Active
+                    || _config.Item("harasstoggle").GetValue<KeyBind>().Active))
             {
                 Harass();
 
@@ -320,27 +324,17 @@ namespace D_Shyvana
         private static float ComboDamage(Obj_AI_Base enemy)
         {
             var damage = 0d;
-            if (_igniteSlot != SpellSlot.Unknown &&
-                _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
-                damage += ObjectManager.Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
-            if (Items.HasItem(3077) && Items.CanUseItem(3077))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Tiamat);
-            if (Items.HasItem(3074) && Items.CanUseItem(3074))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Hydra);
-            if (Items.HasItem(3153) && Items.CanUseItem(3153))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Botrk);
-            if (Items.HasItem(3144) && Items.CanUseItem(3144))
-                damage += _player.GetItemDamage(enemy, Damage.DamageItems.Bilgewater);
-            if (_q.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.Q)*1.2;
-            if (_q.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.W)*3;
-            if (_e.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.E);
-            if (_r.IsReady())
-                damage += _player.GetSpellDamage(enemy, SpellSlot.R);
-            damage += _player.GetAutoAttackDamage(enemy, true)*2;
-            return (float) damage;
+            if (_igniteSlot != SpellSlot.Unknown && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready) damage += ObjectManager.Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
+            if (Items.HasItem(3077) && Items.CanUseItem(3077)) damage += _player.GetItemDamage(enemy, Damage.DamageItems.Tiamat);
+            if (Items.HasItem(3074) && Items.CanUseItem(3074)) damage += _player.GetItemDamage(enemy, Damage.DamageItems.Hydra);
+            if (Items.HasItem(3153) && Items.CanUseItem(3153)) damage += _player.GetItemDamage(enemy, Damage.DamageItems.Botrk);
+            if (Items.HasItem(3144) && Items.CanUseItem(3144)) damage += _player.GetItemDamage(enemy, Damage.DamageItems.Bilgewater);
+            if (_q.IsReady()) damage += _player.GetSpellDamage(enemy, SpellSlot.Q) * 1.2;
+            if (_q.IsReady()) damage += _player.GetSpellDamage(enemy, SpellSlot.W) * 3;
+            if (_e.IsReady()) damage += _player.GetSpellDamage(enemy, SpellSlot.E);
+            if (_r.IsReady()) damage += _player.GetSpellDamage(enemy, SpellSlot.R);
+            damage += _player.GetAutoAttackDamage(enemy, true) * 2;
+            return (float)damage;
         }
 
         private static void Smiteontarget()
@@ -349,8 +343,8 @@ namespace D_Shyvana
             var hero = HeroManager.Enemies.FirstOrDefault(x => x.IsValidTarget(570));
             var smiteDmg = _player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
             var usesmite = _config.Item("smitecombo").GetValue<bool>();
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite &&
-                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" && usesmite
+                && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready)
             {
                 if (!hero.HasBuffOfType(BuffType.Stun) || !hero.HasBuffOfType(BuffType.Slow))
                 {
@@ -361,9 +355,8 @@ namespace D_Shyvana
                     ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
                 }
             }
-            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite &&
-                ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready &&
-                hero.IsValidTarget(570))
+            if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel" && usesmite
+                && ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) == SpellState.Ready && hero.IsValidTarget(570))
             {
                 ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, hero);
             }
@@ -379,8 +372,8 @@ namespace D_Shyvana
 
             var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
             Smiteontarget();
-            if (t != null && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown &&
-                _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+            if (t != null && _config.Item("UseIgnite").GetValue<bool>() && _igniteSlot != SpellSlot.Unknown
+                && _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
             {
                 if (ComboDamage(t) > t.Health)
                 {
@@ -389,37 +382,28 @@ namespace D_Shyvana
             }
             if (useR && _r.IsReady())
             {
-                if (t != null && _r.GetPrediction(t).Hitchance >= Rchange())
-                    if (!t.HasBuff("JudicatorIntervention") && !t.HasBuff("Undying Rage") &&
-                        ComboDamage(t) > t.Health)
-                        _r.CastIfHitchanceEquals(t, HitChance.Medium);
+                if (t != null && _r.GetPrediction(t).Hitchance >= Rchange()) if (!t.HasBuff("JudicatorIntervention") && !t.HasBuff("Undying Rage") && ComboDamage(t) > t.Health) _r.CastIfHitchanceEquals(t, HitChance.Medium);
             }
             if (useW && _w.IsReady())
             {
-                if (t != null && _player.Distance(t) < _e.Range)
-                    _w.Cast();
+                if (t != null && _player.Distance(t) < _e.Range) _w.Cast();
             }
 
             if (useE && _e.IsReady())
             {
 
-                if (t != null && _player.Distance(t) < _e.Range &&
-                    _e.GetPrediction(t).Hitchance >= Echange())
-                    _e.Cast(t);
+                if (t != null && _player.Distance(t) < _e.Range && _e.GetPrediction(t).Hitchance >= Echange()) _e.Cast(t);
             }
 
             if (useQ && _q.IsReady())
             {
-                if (t != null && _player.Distance(t) < _w.Range)
-                    _q.Cast();
+                if (t != null && _player.Distance(t) < _w.Range) _q.Cast();
             }
 
             if (_r.IsReady() && autoR)
             {
-                if (ObjectManager.Get<Obj_AI_Hero>().Count(hero => hero.IsValidTarget(_r.Range)) >=
-                    _config.Item("MinTargets").GetValue<Slider>().Value
-                    && _r.GetPrediction(t).Hitchance >= Rchange())
-                    _r.Cast(t);
+                if (ObjectManager.Get<Obj_AI_Hero>().Count(hero => hero.IsValidTarget(_r.Range))
+                    >= _config.Item("MinTargets").GetValue<Slider>().Value && _r.GetPrediction(t).Hitchance >= Rchange()) _r.Cast(t);
             }
 
             UseItemes();
@@ -435,20 +419,17 @@ namespace D_Shyvana
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                if (t != null && t.Distance(_player.Position) < _w.Range)
-                    _q.Cast();
+                if (t != null && t.Distance(_player.Position) < _w.Range) _q.Cast();
             }
             if (useW && _w.IsReady())
             {
                 var t = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Magical);
-                if (t != null && _player.Distance(t) < _w.Range)
-                    _w.Cast();
+                if (t != null && _player.Distance(t) < _w.Range) _w.Cast();
             }
             if (useE && _e.IsReady())
             {
                 var t = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                if (t != null && _player.Distance(t) < _e.Range && _e.GetPrediction(t).Hitchance >= Echange())
-                    _e.Cast(t);
+                if (t != null && _player.Distance(t) < _e.Range && _e.GetPrediction(t).Hitchance >= Echange()) _e.Cast(t);
             }
             if (useItemsH && _tiamat.IsReady() && target.IsValidTarget(_tiamat.Range))
             {
@@ -463,9 +444,13 @@ namespace D_Shyvana
         private static void Laneclear()
         {
             var allMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _w.Range, MinionTypes.All);
-            var rangedMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _e.Range + _e.Width,
+            var rangedMinionsE = MinionManager.GetMinions(
+                ObjectManager.Player.ServerPosition,
+                _e.Range + _e.Width,
                 MinionTypes.Ranged);
-            var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _e.Range + _e.Width,
+            var allMinionsE = MinionManager.GetMinions(
+                ObjectManager.Player.ServerPosition,
+                _e.Range + _e.Width,
                 MinionTypes.All);
             var useItemsl = _config.Item("UseItemslane").GetValue<bool>();
             var useQl = _config.Item("UseQL").GetValue<bool>();
@@ -485,9 +470,8 @@ namespace D_Shyvana
                 }
                 else
                     foreach (var minion in allMinionsW)
-                        if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W))
-                            _w.Cast();
+                        if (!Orbwalking.InAutoAttackRange(minion)
+                            && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.W)) _w.Cast();
             }
             if (_e.IsReady() && useEl)
             {
@@ -504,9 +488,8 @@ namespace D_Shyvana
                 }
                 else
                     foreach (var minion in allMinionsE)
-                        if (!Orbwalking.InAutoAttackRange(minion) &&
-                            minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.E))
-                            _e.Cast(minion);
+                        if (!Orbwalking.InAutoAttackRange(minion)
+                            && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.E)) _e.Cast(minion);
             }
             foreach (var minion in allMinionsE)
             {
@@ -529,19 +512,19 @@ namespace D_Shyvana
             var useE = _config.Item("UseELH").GetValue<bool>();
             foreach (var minion in allMinions)
             {
-                if (useQ && _q.IsReady() && _player.Distance(minion) < 200 &&
-                    minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.Q))
+                if (useQ && _q.IsReady() && _player.Distance(minion) < 200
+                    && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     _q.Cast();
                 }
 
-                if (_w.IsReady() && useW && _player.Distance(minion) < _w.Range &&
-                    minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.W))
+                if (_w.IsReady() && useW && _player.Distance(minion) < _w.Range
+                    && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.W))
                 {
                     _w.Cast();
                 }
-                if (_e.IsReady() && useE && _player.Distance(minion) < _e.Range &&
-                    minion.Health < 0.75*_player.GetSpellDamage(minion, SpellSlot.E))
+                if (_e.IsReady() && useE && _player.Distance(minion) < _e.Range
+                    && minion.Health < 0.75 * _player.GetSpellDamage(minion, SpellSlot.E))
                 {
                     _e.Cast(minion);
                 }
@@ -550,9 +533,12 @@ namespace D_Shyvana
 
         private static void JungleClear()
         {
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _w.Range,
+            var mobs = MinionManager.GetMinions(
+                _player.ServerPosition,
+                _w.Range,
                 MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                MinionTeam.Neutral,
+                MinionOrderTypes.MaxHealth);
             var useItemsJ = _config.Item("UseItemsjungle").GetValue<bool>();
             var useQ = _config.Item("UseQJ").GetValue<bool>();
             var useW = _config.Item("UseWJ").GetValue<bool>();
@@ -638,9 +624,8 @@ namespace D_Shyvana
                 {
                     var t = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
                     if (t != null)
-                        if (!t.HasBuff("JudicatorIntervention") && !t.HasBuff("Undying Rage") &&
-                            _r.GetDamage(t) > t.Health && _r.GetPrediction(t).Hitchance >= Rchange())
-                            _r.Cast(t);
+                        if (!t.HasBuff("JudicatorIntervention") && !t.HasBuff("Undying Rage")
+                            && _r.GetDamage(t) > t.Health && _r.GetPrediction(t).Hitchance >= Rchange()) _r.Cast(t);
                 }
             }
         }
@@ -650,23 +635,23 @@ namespace D_Shyvana
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsEnemy))
             {
                 var iBilge = _config.Item("Bilge").GetValue<bool>();
-                var iBilgeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BilgeEnemyhp").GetValue<Slider>().Value)/100);
-                var iBilgemyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Bilgemyhp").GetValue<Slider>().Value)/100);
+                var iBilgeEnemyhp = hero.Health
+                                    <= (hero.MaxHealth * (_config.Item("BilgeEnemyhp").GetValue<Slider>().Value) / 100);
+                var iBilgemyhp = _player.Health
+                                 <= (_player.MaxHealth * (_config.Item("Bilgemyhp").GetValue<Slider>().Value) / 100);
                 var iBlade = _config.Item("Blade").GetValue<bool>();
-                var iBladeEnemyhp = hero.Health <=
-                                    (hero.MaxHealth*(_config.Item("BladeEnemyhp").GetValue<Slider>().Value)/100);
-                var iBlademyhp = _player.Health <=
-                                 (_player.MaxHealth*(_config.Item("Blademyhp").GetValue<Slider>().Value)/100);
+                var iBladeEnemyhp = hero.Health
+                                    <= (hero.MaxHealth * (_config.Item("BladeEnemyhp").GetValue<Slider>().Value) / 100);
+                var iBlademyhp = _player.Health
+                                 <= (_player.MaxHealth * (_config.Item("Blademyhp").GetValue<Slider>().Value) / 100);
                 var iOmen = _config.Item("Omen").GetValue<bool>();
                 var iOmenenemys = hero.CountEnemiesInRange(450) >= _config.Item("Omenenemys").GetValue<Slider>().Value;
                 var iTiamat = _config.Item("Tiamat").GetValue<bool>();
                 var iHydra = _config.Item("Hydra").GetValue<bool>();
                 var iRighteous = _config.Item("Righteous").GetValue<bool>();
                 var iRighteousenemys =
-                    hero.CountEnemiesInRange(_config.Item("Righteousenemysrange").GetValue<Slider>().Value) >=
-                    _config.Item("Righteousenemys").GetValue<Slider>().Value;
+                    hero.CountEnemiesInRange(_config.Item("Righteousenemysrange").GetValue<Slider>().Value)
+                    >= _config.Item("Righteousenemys").GetValue<Slider>().Value;
 
 
                 if (hero.IsValidTarget(450) && iBilge && (iBilgeEnemyhp || iBilgemyhp) && _bilge.IsReady())
@@ -693,8 +678,8 @@ namespace D_Shyvana
                 {
                     _rand.Cast();
                 }
-                if (iRighteousenemys && iRighteous && Items.HasItem(3800) && Items.CanUseItem(3800) &&
-                    hero.IsValidTarget(_config.Item("Righteousenemysrange").GetValue<Slider>().Value))
+                if (iRighteousenemys && iRighteous && Items.HasItem(3800) && Items.CanUseItem(3800)
+                    && hero.IsValidTarget(_config.Item("Righteousenemysrange").GetValue<Slider>().Value))
                 {
                     Items.UseItem(3800);
                 }
@@ -704,32 +689,34 @@ namespace D_Shyvana
             {
                 foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsAlly || hero.IsMe))
                 {
-                    if (hero.Health <= (hero.MaxHealth*(_config.Item("lotisminhp").GetValue<Slider>().Value)/100) &&
-                        hero.Distance(_player.ServerPosition) <= _lotis.Range && _lotis.IsReady())
-                        _lotis.Cast();
+                    if (hero.Health <= (hero.MaxHealth * (_config.Item("lotisminhp").GetValue<Slider>().Value) / 100)
+                        && hero.Distance(_player.ServerPosition) <= _lotis.Range && _lotis.IsReady()) _lotis.Cast();
                 }
             }
         }
 
         private static void Usepotion()
         {
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _q.Range,
+            var mobs = MinionManager.GetMinions(
+                _player.ServerPosition,
+                _q.Range,
                 MinionTypes.All,
-                MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                MinionTeam.Neutral,
+                MinionOrderTypes.MaxHealth);
             var iusehppotion = _config.Item("usehppotions").GetValue<bool>();
-            var iusepotionhp = _player.Health <=
-                               (_player.MaxHealth*(_config.Item("usepotionhp").GetValue<Slider>().Value)/100);
+            var iusepotionhp = _player.Health
+                               <= (_player.MaxHealth * (_config.Item("usepotionhp").GetValue<Slider>().Value) / 100);
             if (_player.InFountain() || ObjectManager.Player.HasBuff("Recall")) return;
 
-            if (Utility.CountEnemiesInRange(800) > 0 ||
-                (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite != null))
+            if (Utility.CountEnemiesInRange(800) > 0
+                || (mobs.Count > 0 && _config.Item("ActiveJungle").GetValue<KeyBind>().Active && _smite != null))
             {
-                if (iusepotionhp && iusehppotion &&
-                    !(ObjectManager.Player.HasBuff("RegenerationPotion") ||
-                      ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
-                      || ObjectManager.Player.HasBuff("ItemCrystalFlask") ||
-                      ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
-                      || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
+                if (iusepotionhp && iusehppotion
+                    && !(ObjectManager.Player.HasBuff("RegenerationPotion")
+                         || ObjectManager.Player.HasBuff("ItemMiniRegenPotion")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlask")
+                         || ObjectManager.Player.HasBuff("ItemCrystalFlaskJungle")
+                         || ObjectManager.Player.HasBuff("ItemDarkCrystalFlask")))
                 {
 
                     if (Items.HasItem(2010) && Items.CanUseItem(2010))
@@ -793,17 +780,17 @@ namespace D_Shyvana
         }
 
         public static readonly string[] Smitetype =
-        {
-            "s5_summonersmiteplayerganker", "s5_summonersmiteduel", "s5_summonersmitequick", "itemsmiteaoe",
-            "summonersmite"
-        };
+            {
+                "s5_summonersmiteplayerganker", "s5_summonersmiteduel",
+                "s5_summonersmitequick", "itemsmiteaoe", "summonersmite"
+            };
 
         private static int GetSmiteDmg()
         {
             int level = _player.Level;
-            int index = _player.Level/5;
-            float[] dmgs = {370 + 20*level, 330 + 30*level, 240 + 40*level, 100 + 50*level};
-            return (int) dmgs[index];
+            int index = _player.Level / 5;
+            float[] dmgs = { 370 + 20 * level, 330 + 30 * level, 240 + 40 * level, 100 + 50 * level };
+            return (int)dmgs[index];
         }
 
         //New map Monsters Name By SKO
@@ -812,21 +799,22 @@ namespace D_Shyvana
             var jungle = _config.Item("ActiveJungle").GetValue<KeyBind>().Active;
             if (ObjectManager.Player.Spellbook.CanUseSpell(_smiteSlot) != SpellState.Ready) return;
             var usered = _config.Item("Usered").GetValue<bool>();
-            var health = (100*(_player.Health/_player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
+            var health = (100 * (_player.Health / _player.MaxHealth)) < _config.Item("healthJ").GetValue<Slider>().Value;
             string[] jungleMinions;
             if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline)
             {
-                jungleMinions = new string[] {"TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf"};
+                jungleMinions = new string[] { "TT_Spiderboss", "TT_NWraith", "TT_NGolem", "TT_NWolf" };
             }
             else
             {
                 jungleMinions = new string[]
-                {
-                    "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_RiftHerald", "SRU_Red", "SRU_Krug",
-                    "SRU_Dragon",
-                    "SRU_Baron"
-                };
+                                    {
+                                        "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_RiftHerald",
+                                        "SRU_Red", "SRU_Krug", "SRU_Dragon_Air", "SRU_Dragon_Water", "SRU_Dragon_Fire",
+                                        "SRU_Dragon_Elder", "SRU_Baron"
+                                    };
             }
+
             var minions = MinionManager.GetMinions(_player.Position, 1000, MinionTypes.All, MinionTeam.Neutral);
             if (minions.Count() > 0)
             {
@@ -834,20 +822,19 @@ namespace D_Shyvana
 
                 foreach (Obj_AI_Base minion in minions)
                 {
-                    if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline &&
-                        minion.Health <= smiteDmg &&
-                        jungleMinions.Any(name => minion.Name.Substring(0, minion.Name.Length - 5).Equals(name)))
+                    if (Utility.Map.GetMap().Type == Utility.Map.MapType.TwistedTreeline && minion.Health <= smiteDmg
+                        && jungleMinions.Any(name => minion.Name.Substring(0, minion.Name.Length - 5).Equals(name)))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
-                    if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name)) &&
-                        !jungleMinions.Any(name => minion.Name.Contains("Mini")))
+                    if (minion.Health <= smiteDmg && jungleMinions.Any(name => minion.Name.StartsWith(name))
+                        && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
-                    else if (jungle && usered && health && minion.Health >= smiteDmg &&
-                             jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red")) &&
-                             !jungleMinions.Any(name => minion.Name.Contains("Mini")))
+                    else if (jungle && usered && health && minion.Health >= smiteDmg
+                             && jungleMinions.Any(name => minion.Name.StartsWith("SRU_Red"))
+                             && !jungleMinions.Any(name => minion.Name.Contains("Mini")))
                     {
                         ObjectManager.Player.Spellbook.CastSpell(_smiteSlot, minion);
                     }
@@ -863,34 +850,52 @@ namespace D_Shyvana
             {
                 if (harass)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.92f,
+                        System.Drawing.Color.GreenYellow,
                         "Auto harass Enabled");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.92f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.92f,
+                        System.Drawing.Color.OrangeRed,
                         "Auto harass Disabled");
             }
             if (_config.Item("Drawsmite").GetValue<bool>() && _smite != null)
             {
                 if (_config.Item("Usesmite").GetValue<KeyBind>().Active)
                 {
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.GreenYellow,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.GreenYellow,
                         "Smite Jungle On");
                 }
                 else
-                    Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.88f, System.Drawing.Color.OrangeRed,
+                    Drawing.DrawText(
+                        Drawing.Width * 0.02f,
+                        Drawing.Height * 0.88f,
+                        System.Drawing.Color.OrangeRed,
                         "Smite Jungle Off");
 
-                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker" ||
-                    _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
+                if (_player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteplayerganker"
+                    || _player.GetSpell(_smiteSlot).Name.ToLower() == "s5_summonersmiteduel")
                 {
                     if (_config.Item("smitecombo").GetValue<bool>())
                     {
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.GreenYellow,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.GreenYellow,
                             "Smite Target On");
                     }
                     else
-                        Drawing.DrawText(Drawing.Width*0.02f, Drawing.Height*0.90f, System.Drawing.Color.OrangeRed,
+                        Drawing.DrawText(
+                            Drawing.Width * 0.02f,
+                            Drawing.Height * 0.90f,
+                            System.Drawing.Color.OrangeRed,
                             "Smite Target Off");
                 }
             }
