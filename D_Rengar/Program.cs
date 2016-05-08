@@ -291,6 +291,7 @@ namespace D_Rengar
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Orbwalking.AfterAttack += OnAfterAttack;
             Orbwalking.BeforeAttack += OnBeforeAttack;
+            CustomEvents.Unit.OnDash += Dash;
             Game.PrintChat(
                 "<font color='#f2f21d'>Do you like it???  </font> <font color='#ff1900'>Drop 1 Upvote in Database </font>");
             Game.PrintChat(
@@ -344,6 +345,78 @@ namespace D_Rengar
 
             KillSteal();
             ChangeComboMode();
+        }
+
+        public static void Dash(Obj_AI_Base sender, Dash.DashItem args)
+        {
+            var useQ = _config.Item("UseQC").GetValue<bool>();
+            var useW = _config.Item("UseWC").GetValue<bool>();
+            var useE = _config.Item("UseEC").GetValue<bool>();
+            var useEE = _config.Item("UseEEC").GetValue<bool>();
+            var iYoumuu = _config.Item("Youmuu").GetValue<bool>();
+            var iTiamat = _config.Item("Tiamat").GetValue<bool>();
+            var iHydra = _config.Item("Hydra").GetValue<bool>();
+            if (!sender.IsMe) return;
+            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+            {
+                if (_player.Mana <= 4)
+                {
+                    if (useQ)
+                    {
+                        var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+                        if (tq.IsValidTarget(_q.Range) && _q.IsReady()) _q.Cast();
+                    }
+
+                    var th = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
+
+                    if (iTiamat && _tiamat.IsReady() && th.IsValidTarget(_tiamat.Range))
+                    {
+                        _tiamat.Cast();
+                    }
+
+                    if (iHydra && _hydra.IsReady() && th.IsValidTarget(_hydra.Range))
+                    {
+                        _hydra.Cast();
+                    }
+
+
+                    if (useE)
+                    {
+                        var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
+                        var predE = _e.GetPrediction(te);
+                        if (te.IsValidTarget(_e.Range) && _e.IsReady()
+                            && predE.Hitchance >= Echange() && predE.CollisionObjects.Count == 0) _e.Cast(te);
+                    }
+                }
+
+                if (_player.Mana == 5)
+                {
+                    var tq = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+                    if (useQ
+                        && (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 0
+                            || (_config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2
+                              && Orbwalking.InAutoAttackRange(tq)))) if (tq.IsValidTarget(_q.Range) && _q.IsReady()) _q.Cast();
+                    var th = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
+
+                    if (iTiamat && _tiamat.IsReady() && th.IsValidTarget(_tiamat.Range))
+                    {
+                        _tiamat.Cast();
+                    }
+
+                    if (iHydra && _hydra.IsReady() && th.IsValidTarget(_hydra.Range))
+                    {
+                        _hydra.Cast();
+                    }
+
+                    if (useE && _config.Item("ComboPrio").GetValue<StringList>().SelectedIndex == 2)
+                    {
+                        var te = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Physical);
+                        var predE = _e.GetPrediction(te);
+                        if (te.IsValidTarget(_e.Range) && _e.IsReady() && predE.Hitchance >= Echange()
+                            && predE.CollisionObjects.Count == 0) _e.Cast(te);
+                    }
+                }
+            }
         }
 
         private static void OnAfterAttack(AttackableUnit unit, AttackableUnit target)
@@ -1005,7 +1078,8 @@ namespace D_Rengar
 
         private static void JungleClear()
         {
-          var mob = MinionManager.GetMinions(
+            var mob =
+                MinionManager.GetMinions(
                     _player.ServerPosition,
                     _e.Range,
                     MinionTypes.All,
@@ -1020,7 +1094,7 @@ namespace D_Rengar
             {
                 return;
             }
-            
+
             if (_player.Mana <= 4)
             {
                 if (useQ && _q.IsReady() && mob.IsValidTarget(_q.Range))
@@ -1028,8 +1102,7 @@ namespace D_Rengar
                     _q.Cast();
                 }
 
-                if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range - 100)
-                    && !_player.HasBuff("rengarpassivebuff"))
+                if (_w.IsReady() && useW && mob.IsValidTarget(_w.Range - 100) && !_player.HasBuff("rengarpassivebuff"))
                 {
                     _w.Cast();
                 }

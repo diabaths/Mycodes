@@ -1,12 +1,12 @@
 ﻿#region
+
 using System;
-using LeagueSharp;
 using System.Linq;
+
+using LeagueSharp;
 using LeagueSharp.Common;
 
 #endregion
-
-// Server Potition Fixed
 
 namespace D_Graves
 {
@@ -429,17 +429,7 @@ namespace D_Graves
 
         private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (_w.IsReady() && gapcloser.Sender.IsValidTarget(_w.Range) && _config.Item("Gap_W").GetValue<bool>())
-                if (gapcloser.Sender.IsMelee())
-                {
-                    //  Game.PrintChat("melee");
-                    _w.Cast(_player);
-                }
-                else
-                {
-                    //  Game.PrintChat("normal");
-                    _w.Cast(gapcloser.Sender);
-                }
+            if (_w.IsReady() && gapcloser.Sender.IsValidTarget(_w.Range) && _config.Item("Gap_W").GetValue<bool>()) _w.Cast(gapcloser.Sender.IsMelee() ? _player : gapcloser.Sender);
 
             if (_e.IsReady() && gapcloser.Sender.Distance(_player.ServerPosition) <= 200
                 && _config.Item("Gap_E").GetValue<bool>())
