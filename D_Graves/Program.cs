@@ -599,7 +599,7 @@ namespace D_Graves
             if (useQ && _q.IsReady())
             {
                 var t = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget(_q.Range)) _q.CastIfHitchanceEquals(t, HitChance.High, true);
+                if (t.IsValidTarget(_q.Range-70)) _q.CastIfHitchanceEquals(t, HitChance.High, true);
             }
 
             if (useW && _w.IsReady())
