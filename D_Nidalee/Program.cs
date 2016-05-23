@@ -951,20 +951,19 @@ namespace D_Nidalee
                 var Minion = allMinions[0];
                 if (IsCougar)
                 {
-                    if (QC.IsReady() && Cougarq && Player.Distance(Minion) < QC.Range)
+                    if (QC.IsReady() && Cougarq && Minion.IsValidTarget(QC.Range))
                     {
                         QC.Cast();
                     }
 
-                    if (EC.IsReady() && Cougare && Player.Distance(Minion) < EC.Range)
+                    if (EC.IsReady() && Cougare && Minion.IsValidTarget(EC.Range))
                     {
                         EC.Cast(Minion.ServerPosition);
                     }
 
                     foreach (var Minio in allMinions)
                     {
-                        WC.Range = Minion.HasBuff("nidaleepassivehunted") ? 730 : 375;
-                        if (WC.IsReady() && Cougarw && Player.Distance(Minion) > 200f)
+                        if (WC.IsReady() && Cougarw && Player.Distance(Minion) > 200f && Minion.IsValidTarget(WC.Range))
                         {
                             WC.Cast(Minio.ServerPosition);
                         }
@@ -990,7 +989,7 @@ namespace D_Nidalee
                         if (prediction.Hitchance >= HitChance.Medium) W.Cast(Minion.ServerPosition);
                     }
 
-                    if (Config.Item("farm_R").GetValue<KeyBind>().Active && !Q.IsReady() || !lanemana || !Humanq)
+                    if (Config.Item("farm_R").GetValue<KeyBind>().Active && (!Q.IsReady() || !lanemana || !Humanq))
                     {
                         if (R.IsReady())
                         {
@@ -1131,7 +1130,7 @@ namespace D_Nidalee
                 if (E.IsReady() &&
                     hero.Health / hero.MaxHealth * 100 <= Config.Item("AllyHPercent").GetValue<Slider>().Value &&
                     Utility.CountEnemiesInRange(1200) > 0 &&
-                    hero.Distance(Player.ServerPosition) <= E.Range)
+                    hero.IsValidTarget(E.Range))
                 {
                     if (IsHuman && mana)
                     {

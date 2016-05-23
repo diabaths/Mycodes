@@ -164,7 +164,7 @@ namespace hi_im_gosu
             buffs = new[]
                         {
                             BuffType.Blind, BuffType.Charm, BuffType.CombatDehancer, BuffType.Fear, BuffType.Flee,
-                            BuffType.Knockback, BuffType.Knockup, BuffType.Polymorph, BuffType.Silence, BuffType.Sleep,
+                            BuffType.Knockback, BuffType.Knockup, BuffType.Polymorph, BuffType.Silence,
                             BuffType.Snare, BuffType.Stun, BuffType.Suppression, BuffType.Taunt
                         };
 
