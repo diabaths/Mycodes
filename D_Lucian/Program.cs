@@ -39,9 +39,9 @@ namespace D_Lucian
             if (_player.ChampionName != ChampionName) return;
 
             _q = new Spell(SpellSlot.Q, 675);
-            _q1 = new Spell(SpellSlot.Q, 1200);
-            _w = new Spell(SpellSlot.W, 1000, TargetSelector.DamageType.Magical);
-            _w2 = new Spell(SpellSlot.W, 1000, TargetSelector.DamageType.Magical);
+            _q1 = new Spell(SpellSlot.Q, 900);
+            _w = new Spell(SpellSlot.W, 900, TargetSelector.DamageType.Magical);
+            _w2 = new Spell(SpellSlot.W, 900, TargetSelector.DamageType.Magical);
             _e = new Spell(SpellSlot.E, 475f);
             _r = new Spell(SpellSlot.R, 1200);
 
